@@ -32,7 +32,7 @@ let currentTokenPromise: Promise<string> | undefined
 // Module variable to hold the latest axios instance created.
 let authorizedAxios: AxiosInstance | undefined
 
-const magicConfig = config.magic
+const clientPortalConfig = config.client_portal
 
 async function getToken(): Promise<string> {
 	// If we already have the token then just return it.
@@ -55,10 +55,10 @@ async function getToken(): Promise<string> {
 
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
-	const credentials = `Basic ${Buffer.from(`${magicConfig.user}:${magicConfig.password}`).toString('base64')}`
+	const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
 	const response = await axios.request<MagicAuthResponse>({
 		method: 'POST',
-		baseURL: magicConfig.url,
+		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
 		headers: {
 			Authorization: credentials,
@@ -100,7 +100,7 @@ const getAuthorizedAxios = async () => {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
-		baseURL: `${magicConfig.url}/hercules`, // all api calls use hercules endpoint
+		baseURL: `${clientPortalConfig.url}/hercules`, // all api calls use hercules endpoint
 	})
 
 	// TODO Should we include an interceptor that catches 403 errors

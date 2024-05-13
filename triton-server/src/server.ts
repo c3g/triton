@@ -40,7 +40,7 @@ declare module 'express-session' {
 
 // Cross-site origins allowed by server
 const CLIENT_ORIGIN = new URL(config.client.url).origin
-const MAGIC_ORIGIN = new URL(config.magic.loginUrl).origin
+const CLIENT_PORTAL_ORIGIN = new URL(config.client_portal.loginUrl).origin
 
 /*
  * Setup
@@ -54,7 +54,7 @@ const app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
-const ORIGINS = [SELF, CLIENT_ORIGIN, MAGIC_ORIGIN] as const
+const ORIGINS = [SELF, CLIENT_ORIGIN, CLIENT_PORTAL_ORIGIN] as const
 
 app.use(compression())
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))

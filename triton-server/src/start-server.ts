@@ -4,6 +4,8 @@
 /**
  * Module dependencies.
  */
+
+import 'dotenv/config'
 import * as http from 'http'
 import { Express } from 'express'
 import server from '../src/server'
