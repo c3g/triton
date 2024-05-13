@@ -1,6 +1,6 @@
-import { Button, Checkbox, Space, Spin, Typography } from 'antd'
+import { Button, Checkbox, Divider, Space, Spin, Tag, Typography } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
-import { DownloadRequest, DownloadRequestStatus, DownloadRequestType } from '../api/api-types'
+import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
@@ -40,6 +40,17 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		}
 	}, [dataset, datasetID, dispatch])
 
+	const requestDetails = useMemo(() => {
+		return dataset?.requests.map((downloadRequest) => {
+			const { id, type, status, expiry_date } = downloadRequest
+			return <Tag key={id} style={{ height: '2rem', lineHeight: '2rem' }}>
+				{type}
+				<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
+				{status === 'SUCCESS' ? expiry_date ?? '?' : status}
+			</Tag>
+		})
+	}, [dataset?.requests])
+
 	return dataset ? (<div
 		style={{
 			backgroundColor: 'white',
@@ -60,7 +71,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			<Space>
 				{
 					// middle
-					dataset.requests.map((r) => <DownloadRequestDetail downloadRequest={r} />)
+					requestDetails
 				}
 			</Space>
 			<Space>
@@ -70,8 +81,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				<div>
 					{!totalSize ? <Spin /> : <DataSize size={totalSize} />}
 				</div>
-				<Button onClick={() => request('SFTP')} disabled={!totalSize && alreadyRequested}>SFTP</Button>
-				<Button onClick={() => request('GLOBUS')} disabled={!totalSize && alreadyRequested}>GLOBUS</Button>
+				<Button onClick={() => request('SFTP')} disabled={!totalSize || alreadyRequested}>SFTP</Button>
+				<Button onClick={() => request('GLOBUS')} disabled={!totalSize || alreadyRequested}>GLOBUS</Button>
 			</Space>
 		</div>
 	</div>
@@ -92,34 +103,4 @@ function DataSize({ size }: SizeProps) {
 			{(size / magnitude).toFixed(2)} {unit}
 		</>
 	)
-}
-
-interface DownloadRequestDetailProps {
-	downloadRequest: DownloadRequest
-}
-
-function DownloadRequestDetail({ downloadRequest }: DownloadRequestDetailProps) {
-	const { type, status, expiry_date } = downloadRequest
-	switch (status as DownloadRequestStatus) {
-		case 'REQUESTED': {
-			return <>REQUESTED</>
-		}
-		case 'PENDING': {
-			return <>PENDING</>
-		}
-		case 'FAILED': {
-			return <>FAILED</>
-		}
-		case 'QUEUED': {
-			return <>QUEUED</>
-		}
-		case 'SUCCESS': {
-			return (
-				<Space direction='vertical'>
-					<Text>{type}</Text>
-					<Text>{`Data available until ${expiry_date ? expiry_date : '?'}`}</Text>
-				</Space>
-			)
-		}
-	}
 }
