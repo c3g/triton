@@ -1,0 +1,89 @@
+swagger: "2.0"
+info:
+  title: ORDS generated API for medicine.genome.hercules
+  version: 1.0.0
+host: medbeta.medicine.mcgill.ca
+basePath: /ords-dev/api/hercules
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /internalUsers/:
+    get:
+      description: Retrieves all the internal users.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}
+  /projectUsers/:
+    get:
+      description: Retrieves all the users within a project.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}
+      parameters:
+        - name: projectId
+          in: header
+          type: string
+          required: true
+  /userAuthenticated/:
+    get:
+      description: Retrieves if user is authenticated or not.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}
+      parameters:
+        - name: userID
+          in: header
+          type: string
+          required: true
+        - name: userToken
+          in: header
+          type: string
+          required: true
+  /userDetails/:
+    get:
+      description: Retrieves basic details about a given user.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}
+      parameters:
+        - name: userID
+          in: header
+          type: string
+          required: true
+  /userProjects/:
+    get:
+      description: Retrieves list of projects within a project.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}
+      parameters:
+        - name: userID
+          in: header
+          type: string
+          required: true
+  /version/:
+    get:
+      description: Retrieves the API version, used as a basic test.
+      responses:
+        "200":
+          description: The queried record.
+          schema:
+            type: object
+            properties: {}

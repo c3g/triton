@@ -1,0 +1,6 @@
+*.js
+config.ts
+
+node_modules/
+
+

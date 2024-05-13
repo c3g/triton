@@ -1,0 +1,17 @@
+{
+	"extends": ["react-app"],
+	"rules": {
+		// no semicolons
+		"semi": [1, "never"],
+		"import/no-anonymous-default-export": "off"
+	},
+	"overrides": [
+		{
+			// Overrides are for typescrpt
+			"files": ["**/*.ts?(x)"],
+			"rules": {
+				"semi": [1, "never"]
+			}
+		}
+	]
+}

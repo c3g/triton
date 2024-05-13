@@ -1,0 +1,18 @@
+{
+  "editor.formatOnSave": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": false,
+  "eslint.onIgnoredFiles": "off",
+  "eslint.validate": ["typescript", "javascript"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.format.enable": true,
+  "javascript.format.enable": true,
+  "prettier.enableDebugLogs": true,
+  "sequencediagrams.diagram.style": "simple"
+}

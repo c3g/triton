@@ -1,0 +1,8 @@
+title: Data Initialization
+
+participant Triton Client as TC
+participant Triton Server as TS
+participant Hercules Server as HS
+
+
+TC -> TS: get projects

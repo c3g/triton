@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"composite": true,
+		"rootDir": "src",
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"declarationDir": "./models",
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"module": "esnext",
+		"moduleResolution": "node"
+	},
+	"include": ["src"]
+}

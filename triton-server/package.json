@@ -1,0 +1,81 @@
+{
+	"name": "triton-server",
+	"version": "0.0.0",
+	"description": "Triton data delivery backend",
+	"main": "src/start-server.ts",
+	"scripts": {
+		"test": "jest",
+		"start": "NODE_ENV=development npx nodemon src/start-server.ts",
+		"debug": "NODE_ENV=development DEBUG=express-session npx nodemon src/start-server.ts"
+	},
+	"nodemonConfig": {
+		"ext": "*.ts",
+		"watch": [
+			"config.ts",
+			"jest.config.ts",
+			"package-lock.json",
+			"src",
+			"tsconfig.json",
+			"../triton-types/models"
+		],
+		"verbose": false
+	},
+	"author": "",
+	"license": "LGPLv3",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/c3g/triton.git"
+	},
+	"homepage": "https://github.com/c3g/triton#readme",
+	"bugs": {
+		"url": "https://github.com/c3g/triton/issues"
+	},
+	"dependencies": {
+		"axios": "^0.27.2",
+		"better-sqlite3": "^8.5.2",
+		"compression": "^1.7.4",
+		"connect-flash": "^0.1.1",
+		"connect-sqlite3": "^0.9.13",
+		"cookie-parser": "^1.4.6",
+		"date-fns": "2.29.2",
+		"express": "^4.18.1",
+		"express-async-handler": "^1.2.0",
+		"express-csp-header": "^5.1.0",
+		"express-session": "^1.17.3",
+		"express-session-sqlite": "2.1.1",
+		"helmet": "^5.1.1",
+		"kysely": "^0.26.3",
+		"jwt-decode": "^3.1.2",
+		"memorystore": "^1.6.7",
+		"pino": "^8.14.1",
+		"serve-favicon": "^2.5.0",
+		"sqlite3": "5.0.11"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.4",
+		"@types/compression": "^1.7.2",
+		"@types/connect-flash": "^0.0.37",
+		"@types/connect-sqlite3": "^0.9.1",
+		"@types/cookie-parser": "^1.4.3",
+		"@types/express": "^4.17.13",
+		"@types/express-session": "^1.17.5",
+		"@types/jest": "^28.1.8",
+		"@types/node": "^18.7.11",
+		"@types/serve-favicon": "^2.5.3",
+		"@types/sqlite3": "^3.1.8",
+		"@typescript-eslint/eslint-plugin": "^5.34.0",
+		"eslint": "^8.22.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-config-standard-with-typescript": "^22.0.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-n": "^15.2.5",
+		"eslint-plugin-promise": "^6.0.0",
+		"jest": "^28.1.3",
+		"nodemon": "^3.0.1",
+		"pino-pretty": "^10.0.1",
+		"prettier": "2.7.1",
+		"ts-jest": "^28.0.8",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.7.4"
+	}
+}

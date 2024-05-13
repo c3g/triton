@@ -1,0 +1,30 @@
+title: Hercules Data Portal Login Sequence
+
+participant User as U
+participant Hercules Client as HC
+participant Hercules Server as HS
+participant Triton Server as TS
+participant Triton Client as TC
+
+U -> HC: Clicks Data Portal button
+Note right of HC: Hercules passes user id \n and token in URL to Triton
+HC -> TS: Redirects to Triton magic-callback endpoint
+Note right of TS: Creates session and stores \n userID and token
+TS -> TS: Create session
+Note right of TS: Triton Server \n redirects to client "/"
+TS -> TC: Redirect to "/"
+Note left of TC: Client asks server \n if logged in
+TC -> TS: isLoggedIn
+Note right of TS: Server gets userID \n and token from session
+TS -> TS: Get login from session
+Note left of TS: Triton asks Hercules server \n for login and user details
+TS -> HS: getUserDetails
+HS -> TS: user details
+Note right of TS: Server replies with user info
+TS -> TC: user login info
+TC -> TC: Client stores user details and login state
+Note left of TC: Client initializes user data
+TC -> TS: Load user data
+
+
+
