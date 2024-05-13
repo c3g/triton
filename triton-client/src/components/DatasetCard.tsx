@@ -40,16 +40,32 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		}
 	}, [dataset, datasetID, dispatch])
 
+	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
+		(requestByType, request) => {
+			requestByType[request.type] = request
+			return requestByType
+		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
+	[dataset?.requests])
+	const supportedDownloadType: DownloadRequestType[] = useMemo(() => ['SFTP', 'GLOBUS'], [])
 	const requestDetails = useMemo(() => {
-		return dataset?.requests.map((downloadRequest) => {
-			const { id, type, status, expiry_date } = downloadRequest
-			return <Button key={id} style={{ paddingLeft: '4', paddingRight: '4' }}>
-				{type}
-				<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
-				{status === 'SUCCESS' ? expiry_date ?? '?' : status}
-			</Button>
+		return supportedDownloadType.map((type) => {
+			const req = requestByType[type]
+			if (req) {
+				const { type, status, expiry_date } = req
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }}>
+					{type}
+					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
+					{status === 'SUCCESS' ? expiry_date ?? '?' : status}
+				</Button>
+			} else {
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested} onClick={() => request(type)}>
+					{type}
+					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
+					AVAILABLE
+				</Button>
+			}
 		})
-	}, [dataset?.requests])
+	}, [alreadyRequested, request, requestByType, supportedDownloadType, totalSize])
 
 	return dataset ? (<div
 		style={{
@@ -65,7 +81,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				{
 					// left
 				}
-				<Checkbox disabled={false} />
 				<Text strong>Lane {dataset.lane}</Text>
 			</Space>
 			<Space>
@@ -81,8 +96,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				<div>
 					{!totalSize ? <Spin /> : <DataSize size={totalSize} />}
 				</div>
-				<Button onClick={() => request('SFTP')} disabled={!totalSize || alreadyRequested}>SFTP</Button>
-				<Button onClick={() => request('GLOBUS')} disabled={!totalSize || alreadyRequested}>GLOBUS</Button>
 			</Space>
 		</div>
 	</div>
