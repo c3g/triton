@@ -43,11 +43,11 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const requestDetails = useMemo(() => {
 		return dataset?.requests.map((downloadRequest) => {
 			const { id, type, status, expiry_date } = downloadRequest
-			return <Tag key={id} style={{ height: '2rem', lineHeight: '2rem' }}>
+			return <Button key={id} style={{ paddingLeft: '4', paddingRight: '4' }}>
 				{type}
 				<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
 				{status === 'SUCCESS' ? expiry_date ?? '?' : status}
-			</Tag>
+			</Button>
 		})
 	}, [dataset?.requests])
 
