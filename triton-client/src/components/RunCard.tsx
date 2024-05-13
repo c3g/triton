@@ -32,8 +32,6 @@ export function RunCard({ run }: RunCardProps) {
 		}
 		return date
 	}, undefined)
-	const releasedSampleCount = run.availableReadsetsCount
-	const totalSampleCount = run.readsetCount
 	const downloadsReady = datasets.length
 
 	return (
@@ -51,7 +49,6 @@ export function RunCard({ run }: RunCardProps) {
 					</Space>
 					<Space>
 						<Text strong>{`${downloadsReady} Datasets Available`}</Text>
-						<Text>{`(${releasedSampleCount}/${totalSampleCount} Samples)`}</Text>
 					</Space>
 				</Space>
 			</div>
