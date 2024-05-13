@@ -19,6 +19,7 @@ import MagicAuthMiddleware from './magic/magic_middleware'
 import download from './download/routes'
 import * as sqlite3 from 'sqlite3'
 import sqliteStoreFactory from 'express-session-sqlite'
+import cors from 'cors'
 import contactService from './contact-service'
 const SQLiteStore = sqliteStoreFactory(session)
 
@@ -53,6 +54,8 @@ const app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
+const ORIGINS = [SELF, CLIENT_ORIGIN, MAGIC_ORIGIN] as const
+
 app.use(compression())
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(httpLogger)
@@ -60,12 +63,13 @@ app.use(helmet())
 app.use(
 	expressCspHeader({
 		directives: {
-			'default-src': [SELF, 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', CLIENT_ORIGIN, MAGIC_ORIGIN],
-			'connect-src': [SELF, CLIENT_ORIGIN, MAGIC_ORIGIN],
-			'navigate-to': [SELF, CLIENT_ORIGIN, MAGIC_ORIGIN],
+			'default-src': [...ORIGINS, 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+			'connect-src': [...ORIGINS],
+			'navigate-to': [...ORIGINS],
 		},
 	})
 )
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
@@ -80,7 +84,7 @@ app.use(
 			ttl: 30 /* minutes */ * 60 * 1000,
 		}),
 		cookie: { maxAge: 30 /* minutes */ * 60 * 1000 },
-		secret: 'ommanipadmehum',
+		secret: 'ommanipadmehum', // TODO: set through config.ts?
 		resave: true,
 		saveUninitialized: true,
 	})
@@ -95,6 +99,10 @@ app.use(function (req, res, next) {
 	res.setHeader('Access-Control-Allow-Credentials', 'true')
 	next()
 })
+
+app.use(cors({
+	origin: [...ORIGINS],
+}))
 
 // ===============triton client==================//
 // Set up the server to server triton-client
