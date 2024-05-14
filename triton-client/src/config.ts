@@ -47,4 +47,5 @@ function getConfig() {
 
 // Export the config that matches the current build environment.
 const CONFIG = getConfig()
+console.info(`CONFIG: ${JSON.stringify(CONFIG)}`)
 export default CONFIG
