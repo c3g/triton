@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 /**
  * CONFIG
  *
@@ -30,13 +32,13 @@ const debugConfig: ClientConfig = {
 
 // Configruation for the PROD environment
 const prodConfig: ClientConfig = {
-	apiBaseUrl: new URL('http://localhost:3001/api/'), // TODO: Set the real url once prod is set up
+	apiBaseUrl: new URL(`${process.env.SERVER_ORIGIN}/api/` ?? 'http://localhost:3001/api/'), // TODO: Set the real url once prod is set up
 }
 
 // Get the config that matches the environment
 function getConfig() {
 	switch (
-		process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
+	process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
 	) {
 		case 'development':
 			return debugConfig
