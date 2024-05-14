@@ -39,9 +39,9 @@ import { clearTimeout } from 'timers'
 export type Response<T> = AxiosResponse<T, { detail: string }>
 
 // Freezeman api configuration fields.
-const FREEZEMAN_API_URL = config.freezeman.url
-const FREEZEMAN_USERNAME = config.freezeman.username
-const FREEZEMAN_PASSWORD = config.freezeman.password
+const LIMS_API_URL = config.lims.url
+const LIMS_USERNAME = config.lims.username
+const LIMS_PASSWORD = config.lims.password
 
 // The freezeman auth tokens data structure.
 interface FreezemanAuthTokens {
@@ -226,7 +226,7 @@ class FreezemanAPIAuthorization {
 	 * If an error occurs, set up a timer to retry the log in after N seconds.
 	 */
 	#fetchInitialToken() {
-		fetchToken(FREEZEMAN_USERNAME, FREEZEMAN_PASSWORD)
+		fetchToken(LIMS_USERNAME, LIMS_PASSWORD)
 			.then((auth) => {
 				// Ignore result if the auth was aborted while waiting for the response.
 				if (this.state !== AuthLoopState.ABORT) {
@@ -347,8 +347,8 @@ class FreezemanAPIAuthorization {
  * @param password
  * @returns FreezemanAuthTokens
  */
-export async function fetchToken(username: string = FREEZEMAN_USERNAME, password: string = FREEZEMAN_PASSWORD): Promise<FreezemanAuthTokens> {
-	const response = await Axios.post(`${FREEZEMAN_API_URL}/token/`, {
+export async function fetchToken(username: string | undefined = LIMS_USERNAME, password: string | undefined = LIMS_PASSWORD): Promise<FreezemanAuthTokens> {
+	const response = await Axios.post(`${LIMS_API_URL}/token/`, {
 		username,
 		password,
 	})
@@ -367,7 +367,7 @@ export async function fetchToken(username: string = FREEZEMAN_USERNAME, password
  * @returns FreezemanAuthTokens
  */
 async function refreshToken(refreshToken: string): Promise<FreezemanAuthTokens> {
-	const response = await Axios.post(`${FREEZEMAN_API_URL}/token/refresh/`, { refresh: refreshToken })
+	const response = await Axios.post(`${LIMS_API_URL}/token/refresh/`, { refresh: refreshToken })
 	if (response.status === 200) {
 		return response.data
 	} else {

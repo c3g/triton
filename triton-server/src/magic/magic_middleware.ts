@@ -76,11 +76,11 @@ const magicAuthMiddleware = asyncHandler(async (req: Express.Request, res: Expre
 		// that error and handle the redirect itself. The server includes the Hercules login link
 		// as part of the 401 error.
 
-		// res.redirect(302, config.magic.loginUrl)
+		// res.redirect(302, config.client_portal.loginUrl)
 
 		// Respond with a 401 error and include the hercules login page url, which the client
 		// will use to "redirect" to the login page.
-		res.status(401).json({ url: config.magic.loginUrl })
+		res.status(401).json({ url: config.client_portal.loginUrl })
 	}
 })
 

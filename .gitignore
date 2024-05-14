@@ -23,6 +23,9 @@ auto-save-list
 tramp
 .\#*
 
+# Env file
+*.env
+
 # Org-mode
 .org-id-locations
 *_archive
