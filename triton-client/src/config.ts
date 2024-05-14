@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 /**
  * CONFIG
  *
@@ -32,7 +30,7 @@ const debugConfig: ClientConfig = {
 
 // Configruation for the PROD environment
 const prodConfig: ClientConfig = {
-	apiBaseUrl: new URL(`${process.env.SERVER_ORIGIN}/api/` ?? 'http://localhost:3001/api/'), // TODO: Set the real url once prod is set up
+	apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}/api/` ?? 'http://localhost:3001/api/'), // TODO: Set the real url once prod is set up
 }
 
 // Get the config that matches the environment
