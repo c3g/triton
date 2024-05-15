@@ -2,25 +2,22 @@ import path from 'path'
 import 'dotenv/config'
 
 const {
-	API_URL = 'http://localhost:3001',
+	API_URL,
 	LOGGER_LEVEL = 'info',
-	CLIENT_ORIGIN = 'http://localhost:3000',
-	CLIENT_PORTAL_ORIGIN = 'http://localhost:1234',
-	CLIENT_PORTAL_USERNAME = '',
-	CLIENT_PORTAL_PASSWORD = '',
-	LIMS_API_URL = 'http://127.0.0.1:8000/api',
-	LIMS_USERNAME = '',
-	LIMS_PASSWORD = '',
-	SFTP_SERVER = '0.0.0.0',
-	SFTP_PORT = '21',
-	ERROR_MONITORING_EMAIL = 'user@domain.com'
+	CLIENT_ORIGIN,
+	CLIENT_PORTAL_ORIGIN,
+	CLIENT_PORTAL_USERNAME,
+	CLIENT_PORTAL_PASSWORD,
+	LIMS_API_URL,
+	LIMS_USERNAME,
+	LIMS_PASSWORD,
+	SFTP_SERVER,
+	SFTP_PORT,
+	ERROR_MONITORING_EMAIL,
 } = process.env
 
 if (API_URL === undefined) {
 	throw new Error('Must define API_URL environment variable')
-}
-if (LOGGER_LEVEL === undefined) {
-	throw new Error('Must define LOGGER_LEVEL environment variable')
 }
 if (CLIENT_ORIGIN === undefined) {
 	throw new Error('Must define CLIENT_ORIGIN environment variable')
