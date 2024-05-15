@@ -8,6 +8,7 @@ import path from 'path'
 import 'dotenv/config'
 
 export const {
+	LOGGER_LEVEL = 'info',
 	CLIENT_ORIGIN = 'http://localhost:3000',
 	CLIENT_PORTAL_ORIGIN = 'http://localhost:1234',
 	CLIENT_PORTAL_USERNAME = 'wxGFi8MjHlakuaQ-ls99Rw..',
@@ -19,6 +20,10 @@ export const {
 
 export default {
 	url: 'http://localhost:3001',
+
+	logger: {
+		level: LOGGER_LEVEL,
+	},
 
 	paths: {
 		data: path.join(__dirname, 'data'),

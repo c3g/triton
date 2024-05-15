@@ -3,13 +3,15 @@ import pino from 'pino'
 import asyncHandler from 'express-async-handler'
 import Express from 'express'
 
+import config from '../config'
+
 export const logger = pino({
 	transport: {
 		// We recommend against using pino-pretty in production and highly recommend installing pino-pretty as a development dependency.
 		// - https://github.com/pinojs/pino-pretty#programmatic-integration
 		target: 'pino-pretty',
 	},
-	level: 'warn',
+	level: config.logger.level,
 })
 
 export const httpLogger = asyncHandler(async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
