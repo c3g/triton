@@ -34,7 +34,7 @@ export function start() {
             contacts.map(async (contact) => {
                 const emails = await getEmailsForProject(contact.project_id)
 
-                await Promise.all(
+                await Promise.allSettled(
                     emails.map(async (to: string) => {
                         logger.info(`[contacts] Sending email to ${to}`)
                         await sendEmail(
@@ -72,7 +72,7 @@ function getMessageFor(contact: Contact) {
       <br/>
       Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
       Username: <b>${contact.project_id}</b><br/>
-      Password: <b>${contact.depth ?? 'contact.depth'}</b><br/>
+      Password: <b>${contact.depth ?? ''}</b><br/>
       <br/>
       Thanks.<br/>
       `
@@ -86,7 +86,7 @@ function getMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? 'contact.depth'}</b><br/>
+        Password: <b>${contact.depth ?? ''}</b><br/>
         <br/>
         Thanks.<br/>
         `
@@ -100,7 +100,7 @@ function getMessageFor(contact: Contact) {
         <br/>
         Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? 'contact.depth'}</b><br/>
+        Password: <b>${contact.depth ?? ''}</b><br/>
         <br/>
         Thanks.<br/>
         `
@@ -114,7 +114,7 @@ function getMessageFor(contact: Contact) {
       <br/>
       Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
       Username: <b>${contact.project_id}</b><br/>
-      Password: <b>${contact.depth ?? 'contact.depth'}</b><br/>
+      Password: <b>${contact.depth ?? ''}</b><br/>
       <br/>
       Thanks.<br/>
       `
