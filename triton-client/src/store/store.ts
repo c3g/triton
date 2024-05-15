@@ -1,6 +1,4 @@
 import { Middleware, configureStore } from '@reduxjs/toolkit'
-import { EpicMiddleware, createEpicMiddleware } from 'redux-observable'
-import { rootEpic } from '../epics/root'
 import { createLogger } from 'redux-logger'
 
 import AuthReducer, { AuthState, AuthAction } from './auth'
@@ -21,8 +19,6 @@ export interface RootState {
 
 export type AppAction = AuthAction | ProjectsStateAction | DatasetStateAction | ReadsetsStateAction | DatasetFilesStateAction | RunsStateAction
 
-const epicMiddleware: EpicMiddleware<AppAction, AppAction, RootState, any> = createEpicMiddleware()
-
 const loggerMiddleware: [Middleware<{}, RootState>] | [] =
 	process.env.NODE_ENV === 'development'
 		? [
@@ -41,9 +37,7 @@ export const store = configureStore({
 		readsetsState: ReadsetsReducer,
 		datasetFilesState: DatasetFilesReducer,
 	},
-	middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(epicMiddleware)//.concat(loggerMiddleware),
+	middleware: (getDefaultMiddleware) => getDefaultMiddleware()//.concat(loggerMiddleware),
 })
-
-epicMiddleware.run(rootEpic)
 
 export type AppDispatch = typeof store.dispatch
