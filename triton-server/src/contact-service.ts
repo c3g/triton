@@ -27,7 +27,7 @@ export function start() {
     async function tick() {
         const db = await defaultDatabaseActions()
         const contacts = await db.listReadyContacts()
-        logger.info(`[contacts] Found ${contacts.length} contacts`)
+        logger.debug(`[contacts] Found ${contacts.length} contacts`)
         if (contacts.length === 0) return
 
         await Promise.all(
@@ -38,7 +38,7 @@ export function start() {
                     emails.map(async (to: string) => {
                         logger.info(`[contacts] Sending email to ${to}`)
                         await sendEmail(
-                            config.mail.from,
+                            '',
                             to,
                             getSubjectFor(contact),
                             getMessageFor(contact),
@@ -136,7 +136,7 @@ async function getEmailsForProject(projectID: ExternalProjectID): Promise<string
 
         const { stack = 'e.stack' } = e instanceof Error ? e : {}
         await sendEmail(
-            config.mail.from,
+            '',
             config.mail.errorMonitoring,
             subject,
             `ProjectID: ${projectID}<br/><pre>${stack}</pre>`,
