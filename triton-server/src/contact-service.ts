@@ -30,40 +30,71 @@ export function start() {
         logger.debug(`[contacts] Found ${contacts.length} contacts`)
         if (contacts.length === 0) return
 
-        await Promise.all(
-            contacts.map(async (contact) => {
-                const emails = await getEmailsForProject(contact.project_id)
-
-                await Promise.allSettled(
-                    emails.map(async (to: string) => {
-                        logger.info(`[contacts] Sending email to ${to}`)
-                        await sendEmail(
-                            '',
-                            to,
-                            getSubjectFor(contact),
-                            getMessageFor(contact),
-                        ).catch((error) => logger.error(error, `[contacts] Could not send email to ${to}`))
-                    })
-                )
-
-                logger.info(`[contacts] Removing contact ${contact.id}`)
-                await db.removeContact(contact.project_id, contact.type).catch((error) =>
-                    logger.error(error, `[contacts] Could not remove contact ${contact.id}`)
+        await Promise.allSettled(contacts.filter((contact) => contact.depth === '').map(async (contact) => {            
+            await broadcastEmailsOfProject(contact.project_id, async (send) => {
+                await send(
+                    getCredentialSubjectFor(contact),
+                    getCredentialMessageFor(contact),
                 )
             })
-        )
+
+            logger.info(`[contacts] Removing contact ${JSON.stringify(contact)}`)
+            await db.removeContact(contact.project_id, contact.type).catch((error) =>
+                logger.error(error, `[contacts] Could not remove contact ${JSON.stringify(contact)}`)
+            )
+        }))
+
+        const requests = await db.listRequests()
+        await Promise.allSettled(requests.map(async (request) => {
+            await broadcastEmailsOfProject(request.project_id, async (send) => {
+                if (request.status === 'SUCCESS') {
+                    const subject = `The dataset #${request.id} for project ${request.project_id} is ready`
+                    await send(
+                        `${subject}`,
+                        `${subject}.<br/>
+                        The dataset can be downloaded using ${request.type} using the credential provided to you.`,
+                    )
+                }
+                if (request.status === 'FAILED') {
+                    const subject = `The dataset #${request.id} for project ${request.project_id} failed to be staged`
+                    await send(
+                        `${subject}`,
+                        `${subject}.`,
+                    )
+                }
+                if (request.status === 'QUEUED') {
+                    const subject = `The dataset #${request.id} for project ${request.project_id} is queued for staging`
+                    await send(
+                        `${subject}`,
+                        `${subject}.`,
+                    )
+                }
+            })
+        }))
     }
 
     return stop
 }
 
-function getSubjectFor(contact: Contact) {
+async function broadcastEmailsOfProject(projectID: string, fn: (sendEmail: (subject: string, message: string) => Promise<void>) => Promise<void>) {
+    const emails = await getEmailsForProject(projectID)
+
+    await Promise.allSettled(
+        emails.map(async (to: string) => {
+            logger.info(`[contacts] Sending email to ${to}`)
+            await fn(async (subject, message) => await sendEmail('', to, subject, message))
+                .catch((error) => logger.error(error, `[contacts] Could not send email to ${to}`))
+        })
+    )
+}
+
+function getCredentialSubjectFor(contact: Contact) {
     return contact.status === 'NEW'
         ? `Credentials for ${contact.type} account ${contact.project_id}`
         : `Password reset for ${contact.type} account ${contact.project_id}`
 }
 
-function getMessageFor(contact: Contact) {
+function getCredentialMessageFor(contact: Contact) {
     if (contact.type === 'GLOBUS' && contact.status === 'NEW') {
         return `
       Hello,<br/>

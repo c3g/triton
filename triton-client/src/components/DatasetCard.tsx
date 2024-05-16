@@ -81,7 +81,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				{
 					// left
 				}
-				<Text strong>Lane {dataset.lane}</Text>
+				<Text strong>Dataset #{dataset.id}</Text>
 			</Space>
 			<Space>
 				{

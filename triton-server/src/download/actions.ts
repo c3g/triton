@@ -18,6 +18,10 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
+	async function listRequests() {
+		return await db.selectFrom('requests').selectAll().execute()
+	}
+
 	async function getRequest(datasetId: DatasetID, type: DownloadRequestType) {
 		return await db
 			.selectFrom('requests')
@@ -90,6 +94,7 @@ export async function createActions(db: Kysely<Database>) {
 
 	return {
 		listRequestsByDatasetId,
+		listRequests,
 		getRequest,
 		getRequestByID,
 		createRequest,
