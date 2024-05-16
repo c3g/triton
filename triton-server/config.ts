@@ -1,25 +1,52 @@
-/*
- *
- * This is an example configuration. The application requires a similar file,
- * named 'config.ts' in the same folder as this one, in order to work.
- */
-
 import path from 'path'
 import 'dotenv/config'
 
-export const {
+const {
+	API_URL,
 	LOGGER_LEVEL = 'info',
-	CLIENT_ORIGIN = 'http://localhost:3000',
-	CLIENT_PORTAL_ORIGIN = 'http://localhost:1234',
-	CLIENT_PORTAL_USERNAME = 'wxGFi8MjHlakuaQ-ls99Rw..',
-	CLIENT_PORTAL_PASSWORD = 'eW4yvfLHi5nlRNn8EJlsPg..',
-	LIMS_API_URL = 'http://127.0.0.1:8000/api',
-	LIMS_USERNAME = 'potato',
-	LIMS_PASSWORD = 'potato',
+	CLIENT_ORIGIN,
+	CLIENT_PORTAL_ORIGIN,
+	CLIENT_PORTAL_USERNAME,
+	CLIENT_PORTAL_PASSWORD,
+	LIMS_API_URL,
+	LIMS_USERNAME,
+	LIMS_PASSWORD,
+	SFTP_SERVER,
+	SFTP_PORT,
+	ERROR_MONITORING_EMAIL,
 } = process.env
 
+if (API_URL === undefined) {
+	throw new Error('Must define API_URL environment variable')
+}
+if (CLIENT_ORIGIN === undefined) {
+	throw new Error('Must define CLIENT_ORIGIN environment variable')
+}
+if (CLIENT_PORTAL_ORIGIN === undefined) {
+	throw new Error('Must define CLIENT_PORTAL_ORIGIN environment variable')
+}
+if (CLIENT_PORTAL_USERNAME === undefined) {
+	throw new Error('Must define CLIENT_PORTAL_USERNAME environment variable')
+}
+if (CLIENT_PORTAL_PASSWORD === undefined) {
+	throw new Error('Must define CLIENT_PORTAL_PASSWORD environment variable')
+}
+if (LIMS_API_URL === undefined) {
+	throw new Error('Must define LIMS_API_URL environment variable')
+}
+if (LIMS_USERNAME === undefined) {
+	throw new Error('Must define LIMS_USERNAME environment variable')
+}
+if (LIMS_PASSWORD === undefined) {
+	throw new Error('Must define LIMS_PASSWORD environment variable')
+}
+if (ERROR_MONITORING_EMAIL === undefined) {
+	throw new Error('Must define ERROR_MONITORING_EMAIL environment variable')
+}
+
+
 export default {
-	url: 'http://localhost:3001',
+	url: API_URL,
 
 	logger: {
 		level: LOGGER_LEVEL,
@@ -31,37 +58,15 @@ export default {
 		downloadDB: path.join(__dirname, 'data', 'downloads.db'),
 
 		workCompleteFile: path.join(__dirname, 'data', 'work-complete.json'),
-
-		dataPrefix: '/data/glsftp/',
-	},
-
-	clarity: {
-		baseURL: 'https://bravotestapp.genome.mcgill.ca',
-		url: 'https://bravotestapp.genome.mcgill.ca/api/v2',
-		database: {
-			host: '127.0.0.1',
-			user: 'rgregoir',
-			password: 'secret',
-			database: 'ClarityLIMS',
-		},
 	},
 
 	mail: {
-		from: 'no-reply@domain.com',
-		errorMonitoring: 'user@domain.com',
-	},
-
-	nodemailer: {
-		service: 'gmail',
-		auth: {
-			user: 'email@gmail.com',
-			pass: 'secret',
-		},
+		errorMonitoring: ERROR_MONITORING_EMAIL,
 	},
 
 	sftp: {
-		server: '0.0.0.0',
-		port: '21',
+		server: SFTP_SERVER,
+		port: SFTP_PORT,
 	},
 
 	client_portal: {
