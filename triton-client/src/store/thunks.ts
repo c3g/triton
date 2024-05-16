@@ -1,13 +1,12 @@
 import apiTriton from '../api/api-triton'
 import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonProject, TritonReadset } from '../api/api-types'
-import { convertToSerializedError } from '../epics/utils'
 import { AuthActions } from './auth'
 import { DatasetFilesStateActions } from './datasetFiles'
 import { DatasetsStateActions } from './datasets'
 import { ProjectsStateActions } from './projects'
 import { ReadsetsStateActions } from './readsets'
 import { RunsStateActions } from './runs'
-import { AppDispatch, RootState } from './store'
+import { AppDispatch, RootState, convertToSerializedError } from './store'
 
 export const fetchLoginStatus = () => async (dispatch: AppDispatch, getState: () => RootState) => {
 	if (getState().auth.loading) return
@@ -48,7 +47,6 @@ export const fetchRuns = (externalProjectId: ExternalProjectID) => async (dispat
 		// console.info('Loaded runs succesfully', runs)
 		dispatch(RunsStateActions.setRunsByProjectId({ projectId: externalProjectId, runs }))
 		// console.info(getState().runsState.runsById)
-		// dispatch(ReadsetsStateActions.initializeReadsetsByDatasetIds(datasets))
 		return runs
 	} catch (err: any) {
 		dispatch(DatasetsStateActions.setError({ projectId: externalProjectId, error: convertToSerializedError(err) }))

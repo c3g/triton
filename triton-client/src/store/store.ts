@@ -1,4 +1,4 @@
-import { Middleware, configureStore } from '@reduxjs/toolkit'
+import { Middleware, SerializedError, configureStore } from '@reduxjs/toolkit'
 import { createLogger } from 'redux-logger'
 
 import AuthReducer, { AuthState, AuthAction } from './auth'
@@ -41,3 +41,12 @@ export const store = configureStore({
 })
 
 export type AppDispatch = typeof store.dispatch
+
+export function convertToSerializedError(err: any): SerializedError {
+	if (err instanceof Error) {
+		const { name, message, stack, code }: SerializedError = err
+		return { name, message, stack, code }
+	} else {
+		return { name: err.toString(), message: err.toString() }
+	}
+}

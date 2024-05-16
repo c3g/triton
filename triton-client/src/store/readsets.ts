@@ -38,7 +38,7 @@ export const readsetsSlice = createSlice({
 				readsets: [],
 			}
 		},
-		// Must be called within thunks that initialize datasets!
+		// Must be called in fetchDatasets
 		initializeReadsetsByDatasetIds: (state, action: PayloadAction<Pick<TritonDataset, 'id'>[]>) => {
 			const datasets = action.payload
 			datasets.forEach(({ id: datasetId }) => {

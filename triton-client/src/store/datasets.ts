@@ -27,7 +27,7 @@ export const datasetsSlice = createSlice({
 				datasets: [],
 			}
 		},
-		// Must be called within thunks that initialize projects!
+		// Must be called in fetchProjects
 		initializeDatasetsByProjectId: (state, action: PayloadAction<Pick<TritonProject, 'external_id'>[]>) => {
 			const projects = action.payload
 			projects.forEach(({ external_id: projectId }) => {

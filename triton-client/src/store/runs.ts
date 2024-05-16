@@ -25,6 +25,7 @@ export const runsSlice = createSlice({
 				runs: [],
 			}
 		},
+		// Must be called in fetchProjects
         initializeRunsByProjectId: (state, action: PayloadAction<Pick<TritonProject, 'external_id'>[]>) => {
 			const projects = action.payload
 			projects.forEach(({ external_id: projectId }) => {
