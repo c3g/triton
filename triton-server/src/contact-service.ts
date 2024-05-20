@@ -68,6 +68,7 @@ export function start() {
                     )
                 }
             })
+            await db.updateNotificationDate(request.id)
         }))
     }
 

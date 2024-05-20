@@ -92,6 +92,16 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.deleteFrom('contacts').where('project_id', '=', projectID).where('type', '=', type).executeTakeFirstOrThrow()
 	}
 
+	async function updateNotificationDate(requestID: DownloadRequestID) {
+		return await db
+			.updateTable('requests')
+			.set({ notification_date: currentDateToString() })
+			.where('id', '=', requestID)
+			.returningAll()
+			.executeTakeFirstOrThrow()
+	
+	}
+
 	return {
 		listRequestsByDatasetId,
 		listRequests,
@@ -103,6 +113,7 @@ export async function createActions(db: Kysely<Database>) {
 		listFilesByDatasetId,
 		listReadyContacts,
 		removeContact,
+		updateNotificationDate,
 	}
 }
 
