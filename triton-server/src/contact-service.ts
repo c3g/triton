@@ -47,23 +47,21 @@ export function start() {
         const requests = await db.listRequests()
         await Promise.allSettled(requests.map(async (request) => {
             await broadcastEmailsOfProject(request.project_id, async (send) => {
-                if (request.status === 'SUCCESS') {
-                    const subject = `The dataset #${request.id} for project ${request.project_id} is ready`
+                const completion_date = request.completion_date && new Date(request.completion_date)
+                const notification_date = request.notification_date && new Date(request.notification_date)
+                const failure_date = request.failure_date && new Date(request.failure_date)
+                // TODO: update the notification_date in the database
+
+                if (request.status === 'SUCCESS' && completion_date && (!notification_date || notification_date < completion_date)) {
+                    const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
                     await send(
                         `${subject}`,
                         `${subject}.<br/>
                         The dataset can be downloaded using ${request.type} using the credential provided to you.`,
                     )
                 }
-                if (request.status === 'FAILED') {
-                    const subject = `The dataset #${request.id} for project ${request.project_id} failed to be staged`
-                    await send(
-                        `${subject}`,
-                        `${subject}.`,
-                    )
-                }
-                if (request.status === 'QUEUED') {
-                    const subject = `The dataset #${request.id} for project ${request.project_id} is queued for staging`
+                if (request.status === 'FAILED' && failure_date && (!notification_date || notification_date < failure_date)) {
+                    const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`
                     await send(
                         `${subject}`,
                         `${subject}.`,

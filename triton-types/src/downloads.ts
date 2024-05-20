@@ -23,6 +23,8 @@ export interface DownloadRequestRecord {
 	readonly creation_date: string
 	readonly completion_date?: string
 	readonly expiry_date?: string
+	readonly failure_date?: string
+	readonly notification_date?: string
 
 	readonly requester?: string
 	readonly notified: 0 | 1 // default 0 (false)

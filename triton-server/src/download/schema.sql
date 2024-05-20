@@ -12,6 +12,8 @@ create table requests (
     creation_date   text not null, -- ISO8601
     completion_date text, -- ISO8601
     expiry_date     text, -- ISO8601
+    failure_date text, -- ISO8601
+    notification_date text, -- ISO8601
 
     requester       text,
     notified        tinyint not null default 0,
