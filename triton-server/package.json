@@ -4,8 +4,8 @@
 	"description": "Triton data delivery backend",
 	"main": "src/start-server.ts",
 	"scripts": {
-		"test": "jest",
 		"start-production": "NODE_ENV=production npx ts-node src/start-server.ts",
+		"test": "jest --setupFiles ./config.ts",
 		"start": "NODE_ENV=development npx nodemon src/start-server.ts",
 		"debug": "NODE_ENV=development DEBUG=express-session npx nodemon src/start-server.ts"
 	},
