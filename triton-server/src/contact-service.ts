@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /*
  * contact-service.ts
@@ -47,12 +48,12 @@ export function start() {
         const requests = await db.listRequests()
         await Promise.allSettled(requests.map(async (request) => {
             await broadcastEmailsOfProject(request.project_id, async (send) => {
-                const completion_date = request.completion_date && new Date(request.completion_date)
-                const notification_date = request.notification_date && new Date(request.notification_date)
-                const failure_date = request.failure_date && new Date(request.failure_date)
+                const completionDate = request.completion_date && new Date(request.completion_date)
+                const notificationDate = request.notification_date && new Date(request.notification_date)
+                const failureDate = request.failure_date && new Date(request.failure_date)
                 // TODO: update the notification_date in the database
 
-                if (request.status === 'SUCCESS' && completion_date && (!notification_date || notification_date < completion_date)) {
+                if (request.status === 'SUCCESS' && completionDate && (!notificationDate || notificationDate < completionDate)) {
                     const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
                     await send(
                         `${subject}`,
@@ -60,7 +61,7 @@ export function start() {
                         The dataset can be downloaded using ${request.type} using the credential provided to you.`,
                     )
                 }
-                if (request.status === 'FAILED' && failure_date && (!notification_date || notification_date < failure_date)) {
+                if (request.status === 'FAILED' && failureDate && (!notificationDate || notificationDate < failureDate)) {
                     const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`
                     await send(
                         `${subject}`,
