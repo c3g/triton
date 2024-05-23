@@ -55,13 +55,11 @@ async function getToken(): Promise<string> {
 
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
-	const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
 	const response = await axios.request<MagicAuthResponse>({
 		method: 'POST',
 		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
 		headers: {
-			Authorization: credentials,
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
@@ -107,17 +105,17 @@ const getAuthorizedAxios = async () => {
 	// and clears the token or reauthorizes and attempts the request again?
 
 	authorizedAxios.interceptors.request.use((req) => {
-		const { baseURL, url, method, params, headers } = req
-		logger.debug({ baseURL, url, method, params, Authorization: headers?.Authorization }, 'Magic Request')
+		const { baseURL, url, method, params } = req
+		logger.debug({ baseURL, url, method, params }, 'Magic Request')
 		return req
 	})
 	authorizedAxios.interceptors.response.use((res) => {
 		const {
 			status,
-			config: { baseURL, url, method, params, headers },
+			config: { baseURL, url, method, params },
 			data,
 		} = res
-		logger.debug({ status, data, config: { baseURL, url, method, params, Authorization: headers?.Authorization } }, 'Magic Response')
+		logger.debug({ status, data, config: { baseURL, url, method, params } }, 'Magic Response')
 		return res
 	})
 
