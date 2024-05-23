@@ -25,7 +25,7 @@ const debugConfig: ClientConfig = {
 
 // Configruation for the PROD environment
 const prodConfig: ClientConfig = {
-	apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}/api/`),
+	apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}api/`),
 }
 
 // Get the config that matches the environment
