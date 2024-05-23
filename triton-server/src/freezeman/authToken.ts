@@ -356,7 +356,6 @@ export async function fetchToken(username: string | undefined = LIMS_USERNAME, p
 		// TODO check the actual return code
 		return response.data
 	} else {
-		logger.error(response)
 		throw new Error(`Unable to fetch freezeman auth token. ${response.status}: ${response.statusText}`)
 	}
 }
@@ -371,7 +370,6 @@ async function refreshToken(refreshToken: string): Promise<FreezemanAuthTokens> 
 	if (response.status === 200) {
 		return response.data
 	} else {
-		logger.error(response)
 		throw new Error(`Unable to refresh freezeman auth token. ${response.status}: ${response.statusText}`)
 	}
 }
