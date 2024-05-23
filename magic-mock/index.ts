@@ -13,7 +13,7 @@ function makeMagicReply<T>(data: T): MagicReply<T> {
 const app = express()
 
 app.use('/login', (req, res) => {
-	res.redirect('http://localhost:3001/api/auth/magic-callback?userID=userID&token=token')
+	res.redirect('https://newtritonqc.genome.mcgill.ca:3001/api/auth/magic-callback?userID=userID&token=token')
 })
 
 app.use('/oauth/token', (req, res) => {
