@@ -239,7 +239,7 @@ class FreezemanAPIAuthorization {
 				// Ignore result if the auth was aborted while waiting for the response.
 				if (this.state !== AuthLoopState.ABORT) {
 					logger.debug(debugMsg(this.state, 'Failed to fetch token'))
-					logger.error(error)
+					logger.error({ message: error.message, method: error.config.method, url: error.config.url })
 
 					// Try fetching again in N seconds
 
@@ -314,7 +314,7 @@ class FreezemanAPIAuthorization {
 					// Ignore error if auth was aborted while waiting for response.
 					if (this.state !== AuthLoopState.ABORT) {
 						logger.error(`Freezeman auth token refresh failed. Will try to fetch new token.`)
-						logger.error(error)
+						logger.error({ message: error.message, method: error.config.method, url: error.config.url })
 						this.authTokens = undefined
 						this.#changeState(AuthLoopState.START_FETCH)
 					}
