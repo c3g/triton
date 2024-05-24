@@ -5,7 +5,8 @@ const {
 	API_URL,
 	LOGGER_LEVEL = 'info',
 	CLIENT_ORIGIN,
-	CLIENT_PORTAL_ORIGIN,
+	CLIENT_PORTAL_LOGIN,
+	CLIENT_PORTAL_API_URL,
 	CLIENT_PORTAL_USERNAME,
 	CLIENT_PORTAL_PASSWORD,
 	LIMS_API_URL,
@@ -22,8 +23,11 @@ if (API_URL === undefined) {
 if (CLIENT_ORIGIN === undefined) {
 	throw new Error('Must define CLIENT_ORIGIN environment variable')
 }
-if (CLIENT_PORTAL_ORIGIN === undefined) {
+if (CLIENT_PORTAL_LOGIN === undefined) {
 	throw new Error('Must define CLIENT_PORTAL_ORIGIN environment variable')
+}
+if (CLIENT_PORTAL_API_URL === undefined) {
+	throw new Error('Must define CLIENT_PORTAL_API_URL environment variable')
 }
 if (CLIENT_PORTAL_USERNAME === undefined) {
 	throw new Error('Must define CLIENT_PORTAL_USERNAME environment variable')
@@ -71,9 +75,9 @@ export default {
 
 	client_portal: {
 		// Hercules login page url - the user logs in on this page.
-		loginUrl: `${CLIENT_PORTAL_ORIGIN}/login`,
+		loginUrl: CLIENT_PORTAL_LOGIN,
 		// Api endpoint base url
-		url: CLIENT_PORTAL_ORIGIN,
+		url: CLIENT_PORTAL_API_URL,
 		// Credentials for the Triton server to call the Magic api
 		user: CLIENT_PORTAL_USERNAME,
 		password: CLIENT_PORTAL_PASSWORD,
