@@ -24,7 +24,7 @@ if (CLIENT_ORIGIN === undefined) {
 	throw new Error('Must define CLIENT_ORIGIN environment variable')
 }
 if (CLIENT_PORTAL_LOGIN === undefined) {
-	throw new Error('Must define CLIENT_PORTAL_ORIGIN environment variable')
+	throw new Error('Must define CLIENT_PORTAL_LOGIN environment variable')
 }
 if (CLIENT_PORTAL_API_URL === undefined) {
 	throw new Error('Must define CLIENT_PORTAL_API_URL environment variable')
