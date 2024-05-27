@@ -5,7 +5,7 @@
 	"main": "src/start-server.ts",
 	"scripts": {
 		"test": "jest",
-		"start-prod": "NODE_ENV=production npx node-ts src/start-server.ts",
+		"start-prod": "NODE_ENV=production npx ts-node src/start-server.ts",
 		"start": "NODE_ENV=development npx nodemon src/start-server.ts",
 		"debug": "NODE_ENV=development DEBUG=express-session npx nodemon src/start-server.ts"
 	},
