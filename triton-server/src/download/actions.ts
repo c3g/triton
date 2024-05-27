@@ -8,7 +8,7 @@
 import path from 'path'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact } from './download-types'
+import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact, REQUEST_STATUS } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
@@ -62,6 +62,10 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).where('type', '=', type).returningAll().executeTakeFirstOrThrow()
 	}
 
+  async function deleteCancelledRequest() {
+		return await db.updateTable('requests').set({ should_delete: 1 }).where('status', '=', REQUEST_STATUS.SUCCESS).where('is_cancelled', '=', 1).returningAll().execute()
+	}
+
 	async function insertFiles(files: NewDownloadFile[], trx?: Transaction<Database>) {
 		if (files.length === 0) {
 			throw new Error('Cannot insert 0 files')
@@ -107,6 +111,7 @@ export async function createActions(db: Kysely<Database>) {
 		getRequestByID,
 		createRequest,
 		deleteRequest,
+    deleteCancelledRequest,
 		insertFiles,
 		listFilesByDatasetId,
 		listReadyContacts,
@@ -118,7 +123,7 @@ export async function createActions(db: Kysely<Database>) {
 let actions: DatabaseActions | null = null
 export async function defaultDatabaseActions(): Promise<DatabaseActions> {
 	if (!actions) {
-		const db = await createSQLite(config.paths.downloadDB, path.join(__dirname, './schema.sql'))
+		const db = await createSQLite(config.paths.downloadDB /*, path.join(__dirname, './schema.sql') should already exist */)
 		actions = await createActions(db)
 	}
 

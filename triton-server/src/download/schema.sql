@@ -18,6 +18,7 @@ create table requests (
     notification_date text, -- ISO8601
 
     should_delete tinyint not null default 0,
+    is_cancelled tinyint not null default 0,
 
     unique(type, dataset_id)
 );
