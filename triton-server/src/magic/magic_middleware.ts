@@ -2,6 +2,7 @@ import Express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getUserDetails, isUserAuthenticated } from './magic_api'
 import config from '../../config'
+import { logger } from '../logger'
 
 /**
  * This module handles the user login in Triton.
@@ -93,6 +94,8 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
 	const userId = req.query.userID as string
 	const token = req.query.token as string
 
+	logger.debug({ userId, token }, magicCallbackHandler.name)
+
 	// Verify that the user is still logged in with the token.
 	const isAuthenticated = await isUserAuthenticated(userId, token)
 	if (!isAuthenticated) {
@@ -110,6 +113,8 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
 	req.session.save((err) => {
 		if (err !== undefined) console.error(err)
 	})
+
+	logger.debug(`Redirecting to '${config.client.url}'`, magicCallbackHandler.name)
 
 	// Redirect the user to the triton client web app
 	res.redirect(config.client.url)
