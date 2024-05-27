@@ -90,24 +90,19 @@ const magicAuthMiddleware = asyncHandler(async (req: Express.Request, res: Expre
  * button to navigate to triton.
  */
 const magicCallbackHandler = asyncHandler(async (req, res, next) => {
-	const FUNCTION_NAME = 'magicCallbackHandler'
-
 	// userID and token are included as parameters in the magic-callback request.
 	const userId = req.query.userID as string
 	const token = req.query.token as string
 
-	logger.debug({ userId, token }, FUNCTION_NAME)
 
 	// Verify that the user is still logged in with the token.
 	const isAuthenticated = await isUserAuthenticated(userId, token)
-	logger.debug({ userId, token, isAuthenticated }, FUNCTION_NAME)
 	if (!isAuthenticated) {
 		throw Error('Not authenticated')
 	}
 
 	// Ask Magic for the user's details.
 	const userDetails = await getUserDetails(userId, token)
-	logger.debug({ userDetails }, FUNCTION_NAME)
 
 	// Store the user details and their login credentials in the session.
 	// We need the user id and token because triton has to check if the user is
@@ -117,8 +112,6 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
 	req.session.save((err) => {
 		if (err !== undefined) logger.error(err)
 	})
-
-	logger.debug(`Redirecting to '${config.client.url}'`, FUNCTION_NAME)
 
 	// Redirect the user to the triton client web app
 	res.redirect(config.client.url)
