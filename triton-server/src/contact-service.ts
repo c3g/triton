@@ -51,7 +51,6 @@ export function start() {
                 const completionDate = request.completion_date && new Date(request.completion_date)
                 const notificationDate = request.notification_date && new Date(request.notification_date)
                 const failureDate = request.failure_date && new Date(request.failure_date)
-                // TODO: update the notification_date in the database
 
                 if (request.status === 'SUCCESS' && completionDate && (!notificationDate || notificationDate < completionDate)) {
                     const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
