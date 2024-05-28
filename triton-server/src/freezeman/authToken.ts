@@ -239,7 +239,7 @@ class FreezemanAPIAuthorization {
 				// Ignore result if the auth was aborted while waiting for the response.
 				if (this.state !== AuthLoopState.ABORT) {
 					logger.debug(debugMsg(this.state, 'Failed to fetch token'))
-					logger.error(error)
+					logger.error({ message: error.message, method: error.config.method, url: error.config.url })
 
 					// Try fetching again in N seconds
 
@@ -314,7 +314,7 @@ class FreezemanAPIAuthorization {
 					// Ignore error if auth was aborted while waiting for response.
 					if (this.state !== AuthLoopState.ABORT) {
 						logger.error(`Freezeman auth token refresh failed. Will try to fetch new token.`)
-						logger.error(error)
+						logger.error({ message: error.message, method: error.config.method, url: error.config.url })
 						this.authTokens = undefined
 						this.#changeState(AuthLoopState.START_FETCH)
 					}
@@ -356,7 +356,6 @@ export async function fetchToken(username: string | undefined = LIMS_USERNAME, p
 		// TODO check the actual return code
 		return response.data
 	} else {
-		logger.error(response)
 		throw new Error(`Unable to fetch freezeman auth token. ${response.status}: ${response.statusText}`)
 	}
 }
@@ -371,7 +370,6 @@ async function refreshToken(refreshToken: string): Promise<FreezemanAuthTokens> 
 	if (response.status === 200) {
 		return response.data
 	} else {
-		logger.error(response)
 		throw new Error(`Unable to refresh freezeman auth token. ${response.status}: ${response.statusText}`)
 	}
 }

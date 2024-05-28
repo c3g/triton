@@ -51,8 +51,8 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
 
 	// Request logger
 	instance.interceptors.request.use((req) => {
-		const { baseURL, url, method, params, headers } = req
-		logger.debug({ baseURL, url, method, params, Authorization: headers?.Authorization }, 'Freezeman Request')
+		const { baseURL, url, method, params } = req
+		logger.debug({ baseURL, url, method, params }, 'Freezeman Request')
 		return req
 	})
 
@@ -60,11 +60,11 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
 	instance.interceptors.response.use((res) => {
 		const {
 			status,
-			config: { baseURL, url, method, params, headers },
+			config: { baseURL, url, method, params },
 			data,
 		} = res
 		logger.debug(
-			{ status, data, config: { baseURL, url, method, params, Authorization: headers?.Authorization } },
+			{ status, data, config: { baseURL, url, method, params } },
 			'Freezeman Response'
 		)
 		return res
