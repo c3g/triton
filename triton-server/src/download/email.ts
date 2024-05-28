@@ -25,7 +25,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 			})
 			mailx.stdin.write(`${content}`, (err) => {
 				if (err) {
-					logger.error(err, '[mail]')
+					logger.error(err, '[mailx]')
 					reject(err)
 				} else {
 					logger.debug(`[mailx] Finished writing to ${to}`)
