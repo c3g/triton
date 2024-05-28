@@ -13,7 +13,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 	try {
 		await new Promise<void>((resolve, reject) => {
 			mailx.stderr.on('data', (data: string) => {
-				logger.warn(`[mailx] ${data}`)
+				logger.error(`[mailx] ${data}`)
 				reject(data)
 			})
 			mailx.on('exit', () => resolve())
