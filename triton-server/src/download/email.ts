@@ -22,7 +22,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 				logger.error(err, '[mailx]')
 				reject(err)
 			})
-			mailx.stdin.write(`${content}\n`, (err) => {
+			mailx.stdin.write(`${content}`, (err) => {
 				if (err) {
 					logger.error(err, '[mail]')
 					reject(err)
@@ -31,6 +31,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 					resolve()
 				}
 			})
+			mailx.stdin.end()
 		})
 	} finally {
 		mailx.kill()
