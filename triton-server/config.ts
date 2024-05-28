@@ -1,9 +1,40 @@
 import path from 'path'
 import 'dotenv/config'
 
+const TRITON_ENVIRONMENTS = {
+	API_URL: '',
+	LOGGER_LEVEL: 'info',
+	CLIENT_ORIGIN: '',
+	CLIENT_PORTAL_LOGIN: '',
+	CLIENT_PORTAL_API_URL: '',
+	CLIENT_PORTAL_USERNAME: '',
+	CLIENT_PORTAL_PASSWORD: '',
+	LIMS_API_URL: '',
+	LIMS_USERNAME: '',
+	LIMS_PASSWORD: '',
+	SFTP_SERVER: '',
+	SFTP_PORT: '',
+	ERROR_MONITORING_EMAIL: ''
+}
+
+const missingEnvVars: string[] = []
+for (const key of Object.keys(TRITON_ENVIRONMENTS) as Array<keyof typeof TRITON_ENVIRONMENTS>) {
+	const value = process.env[key]
+	if (value === undefined) {
+		if (!TRITON_ENVIRONMENTS[key]) {
+			missingEnvVars.push(key)
+		}
+	} else {
+		TRITON_ENVIRONMENTS[key] = value
+	}
+}
+if (missingEnvVars.length > 0) {
+	throw new Error(`Missing environment variables: ${missingEnvVars.join(', ')}`)
+}
+
 const {
 	API_URL,
-	LOGGER_LEVEL = 'info',
+	LOGGER_LEVEL,
 	CLIENT_ORIGIN,
 	CLIENT_PORTAL_LOGIN,
 	CLIENT_PORTAL_API_URL,
@@ -15,39 +46,7 @@ const {
 	SFTP_SERVER,
 	SFTP_PORT,
 	ERROR_MONITORING_EMAIL,
-} = process.env
-
-if (API_URL === undefined) {
-	throw new Error('Must define API_URL environment variable')
-}
-if (CLIENT_ORIGIN === undefined) {
-	throw new Error('Must define CLIENT_ORIGIN environment variable')
-}
-if (CLIENT_PORTAL_LOGIN === undefined) {
-	throw new Error('Must define CLIENT_PORTAL_LOGIN environment variable')
-}
-if (CLIENT_PORTAL_API_URL === undefined) {
-	throw new Error('Must define CLIENT_PORTAL_API_URL environment variable')
-}
-if (CLIENT_PORTAL_USERNAME === undefined) {
-	throw new Error('Must define CLIENT_PORTAL_USERNAME environment variable')
-}
-if (CLIENT_PORTAL_PASSWORD === undefined) {
-	throw new Error('Must define CLIENT_PORTAL_PASSWORD environment variable')
-}
-if (LIMS_API_URL === undefined) {
-	throw new Error('Must define LIMS_API_URL environment variable')
-}
-if (LIMS_USERNAME === undefined) {
-	throw new Error('Must define LIMS_USERNAME environment variable')
-}
-if (LIMS_PASSWORD === undefined) {
-	throw new Error('Must define LIMS_PASSWORD environment variable')
-}
-if (ERROR_MONITORING_EMAIL === undefined) {
-	throw new Error('Must define ERROR_MONITORING_EMAIL environment variable')
-}
-
+} = TRITON_ENVIRONMENTS
 
 export default {
 	url: API_URL,
