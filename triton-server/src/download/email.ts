@@ -28,7 +28,6 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 					reject(err)
 				} else {
 					logger.debug(`[mailx] Finished writing to ${to}`)
-					resolve()
 				}
 			})
 			mailx.stdin.end()
