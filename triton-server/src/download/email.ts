@@ -7,7 +7,7 @@ import { logger } from '../logger'
 
 
 export async function sendEmail(from: string, to: string, subject: string, content: string) {
-	const mailx = spawn('mailx', ['-s', subject], {
+	const mailx = spawn('mailx', ['-s', subject, to], {
 		stdio: ['pipe', 'ignore', 'pipe']
 	})
 	try {
