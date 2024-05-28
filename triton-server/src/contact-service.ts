@@ -80,9 +80,10 @@ async function broadcastEmailsOfProject(projectID: string, fn: (sendEmail: (subj
 
     await Promise.allSettled(
         emails.map(async (to: string) => {
-            logger.info(`[contacts] Sending email to ${to}`)
-            await fn(async (subject, message) => await sendEmail('', to, subject, message))
-                .catch((error) => logger.error(error, `[contacts] Could not send email to ${to}`))
+            await fn(async (subject, message) => {
+                logger.info(`[contacts] Sending email to ${to}`)
+                await sendEmail('', to, subject, message)
+            }).catch((error) => logger.error(error, `[contacts] Could not send email to ${to}`))
         })
     )
 }
