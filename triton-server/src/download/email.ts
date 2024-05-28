@@ -12,8 +12,8 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 	})
 	try {
 		await new Promise<void>((resolve, reject) => {
-			mailx.stderr.on('data', (data) => {
-				logger.warn(`[mailx] ${data.toString()}`)
+			mailx.stderr.on('data', (data: string) => {
+				logger.warn(`[mailx] ${data}`)
 			})
 			mailx.on('exit', () => resolve())
 			mailx.on('disconnect', () => resolve())
@@ -32,8 +32,6 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 				}
 			})
 		})
-	} catch (err) {
-		throw err
 	} finally {
 		mailx.kill()
 	}
