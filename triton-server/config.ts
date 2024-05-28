@@ -32,27 +32,11 @@ if (missingEnvVars.length > 0) {
 	throw new Error(`Missing environment variables: ${missingEnvVars.join(', ')}`)
 }
 
-const {
-	API_URL,
-	LOGGER_LEVEL,
-	CLIENT_ORIGIN,
-	CLIENT_PORTAL_LOGIN,
-	CLIENT_PORTAL_API_URL,
-	CLIENT_PORTAL_USERNAME,
-	CLIENT_PORTAL_PASSWORD,
-	LIMS_API_URL,
-	LIMS_USERNAME,
-	LIMS_PASSWORD,
-	SFTP_SERVER,
-	SFTP_PORT,
-	ERROR_MONITORING_EMAIL,
-} = TRITON_ENVIRONMENTS
-
 export default {
-	url: API_URL,
+	url: TRITON_ENVIRONMENTS.API_URL,
 
 	logger: {
-		level: LOGGER_LEVEL,
+		level: TRITON_ENVIRONMENTS.LOGGER_LEVEL,
 	},
 
 	paths: {
@@ -64,33 +48,33 @@ export default {
 	},
 
 	mail: {
-		errorMonitoring: ERROR_MONITORING_EMAIL,
+		errorMonitoring: TRITON_ENVIRONMENTS.ERROR_MONITORING_EMAIL,
 	},
 
 	sftp: {
-		server: SFTP_SERVER,
-		port: SFTP_PORT,
+		server: TRITON_ENVIRONMENTS.SFTP_SERVER,
+		port: TRITON_ENVIRONMENTS.SFTP_PORT,
 	},
 
 	client_portal: {
 		// Hercules login page url - the user logs in on this page.
-		loginUrl: CLIENT_PORTAL_LOGIN,
+		loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
 		// Api endpoint base url
-		url: CLIENT_PORTAL_API_URL,
+		url: TRITON_ENVIRONMENTS.CLIENT_PORTAL_API_URL,
 		// Credentials for the Triton server to call the Magic api
-		user: CLIENT_PORTAL_USERNAME,
-		password: CLIENT_PORTAL_PASSWORD,
+		user: TRITON_ENVIRONMENTS.CLIENT_PORTAL_USERNAME,
+		password: TRITON_ENVIRONMENTS.CLIENT_PORTAL_PASSWORD,
 	},
 
 	lims: {
-		url: LIMS_API_URL,
-		username: LIMS_USERNAME,
-		password: LIMS_PASSWORD,
+		url: TRITON_ENVIRONMENTS.LIMS_API_URL,
+		username: TRITON_ENVIRONMENTS.LIMS_USERNAME,
+		password: TRITON_ENVIRONMENTS.LIMS_PASSWORD,
 	},
 
 	client: {
 		// Address of the triton client web application
-		url: CLIENT_ORIGIN,
+		url: TRITON_ENVIRONMENTS.CLIENT_ORIGIN,
 	},
 }
 
