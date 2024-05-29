@@ -23,7 +23,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 				logger.error(err, '[sendmail]')
 				reject(err)
 			})
-			sendmail.stdin.write(`To: ${to}\n Subject: ${subject}\nMIME-Version: 1.0\nContent-Type: text/html\n${content}`, (err) => {
+			sendmail.stdin.write(`To: ${to}\nSubject: ${subject}\nMIME-Version: 1.0\nContent-Type: text/html\n${content}`, (err) => {
 				if (err) {
 					logger.error(err, '[sendmail]')
 					reject(err)
