@@ -7,7 +7,6 @@
 // import util from 'util'
 import path from 'path'
 import config from '../../config'
-import { format as formatDate } from 'date-fns'
 import { Kysely, Transaction } from 'kysely'
 import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact } from './download-types'
 import { createSQLite } from './sqlite-database'
@@ -164,5 +163,5 @@ export function setDatasetDownloading(datasetID: number, value: boolean) {
 // Helpers
 
 function currentDateToString() {
-	return formatDate(new Date(), 'yyyy-mm-ddThh:mm:ss')
+	return (new Date()).toISOString()
 }
