@@ -47,28 +47,32 @@ export function start() {
         const requests = await db.listRequests()
         logger.debug(`[contacts] Found ${requests.length} requests`)
         await Promise.allSettled(requests.map(async (request) => {
-            await broadcastEmailsOfProject(request.project_id, async (send) => {
-                const completionDate = request.completion_date && new Date(request.completion_date)
-                const notificationDate = request.notification_date && new Date(request.notification_date)
-                const failureDate = request.failure_date && new Date(request.failure_date)
+            logger.debug(`[contacts] Processing request: ${JSON.stringify(request)}`)
+            const completionDate = request.completion_date && new Date(request.completion_date)
+            const notificationDate = request.notification_date && new Date(request.notification_date)
+            const failureDate = request.failure_date && new Date(request.failure_date)
 
-                if (request.status === 'SUCCESS' && completionDate && (!notificationDate || notificationDate < completionDate)) {
-                    const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
+            if (request.status === 'SUCCESS' && completionDate && (!notificationDate || notificationDate < completionDate)) {
+                const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
+                await broadcastEmailsOfProject(request.project_id, async (send) => {
                     await send(
                         `${subject}`,
                         `${subject}.<br/>
                         The dataset can be downloaded using ${request.type} using the credential provided to you.`,
                     )
-                }
-                if (request.status === 'FAILED' && failureDate && (!notificationDate || notificationDate < failureDate)) {
-                    const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`
+                })
+                await db.updateNotificationDate(request.id)
+            }
+            if (request.status === 'FAILED' && failureDate && (!notificationDate || notificationDate < failureDate)) {
+                const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`
+                await broadcastEmailsOfProject(request.project_id, async (send) => {
                     await send(
                         `${subject}`,
                         `${subject}.`,
                     )
-                }
-            })
-            await db.updateNotificationDate(request.id)
+                })
+                await db.updateNotificationDate(request.id)
+            }
         }))
     }
 
