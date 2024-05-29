@@ -4,8 +4,8 @@
 	"description": "Triton data delivery backend",
 	"main": "src/start-server.ts",
 	"scripts": {
-		"test": "jest",
 		"start-production": "NODE_ENV=production npx ts-node src/start-server.ts",
+		"test": "jest --setupFiles ./config.ts",
 		"start": "NODE_ENV=development npx nodemon src/start-server.ts",
 		"debug": "NODE_ENV=development DEBUG=express-session npx nodemon src/start-server.ts"
 	},
@@ -39,7 +39,6 @@
 		"connect-sqlite3": "^0.9.13",
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",
-		"date-fns": "2.29.2",
 		"dotenv": "^16.4.5",
 		"express": "^4.18.1",
 		"express-async-handler": "^1.2.0",

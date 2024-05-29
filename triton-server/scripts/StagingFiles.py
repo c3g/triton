@@ -180,7 +180,7 @@ while 1:
         failure=1
 
       if (failure==1):
-        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'FAILED' WHERE dataset_id='" + dataset + "' and type='" + mytype + "'\""], stdout=subprocess.PIPE)
+        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'FAILED',failure_date='" + datetime.datetime.now().isoformat() + " WHERE dataset_id='" + dataset + "' and type='" + mytype + "'\""], stdout=subprocess.PIPE)
         pUpd.communicate()
       else:
         completed=datetime.datetime.now()

@@ -7,7 +7,6 @@
 // import util from 'util'
 import path from 'path'
 import config from '../../config'
-import { format as formatDate } from 'date-fns'
 import { Kysely, Transaction } from 'kysely'
 import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact } from './download-types'
 import { createSQLite } from './sqlite-database'
@@ -16,6 +15,10 @@ export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
 	async function listRequestsByDatasetId(datasetId: DatasetID) {
 		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
+	}
+
+	async function listRequests() {
+		return await db.selectFrom('requests').selectAll().execute()
 	}
 
 	async function getRequest(datasetId: DatasetID, type: DownloadRequestType) {
@@ -40,7 +43,6 @@ export async function createActions(db: Kysely<Database>) {
 				...request,
 				status: 'REQUESTED',
 				creation_date: currentDateToString(),
-				notified: 0,
 				should_delete: 0,
 			}
 			const newRequest = await trx
@@ -88,8 +90,19 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.deleteFrom('contacts').where('project_id', '=', projectID).where('type', '=', type).executeTakeFirstOrThrow()
 	}
 
+	async function updateNotificationDate(requestID: DownloadRequestID) {
+		return await db
+			.updateTable('requests')
+			.set({ notification_date: currentDateToString() })
+			.where('id', '=', requestID)
+			.returningAll()
+			.executeTakeFirstOrThrow()
+	
+	}
+
 	return {
 		listRequestsByDatasetId,
+		listRequests,
 		getRequest,
 		getRequestByID,
 		createRequest,
@@ -98,6 +111,7 @@ export async function createActions(db: Kysely<Database>) {
 		listFilesByDatasetId,
 		listReadyContacts,
 		removeContact,
+		updateNotificationDate,
 	}
 }
 
@@ -149,5 +163,5 @@ export function setDatasetDownloading(datasetID: number, value: boolean) {
 // Helpers
 
 function currentDateToString() {
-	return formatDate(new Date(), 'yyyy-mm-ddThh:mm:ss')
+	return (new Date()).toISOString()
 }
