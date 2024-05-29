@@ -20,7 +20,6 @@ export const httpLogger = asyncHandler(async (req: Express.Request, res: Express
 			method = '',
 			headers: { host = '', origin = '' },
 			url = '',
-			cookies = {},
 		} = req
 		const { statusCode = 0, statusMessage = '' } = res
 
@@ -29,7 +28,6 @@ export const httpLogger = asyncHandler(async (req: Express.Request, res: Express
 				method,
 				headers: { host, origin },
 				url,
-				cookies,
 			},
 			response: { statusCode, statusMessage },
 		}
