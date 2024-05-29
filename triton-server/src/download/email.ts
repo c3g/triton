@@ -7,33 +7,33 @@ import { logger } from '../logger'
 
 
 export async function sendEmail(from: string, to: string, subject: string, content: string) {
-	const mailx = spawn('mailx', ['-s', subject, to], {
+	const sendmail = spawn('sendmail', ['-t'], {
 		stdio: ['pipe', 'ignore', 'pipe']
 	})
 	try {
 		await new Promise<void>((resolve, reject) => {
-			mailx.stderr.on('data', (data: string) => {
-				logger.error(data, '[mailx]')
+			sendmail.stderr.on('data', (data: string) => {
+				logger.error(data, '[sendmail]')
 				reject(data)
 			})
-			mailx.on('exit', () => resolve())
-			mailx.on('disconnect', () => resolve())
-			mailx.on('close', () => resolve())
-			mailx.on('error', (err) => {
-				logger.error(err, '[mailx]')
+			sendmail.on('exit', () => resolve())
+			sendmail.on('disconnect', () => resolve())
+			sendmail.on('close', () => resolve())
+			sendmail.on('error', (err) => {
+				logger.error(err, '[sendmail]')
 				reject(err)
 			})
-			mailx.stdin.write(`${content}`, (err) => {
+			sendmail.stdin.write(`To: ${to}\n Subject: ${subject}\nMIME-Version: 1.0\nContent-Type: text/html\n${content}`, (err) => {
 				if (err) {
-					logger.error(err, '[mailx]')
+					logger.error(err, '[sendmail]')
 					reject(err)
 				} else {
-					logger.debug(`Finished writing to ${to}`, '[mailx]')
+					logger.debug(`Finished writing to ${to}`, '[sendmail]')
 				}
 			})
-			mailx.stdin.end()
+			sendmail.stdin.end()
 		})
 	} finally {
-		mailx.kill()
+		sendmail.kill()
 	}
 }
