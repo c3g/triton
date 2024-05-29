@@ -61,7 +61,7 @@ interface DownloadFileRecord {
 
 export type DownloadFile = Selectable<DownloadFileRecord>
 export type NewDownloadFile = Insertable<DownloadFileRecord>
-export type DownloadFileUpdate = Updateable<DownloadFileRecord>
+export type UpdateDownloadFile = Updateable<DownloadFileRecord>
 
 export type DatasetID = DownloadRequest['dataset_id']
 
