@@ -13,7 +13,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 	try {
 		await new Promise<void>((resolve, reject) => {
 			mailx.stderr.on('data', (data: string) => {
-				logger.error(`[mailx] ${data}`)
+				logger.error(data, '[mailx]')
 				reject(data)
 			})
 			mailx.on('exit', () => resolve())
@@ -28,7 +28,7 @@ export async function sendEmail(from: string, to: string, subject: string, conte
 					logger.error(err, '[mailx]')
 					reject(err)
 				} else {
-					logger.debug(`[mailx] Finished writing to ${to}`)
+					logger.debug(`Finished writing to ${to}`, '[mailx]')
 				}
 			})
 			mailx.stdin.end()
