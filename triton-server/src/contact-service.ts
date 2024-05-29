@@ -28,9 +28,8 @@ export function start() {
     async function tick() {
         const db = await defaultDatabaseActions()
         const contacts = await db.listReadyContacts()
-        logger.debug(`[contacts] Found ${contacts.length} contacts`)
-        if (contacts.length === 0) return
 
+        logger.debug(`[contacts] Found ${contacts.length} contacts`)
         await Promise.allSettled(contacts.filter((contact) => contact.depth === '').map(async (contact) => {            
             await broadcastEmailsOfProject(contact.project_id, async (send) => {
                 await send(
@@ -46,6 +45,7 @@ export function start() {
         }))
 
         const requests = await db.listRequests()
+        logger.debug(`[contacts] Found ${requests.length} requests`)
         await Promise.allSettled(requests.map(async (request) => {
             await broadcastEmailsOfProject(request.project_id, async (send) => {
                 const completionDate = request.completion_date && new Date(request.completion_date)
