@@ -38,9 +38,9 @@ export function start() {
                 )
             })
 
-            logger.info(`[contacts] Removing contact ${JSON.stringify(contact)}`)
+            logger.info(`[contacts] Removing contact ${contact.id}`)
             await db.removeContact(contact.project_id, contact.type).catch((error) =>
-                logger.error(error, `[contacts] Could not remove contact ${JSON.stringify(contact)}`)
+                logger.error(error, `[contacts] Could not remove contact ${contact.id}`)
             )
         }))
 
@@ -90,8 +90,8 @@ async function broadcastEmailsOfProject(projectID: string, fn: (sendEmail: (subj
 
 function getCredentialSubjectFor(contact: Contact) {
     return contact.status === 'NEW'
-        ? `Credentials for ${contact.type} account ${contact.project_id}`
-        : `Password reset for ${contact.type} account ${contact.project_id}`
+        ? `Credentials for project ${contact.project_id} through ${contact.type}`
+        : `Password reset for project ${contact.project_id} through ${contact.type}`
 }
 
 function getCredentialMessageFor(contact: Contact) {
@@ -99,7 +99,7 @@ function getCredentialMessageFor(contact: Contact) {
         return `
       Hello,<br/>
       <br/>
-      A new Globus account has been created for a project to which you have access.<br/>
+      A new Globus account has been created for the project ${contact.project_id}.<br/>
       <br/>
       Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
       Username: <b>${contact.project_id}</b><br/>
@@ -113,7 +113,7 @@ function getCredentialMessageFor(contact: Contact) {
         return `
         Hello,<br/>
         <br/>
-        The Globus password has been reset for a project to which you have access.<br/>
+        The Globus password has been reset for the project ${contact.project_id}.<br/>
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
@@ -127,7 +127,7 @@ function getCredentialMessageFor(contact: Contact) {
         return `
         Hello,<br/>
         <br/>
-        A new SFTP account has been created for a project to which you have access.<br/>
+        A new SFTP account has been created for the project ${contact.project_id}.<br/>
         <br/>
         Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
@@ -141,7 +141,7 @@ function getCredentialMessageFor(contact: Contact) {
         return `
       Hello,<br/>
       <br/>
-      The SFTP password has been reset for a project to which you have access.<br/>
+      The SFTP password has been reset for the project ${contact.project_id}.<br/>
       <br/>
       Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
       Username: <b>${contact.project_id}</b><br/>
@@ -151,8 +151,7 @@ function getCredentialMessageFor(contact: Contact) {
       `
     }
 
-    // maybe hide contact.depth?
-    throw new Error(`Unreachable: (${JSON.stringify(contact)})`)
+    throw new Error(`Unreachable contact: ${contact.id}`)
 }
 
 async function getEmailsForProject(projectID: ExternalProjectID): Promise<string[]> {
