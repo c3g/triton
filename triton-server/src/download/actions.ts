@@ -8,12 +8,12 @@
 import path from 'path'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact, REQUEST_STATUS } from './download-types'
+import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DatasetID, Contact, REQUEST_STATUS } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
-	async function listRequestsByDatasetId(datasetId: DatasetID) {
+	async function listRequestsByDatasetId(datasetId: DatasetID) : Promise<DownloadRequest[]> {
 		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
@@ -44,13 +44,14 @@ export async function createActions(db: Kysely<Database>) {
 				status: 'REQUESTED',
 				creation_date: currentDateToString(),
 				should_delete: 0,
+        is_cancelled: 0,
 			}
+			const insertedFiles = await insertFiles(files, trx)
 			const newRequest = await trx
 				.insertInto('requests')
 				.values(values)
 				.returningAll()
 				.executeTakeFirstOrThrow()
-			const insertedFiles = await insertFiles(files, trx)
 			return {
 				files: insertedFiles,
 				request: newRequest,
@@ -82,7 +83,7 @@ export async function createActions(db: Kysely<Database>) {
 			.execute()
 	}
 
-	async function listFilesByDatasetId(datasetId: DatasetID) {
+	async function listFilesByDatasetId(datasetId: DatasetID): Promise<DownloadFile[]> {
 		return await db.selectFrom('files').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
