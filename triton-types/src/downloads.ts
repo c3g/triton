@@ -24,10 +24,9 @@ export interface DownloadRequestRecord {
 	readonly completion_date?: string
 	readonly expiry_date?: string
 	readonly failure_date?: string
-	readonly notification_date?: string
 
 	readonly requester?: string
-	readonly notified: 0 | 1 // default 0 (false)
+	readonly notification_date?: string
 	readonly should_delete: 0 | 1 // default 0 (false)
 }
 

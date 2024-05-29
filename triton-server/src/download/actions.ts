@@ -44,7 +44,6 @@ export async function createActions(db: Kysely<Database>) {
 				...request,
 				status: 'REQUESTED',
 				creation_date: currentDateToString(),
-				notified: 0,
 				should_delete: 0,
 			}
 			const newRequest = await trx
