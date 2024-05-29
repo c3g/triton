@@ -55,11 +55,13 @@ async function getToken(): Promise<string> {
 
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
+  const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
 	const response = await axios.request<MagicAuthResponse>({
 		method: 'POST',
 		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
 		headers: {
+      Authorization: credentials,
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
