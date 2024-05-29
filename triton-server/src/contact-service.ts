@@ -30,7 +30,7 @@ export function start() {
         const contacts = await db.listReadyContacts()
 
         logger.debug(`[contacts] Found ${contacts.length} contacts`)
-        await Promise.allSettled(contacts.filter((contact) => contact.depth === '').map(async (contact) => {            
+        await Promise.allSettled(contacts.filter((contact) => contact.depth).map(async (contact) => {            
             await broadcastEmailsOfProject(contact.project_id, async (send) => {
                 await send(
                     getCredentialSubjectFor(contact),
