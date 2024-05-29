@@ -8,12 +8,12 @@
 import path from 'path'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DatasetID, Contact, REQUEST_STATUS } from './download-types'
+import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact, REQUEST_STATUS } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
-	async function listRequestsByDatasetId(datasetId: DatasetID) : Promise<DownloadRequest[]> {
+	async function listRequestsByDatasetId(datasetId: DownloadDatasetID) : Promise<DownloadRequest[]> {
 		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
@@ -21,7 +21,7 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.selectFrom('requests').selectAll().execute()
 	}
 
-	async function getRequest(datasetId: DatasetID, type: DownloadRequestType) {
+	async function getRequest(datasetId: DownloadDatasetID, type: DownloadRequestType) {
 		return await db
 			.selectFrom('requests')
 			.where('dataset_id', '=', datasetId)
@@ -59,7 +59,7 @@ export async function createActions(db: Kysely<Database>) {
 		})
 	}
 
-	async function deleteRequest(datasetID: DatasetID, type: DownloadRequestType) {
+	async function deleteRequest(datasetID: DownloadDatasetID, type: DownloadRequestType) {
 		return await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).where('type', '=', type).returningAll().executeTakeFirstOrThrow()
 	}
 
@@ -83,7 +83,7 @@ export async function createActions(db: Kysely<Database>) {
 			.execute()
 	}
 
-	async function listFilesByDatasetId(datasetId: DatasetID): Promise<DownloadFile[]> {
+	async function listFilesByDatasetId(datasetId: DownloadDatasetID): Promise<DownloadFile[]> {
 		return await db.selectFrom('files').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
@@ -124,7 +124,7 @@ export async function createActions(db: Kysely<Database>) {
 let actions: DatabaseActions | null = null
 export async function defaultDatabaseActions(): Promise<DatabaseActions> {
 	if (!actions) {
-		const db = await createSQLite(config.paths.downloadDB /*, path.join(__dirname, './schema.sql') should already exist */)
+		const db = await createSQLite(config.paths.downloadDB, undefined)
 		actions = await createActions(db)
 	}
 

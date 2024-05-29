@@ -63,7 +63,7 @@ export type DownloadFile = Selectable<DownloadFileRecord>
 export type NewDownloadFile = Insertable<DownloadFileRecord>
 export type UpdateDownloadFile = Updateable<DownloadFileRecord>
 
-export type DatasetID = DownloadRequest['dataset_id']
+export type DownloadDatasetID = DownloadRequest['dataset_id']
 
 interface ContactRecord {
 	readonly id: Generated<number>
