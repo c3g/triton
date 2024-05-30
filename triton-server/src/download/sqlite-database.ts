@@ -4,7 +4,7 @@ import { readFileSync } from 'fs'
 import { Kysely, SqliteDialect, sql } from 'kysely'
 import { logger } from '../logger'
 
-export async function createSQLite(path: string, schemaPath: string | undefined = undefined) {
+export async function createSQLite(path: string, schemaPath: string | undefined) {
 	const database = new SQLite(path)
 
   if (schemaPath !== undefined){
