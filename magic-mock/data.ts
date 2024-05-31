@@ -1,5 +1,5 @@
-import { TritonProject, IsLoggedInData } from '../triton-types/api'
-import { ProjectUser, ProjectUsers, UserDetails, UserProjects } from '../triton-types/magic'
+import { TritonProject, IsLoggedInData } from '../triton-types/models/api'
+import { ProjectUser, ProjectUsers, UserDetails, UserProjects } from '../triton-types/models/magic'
 
 export const userDetails: UserDetails = {
 	firstName: 'firstName',

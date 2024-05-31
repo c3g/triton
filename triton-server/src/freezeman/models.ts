@@ -1,1 +1,1 @@
-export * from '../../../triton-types/freezeman'
+export * from '../../../triton-types/models/freezeman'

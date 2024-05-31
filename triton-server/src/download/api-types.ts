@@ -1,1 +1,1 @@
-export * from '../../../triton-types/api'
+export * from '../../../triton-types/models/api'
