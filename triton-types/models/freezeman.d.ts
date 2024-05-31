@@ -21,17 +21,16 @@ export interface Dataset {
 }
 
 export type DatasetID = number
-export enum ReleaseFlag {
-	AVAILABLE = 0,
-	RELEASED = 1,
-	BLOCKED = 2,
-}
 
-export enum ValidationFlag {
-	AVAILABLE = 0,
-	PASSED = 1,
-	FAILED = 1,
-}
+export type ReleaseFlagAvailable = 0
+export type ReleaseFlagReleased = 1
+export type ReleaseFlagBlocked = 2
+export type ReleaseFlag = ReleaseFlagAvailable | ReleaseFlagReleased | ReleaseFlagBlocked
+
+export type ValidationFlagAvailable = 0
+export type ValidationFlagPassed = 1
+export type ValidationFlagFailed = 2
+export type ValidationFlag = ValidationFlagAvailable | ValidationFlagPassed | ValidationFlagFailed
 
 export interface DatasetFile {
 	readonly id: DatasetFileID
