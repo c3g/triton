@@ -10,12 +10,20 @@ export interface Database {
 	contacts: ContactRecord
 }
 
+export enum DownloadRequestStatus {
+	REQUESTED = 'REQUESTED',
+	PENDING = 'PENDING',
+	QUEUED = 'QUEUED',
+	FAILED = 'FAILED',
+	SUCCESS = 'SUCCESS',
+}
+
 /**
  * The request database object used to deal with user requests for files.
  */
 export interface DownloadRequestRecord {
 	readonly id: Generated<number>
-	readonly status: 'REQUESTED' | 'PENDING' | 'QUEUED' | 'FAILED' | 'SUCCESS'
+	readonly status: keyof typeof DownloadRequestStatus
 	readonly type: 'HTTP' | 'SFTP' | 'GLOBUS'
 	readonly dataset_id: string
 	readonly project_id: string
@@ -36,7 +44,6 @@ export type DownloadRequest = Selectable<DownloadRequestRecord>
 export type NewDownloadRequest = Insertable<DownloadRequestRecord>
 export type UpdateDownloadRequest = Updateable<DownloadRequestRecord>
 
-export type DownloadRequestStatus = DownloadRequest['status']
 export type DownloadRequestType = DownloadRequest['type']
 export type DownloadRequestID = DownloadRequest['id']
 

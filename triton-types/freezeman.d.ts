@@ -21,19 +21,17 @@ export interface Dataset {
 }
 
 export type DatasetID = number
-const RELEASE_FLAG = {
-	AVAILABLE: 0,
-	RELEASED: 1,
-	BLOCKED: 2,
-} as const
-export type ReleaseFlag = typeof RELEASE_FLAG[keyof typeof RELEASE_FLAG]
+export enum ReleaseFlag {
+	AVAILABLE = 0,
+	RELEASED = 1,
+	BLOCKED = 2,
+}
 
-const VALIDATION_FLAG = {
-	AVAILABLE: 0,
-	PASSED: 1,
-	FAILED: 2,
-} as const
-export type ValidationFlag = typeof VALIDATION_FLAG[keyof typeof VALIDATION_FLAG]
+export enum ValidationFlag {
+	AVAILABLE = 0,
+	PASSED = 1,
+	FAILED = 1,
+}
 
 export interface DatasetFile {
 	readonly id: DatasetFileID
