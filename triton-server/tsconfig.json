@@ -8,7 +8,7 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"sourceMap": true,
-    	"moduleResolution": "Node",
+		"moduleResolution": "Node",
 	},
 	"include": ["./src", "./*.ts"],
 	"exclude": ["node_modules/"],
