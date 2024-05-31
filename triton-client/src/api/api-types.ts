@@ -3,5 +3,5 @@
     Client code should import types from here, rather than using a path to the external
     types library, which could change.
 */
-export * from '../../../triton-types/src/api'
-export * from '../../../triton-types/src/downloads'
+export * from '../../../triton-types/api'
+export * from '../../../triton-types/downloads'

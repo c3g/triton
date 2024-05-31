@@ -2,25 +2,9 @@
 	"name": "triton-types",
 	"version": "1.0.0",
 	"description": "Type definition library for shared client/server types",
-	"main": "src/index.ts",
-	"types": "models/index.d.ts",
-	"scripts": {
-		"build": "tsc",
-		"start": "npx nodemon",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"nodemonConfig": {
-		"ext": "*.ts",
-		"watch": [
-			"src",
-			"package-lock.json",
-			"tsconfig.json"
-		],
-		"verbose": true,
-		"exec": "npm run build"
-	},
 	"author": "",
 	"license": "ISC",
+	"types": "index.d.ts",
 	"devDependencies": {
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-config-standard-with-typescript": "^23.0.0",

@@ -1,7 +1,7 @@
 import express from 'express'
 import * as http from 'http'
 import data from './data'
-import { MagicReply } from '../triton-types/models/magic'
+import { MagicReply } from '../triton-types/magic'
 
 function makeMagicReply<T>(data: T): MagicReply<T> {
 	return {
