@@ -18,25 +18,19 @@ export interface ClientConfig {
 	apiBaseUrl: URL
 }
 
-// Configuration for the DEV environment
-const debugConfig: ClientConfig = {
-	apiBaseUrl: new URL('http://localhost:3001/api/'),
-}
-
-// Configruation for the PROD environment
-const prodConfig: ClientConfig = {
-	apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}api/`),
-}
-
 // Get the config that matches the environment
-function getConfig() {
+function getConfig(): ClientConfig {
 	switch (
-	process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
+		process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
 	) {
 		case 'development':
-			return debugConfig
+			return {
+				apiBaseUrl: new URL('http://localhost:3001/api/'),
+			}
 		default:
-			return prodConfig
+			return {
+				apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}/api/`),
+			}
 	}
 }
 
