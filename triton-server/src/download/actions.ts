@@ -5,10 +5,9 @@
  */
 
 // import util from 'util'
-import path from 'path'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact, REQUEST_STATUS } from './download-types'
+import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
@@ -64,7 +63,7 @@ export async function createActions(db: Kysely<Database>) {
 	}
 
   async function deleteCancelledRequest() {
-		return await db.updateTable('requests').set({ should_delete: 1 }).where('status', '=', REQUEST_STATUS.SUCCESS).where('is_cancelled', '=', 1).returningAll().execute()
+		return await db.updateTable('requests').set({ should_delete: 1 }).where('status', '=', 'SUCCESS').where('is_cancelled', '=', 1).returningAll().execute()
 	}
 
 	async function insertFiles(files: NewDownloadFile[], trx?: Transaction<Database>) {
