@@ -4,7 +4,6 @@ import { TritonConstants } from "../api/api-types"
 export interface ConstantsState extends Omit<TritonConstants, 'id'> {}
 
 const initialState: ConstantsState = {
-    http_project_size: 0,
     globus_project_size: 0,
     sftp_project_size: 0
 }
@@ -14,7 +13,6 @@ export const constantsSlice = createSlice({
     initialState,
     reducers: {
         setConstants: (state, action: PayloadAction<ConstantsState>) => {
-            state.http_project_size = action.payload.http_project_size
             state.globus_project_size = action.payload.globus_project_size
             state.sftp_project_size = action.payload.sftp_project_size
         },
