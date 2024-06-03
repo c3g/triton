@@ -47,3 +47,10 @@ create table contacts (
 
    unique(project_id, type)
 );
+
+create table constants (
+    id                  INTEGER PRIMARY KEY ASC check(id = 0),
+    http_project_size   INTEGER not null,
+    globus_project_size INTEGER not null,
+    sftp_project_size   INTEGER not null
+);
