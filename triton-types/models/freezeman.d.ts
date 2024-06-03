@@ -21,19 +21,16 @@ export interface Dataset {
 }
 
 export type DatasetID = number
-const RELEASE_FLAG = {
-	AVAILABLE: 0,
-	RELEASED: 1,
-	BLOCKED: 2,
-} as const
-export type ReleaseFlag = typeof RELEASE_FLAG[keyof typeof RELEASE_FLAG]
 
-const VALIDATION_FLAG = {
-	AVAILABLE: 0,
-	PASSED: 1,
-	FAILED: 2,
-} as const
-export type ValidationFlag = typeof VALIDATION_FLAG[keyof typeof VALIDATION_FLAG]
+export type ReleaseFlagAvailable = 0
+export type ReleaseFlagReleased = 1
+export type ReleaseFlagBlocked = 2
+export type ReleaseFlag = ReleaseFlagAvailable | ReleaseFlagReleased | ReleaseFlagBlocked
+
+export type ValidationFlagAvailable = 0
+export type ValidationFlagPassed = 1
+export type ValidationFlagFailed = 2
+export type ValidationFlag = ValidationFlagAvailable | ValidationFlagPassed | ValidationFlagFailed
 
 export interface DatasetFile {
 	readonly id: DatasetFileID

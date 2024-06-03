@@ -5,15 +5,14 @@
  */
 
 // import util from 'util'
-import path from 'path'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequestID, DatasetID, Contact } from './download-types'
+import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
-	async function listRequestsByDatasetId(datasetId: DatasetID) {
+	async function listRequestsByDatasetId(datasetId: DownloadDatasetID) : Promise<DownloadRequest[]> {
 		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
@@ -21,7 +20,7 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.selectFrom('requests').selectAll().execute()
 	}
 
-	async function getRequest(datasetId: DatasetID, type: DownloadRequestType) {
+	async function getRequest(datasetId: DownloadDatasetID, type: DownloadRequestType) {
 		return await db
 			.selectFrom('requests')
 			.where('dataset_id', '=', datasetId)
@@ -44,13 +43,14 @@ export async function createActions(db: Kysely<Database>) {
 				status: 'REQUESTED',
 				creation_date: currentDateToString(),
 				should_delete: 0,
+        is_cancelled: 0,
 			}
+			const insertedFiles = await insertFiles(files, trx)
 			const newRequest = await trx
 				.insertInto('requests')
 				.values(values)
 				.returningAll()
 				.executeTakeFirstOrThrow()
-			const insertedFiles = await insertFiles(files, trx)
 			return {
 				files: insertedFiles,
 				request: newRequest,
@@ -58,8 +58,12 @@ export async function createActions(db: Kysely<Database>) {
 		})
 	}
 
-	async function deleteRequest(datasetID: DatasetID, type: DownloadRequestType) {
+	async function deleteRequest(datasetID: DownloadDatasetID, type: DownloadRequestType) {
 		return await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).where('type', '=', type).returningAll().executeTakeFirstOrThrow()
+	}
+
+  async function deleteCancelledRequest() {
+		return await db.updateTable('requests').set({ should_delete: 1 }).where('status', '=', 'SUCCESS').where('is_cancelled', '=', 1).returningAll().execute()
 	}
 
 	async function insertFiles(files: NewDownloadFile[], trx?: Transaction<Database>) {
@@ -78,7 +82,7 @@ export async function createActions(db: Kysely<Database>) {
 			.execute()
 	}
 
-	async function listFilesByDatasetId(datasetId: DatasetID) {
+	async function listFilesByDatasetId(datasetId: DownloadDatasetID): Promise<DownloadFile[]> {
 		return await db.selectFrom('files').where('dataset_id', '=', datasetId).selectAll().execute()
 	}
 
@@ -107,6 +111,7 @@ export async function createActions(db: Kysely<Database>) {
 		getRequestByID,
 		createRequest,
 		deleteRequest,
+    deleteCancelledRequest,
 		insertFiles,
 		listFilesByDatasetId,
 		listReadyContacts,
@@ -118,7 +123,7 @@ export async function createActions(db: Kysely<Database>) {
 let actions: DatabaseActions | null = null
 export async function defaultDatabaseActions(): Promise<DatabaseActions> {
 	if (!actions) {
-		const db = await createSQLite(config.paths.downloadDB, path.join(__dirname, './schema.sql'))
+		const db = await createSQLite(config.paths.downloadDB, undefined)
 		actions = await createActions(db)
 	}
 

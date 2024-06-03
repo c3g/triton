@@ -76,5 +76,9 @@ export default {
 		// Address of the triton client web application
 		url: TRITON_ENVIRONMENTS.CLIENT_ORIGIN,
 	},
+
+  request_service: {
+    tick_frequency: 30000 /* miliseconds */
+  }
 }
 

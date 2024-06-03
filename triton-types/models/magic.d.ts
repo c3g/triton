@@ -1,5 +1,3 @@
-// TODO Determine which fields can be optional
-
 /**
  * Standard reply format from magic api's. All api replies return this structure.
  */

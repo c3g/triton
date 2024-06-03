@@ -1,4 +1,4 @@
-import { DownloadFile, NewDownloadFile } from '../../../../triton-types/src/downloads'
+import { DownloadFile, NewDownloadFile } from '../../../../triton-types/models/downloads'
 import { DatabaseActions, createActions as createDatabaseActions } from '../../download/actions'
 import { createSQLite } from '../../download/sqlite-database'
 import path from 'path'

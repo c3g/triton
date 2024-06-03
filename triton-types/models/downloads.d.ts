@@ -2,7 +2,7 @@
  * The request objec used to deal with user requests for files.
  */
 
-import { Generated, Insertable, Selectable, Updateable } from 'kysely'
+import { Generated, Insertable, Selectable, Updateable, ColumnType } from 'kysely'
 
 export interface Database {
 	requests: DownloadRequestRecord
@@ -15,25 +15,26 @@ export interface Database {
  */
 export interface DownloadRequestRecord {
 	readonly id: Generated<number>
-	readonly status: 'REQUESTED' | 'PENDING' | 'SUCCESS' | 'FAILED' | 'QUEUED'
+	readonly status: 'REQUESTED' | 'PENDING' | 'QUEUED' | 'FAILED' | 'SUCCESS'
 	readonly type: 'HTTP' | 'SFTP' | 'GLOBUS'
 	readonly dataset_id: string
 	readonly project_id: string
 
-	readonly creation_date: string
-	readonly completion_date?: string
-	readonly expiry_date?: string
-	readonly failure_date?: string
+	readonly creation_date: ColumnType<string, string, never>
+	readonly completion_date?: ColumnType<string, never, string>
+	readonly expiry_date?: ColumnType<string, string, never>
+	readonly failure_date?: ColumnType<string, string, string>
 
 	readonly requester?: string
 	readonly notification_date?: string
 	readonly should_delete: 0 | 1 // default 0 (false)
+  readonly is_cancelled: 0 | 1 // default 0 (false)
 }
 
 // make sure that the correct types are used in each operation.
 export type DownloadRequest = Selectable<DownloadRequestRecord>
 export type NewDownloadRequest = Insertable<DownloadRequestRecord>
-export type DownloadRequestUpdate = Updateable<DownloadRequestRecord>
+export type UpdateDownloadRequest = Updateable<DownloadRequestRecord>
 
 export type DownloadRequestStatus = DownloadRequest['status']
 export type DownloadRequestType = DownloadRequest['type']
@@ -51,9 +52,9 @@ interface DownloadFileRecord {
 
 export type DownloadFile = Selectable<DownloadFileRecord>
 export type NewDownloadFile = Insertable<DownloadFileRecord>
-export type DownloadFileUpdate = Updateable<DownloadFileRecord>
+export type UpdateDownloadFile = Updateable<DownloadFileRecord>
 
-export type DatasetID = DownloadRequest['dataset_id']
+export type DownloadDatasetID = DownloadRequest['dataset_id']
 
 interface ContactRecord {
 	readonly id: Generated<number>
