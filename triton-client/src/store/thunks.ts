@@ -6,6 +6,7 @@ import { DatasetsStateActions } from './datasets'
 import { ProjectsStateActions } from './projects'
 import { ReadsetsStateActions } from './readsets'
 import { RunsStateActions } from './runs'
+import { ConstantsStateActions } from './constants'
 import { AppDispatch, RootState, convertToSerializedError } from './store'
 
 export const fetchLoginStatus = () => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -122,3 +123,13 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
 			throw err
 		}
 	}
+
+export const fetchConstants = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+	try {
+		const constants = await apiTriton.getConstants()
+		dispatch(ConstantsStateActions.setConstants(constants))
+	} catch (err) {
+		dispatch(ConstantsStateActions.setError(convertToSerializedError(err)))
+		throw err
+	}
+}
