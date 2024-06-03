@@ -13,7 +13,8 @@ import './Common.scss'
 
 import { Alert, Layout, Spin } from 'antd'
 import { TritonProject } from '../api/api-types'
-import { fetchLoginStatus, fetchProjects } from '../store/thunks'
+import { fetchLoginStatus, fetchProjects, fetchConstants } from '../store/thunks'
+import { selectConstants } from '../store/constants'
 
 const { Sider, Content } = Layout
 
@@ -31,6 +32,7 @@ function App() {
 	const user = useAppSelector(selectLoggedInUser)
 	const projects = useAppSelector<TritonProject[]>(selectProjects)
 	const areProjectsLoading = useAppSelector(selectProjectsLoading)
+	const constants = useAppSelector(selectConstants)
 
 	useEffect(() => {
 		if (!isLoggedIn) dispatch(fetchLoginStatus())
@@ -38,6 +40,10 @@ function App() {
 
 	useEffect(() => {
 		if (isLoggedIn) dispatch(fetchProjects())
+	}, [dispatch, isLoggedIn])
+
+	useEffect(() => {
+		dispatch(fetchConstants())
 	}, [dispatch, isLoggedIn])
 
 	let userName
@@ -66,6 +72,9 @@ function App() {
 								<Route path="/run/:runName" element={<RunDetail />} />
 								<Route path="*" element={<Navigate to="/" replace />} />
 							</Routes>
+							{constants.globus_project_size && `Globus: ${constants.globus_project_size} GB`}
+							{constants.http_project_size && `HTTP: ${constants.http_project_size} GB`}
+							{constants.sftp_project_size && `SFTP: ${constants.sftp_project_size} GB`}
 						</Content>
 					</Layout>
 				</Layout>

@@ -1,6 +1,6 @@
 // Models used by the client API.
 
-import { DownloadFile, DownloadRequest, DownloadRequestType } from './downloads'
+import { DownloadFile, DownloadRequest, DownloadRequestType, Constants } from './downloads'
 import { Dataset, DatasetFile, Readset } from './freezeman'
 import * as Magic from './magic'
 
@@ -88,3 +88,5 @@ export interface TritonCreateRequestResponse {
 	files: DownloadFile[];
 	request: DownloadRequest
 }
+
+export interface TritonConstants extends Constants {}

@@ -60,4 +60,13 @@ router.delete(
 	})
 )
 
+router.get(
+	'/constants',
+	asyncHandler(async (req: Request, res: Response) => {
+		const { getConstants } = await defaultDatabaseActions()
+		const result = await getConstants()
+		dataHandler(res)(result)
+	})
+)
+
 export default router

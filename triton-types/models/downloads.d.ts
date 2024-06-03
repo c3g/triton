@@ -8,6 +8,7 @@ export interface Database {
 	requests: DownloadRequestRecord
 	files: DownloadFileRecord
 	contacts: ContactRecord
+	constants: ConstantsRecord
 }
 
 /**
@@ -64,3 +65,11 @@ interface ContactRecord {
 	readonly type: 'SFTP' | 'GLOBUS'
 }
 export type Contact = Selectable<ContactRecord>
+
+interface ConstantsRecord {
+	readonly id: 0
+	readonly http_project_size: number
+	readonly globus_project_size: number
+	readonly sftp_project_size: number
+}
+export type Constants = Selectable<ConstantsRecord>
