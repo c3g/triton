@@ -73,7 +73,6 @@ function App() {
 								<Route path="*" element={<Navigate to="/" replace />} />
 							</Routes>
 							{constants.globus_project_size && `Globus: ${constants.globus_project_size} GB`}
-							{constants.http_project_size && `HTTP: ${constants.http_project_size} GB`}
 							{constants.sftp_project_size && `SFTP: ${constants.sftp_project_size} GB`}
 						</Content>
 					</Layout>
