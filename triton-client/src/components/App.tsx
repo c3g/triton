@@ -72,8 +72,8 @@ function App() {
 								<Route path="/run/:runName" element={<RunDetail />} />
 								<Route path="*" element={<Navigate to="/" replace />} />
 							</Routes>
-							{constants.globus_project_size && `Globus: ${constants.globus_project_size} GB`}
-							{constants.sftp_project_size && `SFTP: ${constants.sftp_project_size} GB`}
+							<div>{constants.globus_project_size && `Globus: ${constants.globus_project_size} GB`}</div>
+							<div>{constants.sftp_project_size && `SFTP: ${constants.sftp_project_size} GB`}</div>
 						</Content>
 					</Layout>
 				</Layout>
