@@ -12,7 +12,7 @@
 		"url": "https://github.com/c3g/triton/issues"
 	},
 	"scripts": {
-		"start": "react-scripts start",
+		"start": "NODE_ENV=development react-scripts start",
 		"build": "NODE_ENV=production react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"

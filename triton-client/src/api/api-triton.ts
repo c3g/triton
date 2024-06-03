@@ -1,6 +1,5 @@
 import {
 	ApiReply,
-	DownloadRequestType,
 	ExternalProjectID,
 	IsLoggedInData,
 	TritonCreateRequestBody,

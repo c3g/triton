@@ -2,18 +2,12 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"composite": true,
-		"rootDir": "src",
+		"rootDir": "models",
 		"declaration": true,
-		"emitDeclarationOnly": true,
-		"declarationDir": "./models",
-		"declarationMap": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
-		"noFallthroughCasesInSwitch": true,
 		"module": "esnext",
 		"moduleResolution": "node"
 	},
-	"include": ["src"]
+	"include": ["models/*.d.ts"]
 }

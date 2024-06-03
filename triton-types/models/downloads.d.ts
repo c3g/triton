@@ -10,21 +10,12 @@ export interface Database {
 	contacts: ContactRecord
 }
 
-export const REQUEST_STATUS = {
-  REQUESTED: "REQUESTED",
-  PENDING: "PENDING",
-  QUEUED: "QUEUED",
-  FAILED: "FAILED",
-  SUCCESS: "SUCCESS",
-} as const
-export type RequestStatus = typeof REQUEST_STATUS[keyof typeof REQUEST_STATUS]
-
 /**
  * The request database object used to deal with user requests for files.
  */
 export interface DownloadRequestRecord {
 	readonly id: Generated<number>
-	readonly status: RequestStatus
+	readonly status: 'REQUESTED' | 'PENDING' | 'QUEUED' | 'FAILED' | 'SUCCESS'
 	readonly type: 'HTTP' | 'SFTP' | 'GLOBUS'
 	readonly dataset_id: string
 	readonly project_id: string
