@@ -22,9 +22,6 @@ export function start() {
 
     async function tick() {
         const db = await defaultDatabaseActions()
-        // const requests = await db.listRequests()
-        // logger.debug(`[requests] Found ${requests.length} requests`)
-        // if (requests.length === 0) return
 
         await db.deleteCancelledRequest() // Convert all cancelled requests to ready for deletion once they are fully staged.
     }
