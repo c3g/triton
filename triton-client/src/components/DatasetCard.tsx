@@ -1,16 +1,23 @@
 import { Button, Modal, Space, Spin, Typography } from 'antd'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
-import { createDownloadRequest, fetchReadsets } from '../store/thunks'
+import { deleteDownloadRequest, createDownloadRequest, fetchReadsets } from '../store/thunks'
 import { selectConstants } from '../store/constants'
 import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
+import { CloseCircleOutlined } from '@ant-design/icons'
+import { ActionDropdown } from './ActionDropdown'
 
 const { Text } = Typography
 interface DatasetCardProps {
 	datasetID: number
+}
+
+export interface StagingAction {
+  action: {name: string, actionCall: () => void}
+  icon: ReactElement
 }
 
 function DatasetCard({ datasetID }: DatasetCardProps) {
@@ -20,7 +27,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const constants = useAppSelector(selectConstants)
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
-	const alreadyRequested = dataset ? dataset.requests.length > 0 : false
+  const [activeRequest, setActiveRequest] = useState<DownloadRequest>()
+	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
 	const dispatchCreateRequest = useCallback(async (type: DownloadRequestType) => {
@@ -46,6 +54,15 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		dispatch(fetchReadsets(datasetID))
 	}, [datasetID, dispatch])
 
+  useEffect(() => {
+    if (dataset && dataset.requests.length > 0) {
+      setActiveRequest(dataset?.requests[0])
+    }
+    else {
+      setActiveRequest(undefined)
+    }
+  },[dataset, dataset?.requests])
+
 	const request = useCallback((downloadType: DownloadRequestType) => {
 		if (dataset && project && totalSize) {
 			const diskUsage = project.diskUsage[downloadType]
@@ -64,6 +81,12 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		}
 	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
 
+  const deleteRequest = useCallback(() => {
+		if (dataset) {
+			dispatch(deleteDownloadRequest(dataset.external_project_id, datasetID)).catch((e) => console.error(e))
+		}
+	}, [dataset, datasetID, dispatch])
+
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {
 			requestByType[request.type] = request
@@ -73,34 +96,40 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const requestDetails = useMemo(() => {
 		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
-			if (req) {
+			if (req && !!!req.should_delete) {
 				const { type, status, expiry_date } = req
-				let statusDescription: ReactNode
+        const actions: StagingAction[] = [
+          {action: {name: "Unstage dataset", actionCall: () => deleteRequest()}, icon: <CloseCircleOutlined style={{color: '#c9162b'}}/>}
+        ]
+
+        let statusDescription: ReactNode
 				if (status === "SUCCESS") {
-					statusDescription = ["SUCCESS", "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
+					statusDescription = ["AVAILABLE", "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
 				} else if (status === "FAILED") {
 					statusDescription = "FAILED"
 				} else {
 					statusDescription = "QUEUED"
 				}
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={updatingRequest}>
-					<Space>
-						{type}
-						{"|"}
-						{statusDescription}
-					</Space>
-				</Button>
+				const buttonStagingActive = (<Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={updatingRequest}>
+					                        <Space>
+                                    {type}
+                                    {"|"}
+                                    {statusDescription}
+                                  </Space>
+                               </Button>)
+
+				return <ActionDropdown button={buttonStagingActive} actions={actions}/>
 			} else {
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest || !dataset || !project} onClick={() => request(type)}>
-					<Space>
-						{type}
-						{"|"}
-						AVAILABLE
-					</Space>
-				</Button>
-			}
-		})
-	}, [requestByType, updatingRequest, totalSize, alreadyRequested, dataset, project, request])
+                  <Space>
+                    {type}
+                    {"|"}
+                  {alreadyRequested && type === activeRequest.type? "UNSTAGING" : "READY"}
+                  </Space>
+				       </Button>
+      }
+    })
+	}, [alreadyRequested, dataset, project, request, updatingRequest, deleteRequest, activeRequest?.type, requestByType, totalSize])
 
 	return dataset ? (<div
 		style={{

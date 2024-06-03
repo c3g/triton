@@ -7,7 +7,7 @@
 // import util from 'util'
 import config from '../../config'
 import { Kysely, Transaction } from 'kysely'
-import { Database, NewDownloadFile, DownloadFile, DownloadRequestType, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact } from './download-types'
+import { Database, NewDownloadFile, DownloadFile, NewDownloadRequest, DownloadRequest, DownloadRequestID, DownloadDatasetID, Contact } from './download-types'
 import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
@@ -20,11 +20,10 @@ export async function createActions(db: Kysely<Database>) {
 		return await db.selectFrom('requests').selectAll().execute()
 	}
 
-	async function getRequest(datasetId: DownloadDatasetID, type: DownloadRequestType) {
+	async function getRequest(datasetId: DownloadDatasetID) {
 		return await db
 			.selectFrom('requests')
 			.where('dataset_id', '=', datasetId)
-			.where('type', '=', type)
 			.selectAll()
 			.executeTakeFirstOrThrow()
 	}
@@ -43,7 +42,6 @@ export async function createActions(db: Kysely<Database>) {
 				status: 'REQUESTED',
 				creation_date: currentDateToString(),
 				should_delete: 0,
-        is_cancelled: 0,
 			}
 			const insertedFiles = await insertFiles(files, trx)
 			const newRequest = await trx
@@ -58,12 +56,9 @@ export async function createActions(db: Kysely<Database>) {
 		})
 	}
 
-	async function deleteRequest(datasetID: DownloadDatasetID, type: DownloadRequestType) {
-		return await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).where('type', '=', type).returningAll().executeTakeFirstOrThrow()
-	}
-
-  async function deleteCancelledRequest() {
-		return await db.updateTable('requests').set({ should_delete: 1 }).where('status', '=', 'SUCCESS').where('is_cancelled', '=', 1).returningAll().execute()
+	async function deleteRequest(datasetID: DownloadDatasetID) {
+		const deletedRequest = await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).returningAll().executeTakeFirstOrThrow()
+    return {request: deletedRequest}
 	}
 
 	async function insertFiles(files: NewDownloadFile[], trx?: Transaction<Database>) {
@@ -115,7 +110,6 @@ export async function createActions(db: Kysely<Database>) {
 		getRequestByID,
 		createRequest,
 		deleteRequest,
-		deleteCancelledRequest,
 		insertFiles,
 		listFilesByDatasetId,
 		listReadyContacts,

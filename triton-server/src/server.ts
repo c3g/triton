@@ -16,12 +16,11 @@ import ApiRouter from './api/api-routes'
 import { UserDetails } from './magic/magic-types'
 import MagicAuthMiddleware from './magic/magic_middleware'
 // File staging DB
-import download from './download/routes'
+import DownloadRouter from './download/routes'
 import * as sqlite3 from 'sqlite3'
 import sqliteStoreFactory from 'express-session-sqlite'
 import cors from 'cors'
 import contactService from './contact-service'
-import requestService from './request-service'
 const SQLiteStore = sqliteStoreFactory(session)
 
 interface Credentials {
@@ -48,7 +47,6 @@ const CLIENT_PORTAL_ORIGIN = new URL(config.client_portal.loginUrl).origin
  */
 
 const stopContactService = contactService.start()
-const stopRequestService = requestService.start()
 
 const app = express()
 
@@ -113,7 +111,7 @@ app.use(cors({
 app.use(MagicAuthMiddleware)
 app.use('/api', ApiRouter)
 // File Staging
-app.use('/api/download', download)
+app.use('/api/download', DownloadRouter)
 
 // Generic error handler that catches any exceptions thrown from our routes.
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {

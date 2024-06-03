@@ -67,7 +67,7 @@ describe('download actions tests', () => {
 			it('test createRequest with empty files', async () => {
 				const db = await createTempDB()
 				await expect(db.createRequest(requestA, [])).rejects.toThrow(new Error('Cannot insert 0 files'))
-				await expect(db.getRequest(requestA.dataset_id, requestA.type)).rejects.toThrow(new Error('no result'))
+				await expect(db.getRequest(requestA.dataset_id)).rejects.toThrow(new Error('no result'))
 			})
 			it('test single createRequest', async () => {
 				const db = await createTempDB()
@@ -76,7 +76,7 @@ describe('download actions tests', () => {
 				expect(result.files).toEqual(files)
 
 				await expect(db.listRequestsByDatasetId(requestA.dataset_id)).resolves.toHaveLength(1)
-				await expect(db.getRequest(requestA.dataset_id, requestA.type)).resolves.toMatchObject(requestA)
+				await expect(db.getRequest(requestA.dataset_id)).resolves.toMatchObject(requestA)
 				await expect(db.getRequestByID(result.request.id)).resolves.toMatchObject(requestA)
 				await expect(db.listFilesByDatasetId(result.request.dataset_id)).resolves.toEqual(files)
 			})
@@ -111,14 +111,14 @@ describe('download actions tests', () => {
 				const db = await createTempDB()
 				const createResult = await db.createRequest(requestA, newFiles)
 
-				const deleteResult = await db.deleteRequest(requestA.dataset_id, requestA.type)
+				const deleteResult = await db.deleteRequest(requestA.dataset_id)
 				expect(deleteResult).toMatchObject({ ...createResult.request, should_delete: 1 })
 
-				await expect(db.getRequest(createResult.request.dataset_id, createResult.request.type)).resolves.toMatchObject(deleteResult)
+				await expect(db.getRequest(createResult.request.dataset_id)).resolves.toMatchObject(deleteResult)
 			})
 			it('test invalid deleteRequest', async () => {
 				const db = await createTempDB()
-				await expect(db.deleteRequest('1234', 'GLOBUS')).rejects.toThrow(new Error('no result'))
+				await expect(db.deleteRequest('1234')).rejects.toThrow(new Error('no result'))
 			})
 		})
 	})
