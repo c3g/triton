@@ -78,7 +78,7 @@ export default {
 	},
 
   request_service: {
-    tick_frequency: 30 /* seconds */ * 1000 /* miliseconds */
+    tick_frequency: 30000 /* miliseconds */
   }
 }
 
