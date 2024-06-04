@@ -61,6 +61,11 @@ export async function listProjects() {
 	return await tritonGet<TritonProject[]>('list-projects')
 }
 
+export async function listRunsForProjects(externalProjectIds: ExternalProjectID[]) {
+	const idList = externalProjectIds.join(',')
+	return await tritonGet<TritonRun[]>(`project-runs?external_project_ids=${idList}`)
+}
+
 /**
  * Fetch the datasets associated with one or more projects. Specify one or more
  * freezeman project ids.
@@ -72,17 +77,12 @@ export async function listDatasetsByIds(datasetIDs: Array<TritonDataset['id']>) 
 	return await tritonGet<TritonDataset[]>(`runs-datasets?ids=${idList}`)
 }
 
-export async function listRunsForProjects(externalProjectIds: ExternalProjectID[]){
-	const idList = externalProjectIds.join(',')
-	return await tritonGet<TritonRun[]>(`project-runs?external_project_ids=${idList}`)
-}
-
 export async function listReadsetsForDataset(datasetID: TritonDataset['id']) {
 	return await tritonGet<TritonReadset[]>(`dataset-readsets?dataset_id=${datasetID}`)
 }
 
-export async function listDatasetFilesForReadset(readsetID: TritonReadset['id']) {
-	return await tritonGet<TritonDatasetFile[]>(`/readset-datasetfiles/readset_id?=${readsetID}`)
+export async function listDatasetFilesByDatasetId(datasetID: TritonDataset['id']) {
+	return await tritonGet<TritonDatasetFile[]>(`/readset-datasetfiles?dataset_id=${datasetID}&`)
 }
 
 export async function createDownloadRequest(body: TritonCreateRequestBody) {
@@ -105,7 +105,7 @@ export default {
 	listRunsForProjects,
 	listDatasetsByIds,
 	listReadsetsForDataset,
-	listDatasetFilesForReadset,
+	listDatasetFilesByDatasetId,
 	createDownloadRequest,
 	getConstants,
 }

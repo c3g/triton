@@ -99,10 +99,8 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
 
 				return await axios.get(`${LIMS_API_URL}/dataset-files/?id__in=${ids.join(',')}&limit=100000`)
 			},
-			listByReadsetIds: async (readsetIds: readonly number[]): Promise<ListResponse<DatasetFile>> => {
-				if (readsetIds.length === 0) throw new Error('Must provide at least one readset id')
-
-				return await axios.get(`${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(',')}&limit=100000`)
+			listByDatasetId: async (datasetId: number): Promise<ListResponse<DatasetFile>> => {
+				return await axios.get(`${LIMS_API_URL}/dataset-files/?readset__dataset__id=${datasetId}&limit=100000`)
 			},
 		},
 		Readset: {

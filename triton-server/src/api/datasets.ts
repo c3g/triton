@@ -55,8 +55,7 @@ export async function listReadsetsByDataset(datasetId: TritonDataset['id']): Pro
 
 export async function listDatasetFilesByDataset(datasetId: TritonDataset['id']): Promise<TritonDatasetFile[]> {
 	const freezemanApi = await getFreezeManAuthenticatedAPI()
-	const readsets = (await freezemanApi.Readset.listByDatasetId(datasetId)).data.results.map((r) => r.id)
-	const datasetFiles = (await freezemanApi.DatasetFile.listByReadsetIds(readsets)).data.results
+	const datasetFiles = (await freezemanApi.DatasetFile.listByDatasetId(datasetId)).data.results
 
 	const { listFilesByDatasetId } = await defaultDatabaseActions()
 	const downloadFiles = await listFilesByDatasetId(`${datasetId}`)

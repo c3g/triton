@@ -95,18 +95,25 @@ export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch
 	}
 }
 
-export const fetchDatasetFiles = (readsetId: TritonReadset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {
-	if (getState().datasetFilesState.datasetFilesByReadsetId[readsetId]?.loading) return
+export const fetchDatasetFiles = (datasetId: TritonDataset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {
+	const readsets = (getState().readsetsState.readsetsByDatasetId[datasetId]?.readsets ?? []).filter((readsetId) => {
+		return !getState().datasetFilesState.datasetFilesByReadsetId[readsetId]?.loading
+	})
 
 	try {
-		dispatch(DatasetFilesStateActions.setLoading(readsetId))
-		const datasetFiles = await apiTriton.listDatasetFilesForReadset(readsetId)
+		readsets.forEach((readsetId) => dispatch(DatasetFilesStateActions.setLoading(readsetId)))
+		const datasetFiles = await apiTriton.listDatasetFilesByDatasetId(datasetId)
 		// console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
-		dispatch(DatasetFilesStateActions.setDatasetFilesByReadsetId({ readsetId, datasetFiles }))
+		const filesByReadset = datasetFiles.reduce<Record<TritonReadset['id'], typeof datasetFiles>>((filesByReadset, datasetFile) => {
+			filesByReadset[datasetFile.datasetFile.readset.id] ??= []
+			filesByReadset[datasetFile.datasetFile.readset.id].push(datasetFile)
+			return filesByReadset
+		}, {})
+		Object.entries(filesByReadset).forEach(([readsetId, datasetFiles]) => dispatch(DatasetFilesStateActions.setDatasetFilesByReadsetId({ readsetId: Number(readsetId), datasetFiles })))
 
 		return datasetFiles
 	} catch (err: any) {
-		dispatch(DatasetFilesStateActions.setError({ readsetId, error: convertToSerializedError(err) }))
+	        readsets.forEach((readsetId) => dispatch(DatasetFilesStateActions.setError({ readsetId, error: convertToSerializedError(err) })))
 		throw err
 	}
 }
