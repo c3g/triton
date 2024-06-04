@@ -46,15 +46,18 @@ function RunDetail() {
 		<div style={{ margin: '1rem 0.5rem' }}>
 			{runsByName[runName] && (
 				<>
-					<div style={{
-						backgroundColor: 'white',
-						paddingLeft: '1rem',
-						marginBottom: '0.5rem',
-						paddingRight: '1rem',
-					}}>
+					<Space
+						style={{
+							backgroundColor: 'white',
+							paddingLeft: '1rem',
+							marginBottom: '0.5rem',
+							paddingRight: '1rem',
+						}}
+						direction="vertical"
+					>
 						<div><Space>{"Globus:"} <DataSize size={totalUsage["GLOBUS"]} /> {"of"} <DataSize size={constants.globus_project_size} /></Space></div>
 		  				<div><Space>{"SFTP:"} <DataSize size={totalUsage["SFTP"]} /> {"of"} <DataSize size={constants.sftp_project_size} /></Space></div>
-					</div>
+					</Space>
 					<DatasetList
 						runName={runName}
 					/>
