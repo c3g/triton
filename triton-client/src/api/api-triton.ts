@@ -96,7 +96,7 @@ export async function createDownloadRequest(body: TritonCreateRequestBody) {
 }
 
 export async function getConstants() {
-	return await tritonGet<TritonConstants>('constants')
+	return await tritonGet<TritonConstants>('download/constants/')
 }
 
 export default {

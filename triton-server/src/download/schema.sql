@@ -49,7 +49,7 @@ create table contacts (
 );
 
 create table constants (
-    id                  INTEGER PRIMARY KEY ASC check(id = 0),
+    id                  INTEGER PRIMARY KEY ASC check(id = 1),
     http_project_size   INTEGER not null,
     globus_project_size INTEGER not null,
     sftp_project_size   INTEGER not null

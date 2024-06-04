@@ -32,7 +32,6 @@ function App() {
 	const user = useAppSelector(selectLoggedInUser)
 	const projects = useAppSelector<TritonProject[]>(selectProjects)
 	const areProjectsLoading = useAppSelector(selectProjectsLoading)
-	const constants = useAppSelector(selectConstants)
 
 	useEffect(() => {
 		if (!isLoggedIn) dispatch(fetchLoginStatus())
@@ -40,10 +39,6 @@ function App() {
 
 	useEffect(() => {
 		if (isLoggedIn) dispatch(fetchProjects())
-	}, [dispatch, isLoggedIn])
-
-	useEffect(() => {
-		dispatch(fetchConstants())
 	}, [dispatch, isLoggedIn])
 
 	let userName
@@ -72,8 +67,6 @@ function App() {
 								<Route path="/run/:runName" element={<RunDetail />} />
 								<Route path="*" element={<Navigate to="/" replace />} />
 							</Routes>
-							<div>{constants.globus_project_size && `Globus: ${constants.globus_project_size} GB`}</div>
-							<div>{constants.sftp_project_size && `SFTP: ${constants.sftp_project_size} GB`}</div>
 						</Content>
 					</Layout>
 				</Layout>

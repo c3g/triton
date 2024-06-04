@@ -61,7 +61,7 @@ router.delete(
 )
 
 router.get(
-	'/constants',
+	'/constants/',
 	asyncHandler(async (req: Request, res: Response) => {
 		const { getConstants } = await defaultDatabaseActions()
 		const result = await getConstants()

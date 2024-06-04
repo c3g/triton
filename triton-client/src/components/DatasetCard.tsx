@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
 import { sizeUnitWithScalar } from '../functions'
+import DataSize from './DataSize'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -103,17 +104,3 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 }
 
 export default DatasetCard
-
-
-interface SizeProps {
-	size: number
-}
-
-function DataSize({ size }: SizeProps) {
-	const { unit, size: magnitude } = sizeUnitWithScalar(size)
-	return (
-		<>
-			{(size / magnitude).toFixed(2)} {unit}
-		</>
-	)
-}

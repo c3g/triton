@@ -67,7 +67,7 @@ interface ContactRecord {
 export type Contact = Selectable<ContactRecord>
 
 interface ConstantsRecord {
-	readonly id: 0
+	readonly id: 1
 	readonly globus_project_size: number
 	readonly sftp_project_size: number
 }
