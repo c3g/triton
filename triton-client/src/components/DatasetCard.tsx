@@ -1,10 +1,11 @@
-import { Button, Checkbox, Divider, Space, Spin, Tag, Typography } from 'antd'
+import { Button, Divider, Modal, Space, Spin, Typography } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
 import DataSize from './DataSize'
+import { selectConstants } from '../store/constants'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -14,6 +15,8 @@ interface DatasetCardProps {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
+	const project = useAppSelector((state) => state.projectsState.projectsById[dataset?.external_project_id ?? -1])
+	const constants = useAppSelector(selectConstants)
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const alreadyRequested = dataset ? dataset.requests.length > 0 : false
@@ -35,10 +38,34 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	}, [datasetID, dispatch])
 
 	const request = useCallback((downloadType: DownloadRequestType) => {
-		if (dataset) {
-			dispatch(createDownloadRequest(dataset.external_project_id, datasetID, downloadType)).catch((e) => console.error(e))
+		if (dataset && project && totalSize) {
+			if (downloadType === 'GLOBUS') {
+				if (project.globusUsage + totalSize > constants.globus_project_size) {
+					Modal.confirm({
+						title: `Globus Project Quota Exceeded`,
+						content: 'The total size of the datasets will exceed the Globus project quota. This dataset will be queued until space is freed.',
+						onOk: () => dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'GLOBUS')).catch((e) => console.error(e)),
+						okText: 'Continue',
+						cancelText: 'Cancel',
+					})
+				} else {
+					dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'GLOBUS')).catch((e) => console.error(e))
+				}
+			} else if (downloadType === 'SFTP') {
+				if (project.sftpUsage + totalSize > constants.sftp_project_size) {
+					Modal.confirm({
+						title: 'SFTP Project Quota Exceeded',
+						content: 'The total size of the datasets will exceed the SFTP project quota. This dataset will be queued until space is freed.',
+						onOk: () => dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'SFTP')).catch((e) => console.error(e)),
+						okText: 'Continue',
+						cancelText: 'Cancel',
+					})
+				} else {
+					dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'SFTP')).catch((e) => console.error(e))
+				}
+			}
 		}
-	}, [dataset, datasetID, dispatch])
+	}, [constants.globus_project_size, constants.sftp_project_size, dataset, datasetID, dispatch, project, totalSize])
 
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {
