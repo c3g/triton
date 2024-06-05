@@ -79,6 +79,29 @@ export const fetchDatasets = (externalProjectId: ExternalProjectID) => async (di
 	}
 }
 
+const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: AppDispatch, getState: () => RootState) => {
+	const readsets = Object.values(getState().readsetsState.readsetsById).reduce<TritonReadset[]>((readsets, readset) => {
+		if (readset && readset.dataset && getState().datasetsState.datasetsById[readset.dataset]?.external_project_id === projectId) {
+			readsets.push(readset)
+		}
+		return readsets
+	}, [])
+	dispatch(ProjectsStateActions.setSFTPUsage({ projectId , usage: readsets.reduce((usage, readset) => {
+		const dataset = getState().datasetsState.datasetsById[readset.dataset]
+		if (dataset && dataset.requests.find((r) => r.type === 'SFTP')) {
+			return usage + readset.total_size
+		}
+		return usage
+	}, 0)}))
+	dispatch(ProjectsStateActions.setGlobusUsage({ projectId , usage: readsets.reduce((usage, readset) => {
+		const dataset = getState().datasetsState.datasetsById[readset.dataset]
+		if (dataset && dataset.requests.find((r) => r.type === 'GLOBUS')) {
+			return usage + readset.total_size
+		}
+		return usage
+	}, 0)}))
+}
+
 export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {
 	if (getState().readsetsState.readsetsByDatasetId[datasetId]?.loading) return
 
@@ -87,7 +110,12 @@ export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch
 		const readsets = await apiTriton.listReadsetsForDataset(datasetId)
 		// console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
 		dispatch(ReadsetsStateActions.setReadsetsByDatasetId({ datasetId, readsets }))
-		
+
+		const projectId = getState().datasetsState.datasetsById[datasetId]?.external_project_id
+		if (projectId) {
+			dispatch(updateProjectUsage(projectId))
+		}
+
 		return readsets
 	} catch (err: any) {
 		dispatch(ReadsetsStateActions.setError({ datasetId, error: convertToSerializedError(err) }))
@@ -118,6 +146,7 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
 			const response = await apiTriton.createDownloadRequest({ projectID: projectId, datasetID, type } )
 			// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
 			dispatch(DatasetsStateActions.setDownloadRequest(response))
+			dispatch(updateProjectUsage(projectId))
 		} catch (err: any) {
 			dispatch(DatasetsStateActions.setError({ projectId, error: convertToSerializedError(err) }))
 			throw err

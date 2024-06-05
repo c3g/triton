@@ -4,7 +4,6 @@ import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
-import { sizeUnitWithScalar } from '../functions'
 import DataSize from './DataSize'
 
 const { Text } = Typography

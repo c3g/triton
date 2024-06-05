@@ -1,12 +1,16 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit'
 import { TritonProject } from '../api/api-types'
 import { RootState } from './store'
-import { ItemsById } from './utils'
+
+export interface ProjectState extends TritonProject {
+	sftpUsage: number
+	globusUsage: number
+}
 
 export interface ProjectsState {
 	loading: boolean
 	projects: TritonProject[]
-	projectsById: Record<TritonProject['external_id'], TritonProject | undefined> // External project ID is used as key
+	projectsById: Record<TritonProject['external_id'], ProjectState | undefined> // External project ID is used as key
 	error?: SerializedError
 }
 
@@ -27,9 +31,25 @@ export const projectsSlice = createSlice({
 			state.loading = false
 			state.projects = action.payload
 			state.projectsById = state.projects.reduce((acc, project) => {
-				acc[project.external_id] = project
+				acc[project.external_id] = {
+					...project,
+					sftpUsage: 0,
+					globusUsage: 0,
+				}
 				return acc
 			}, {} as ProjectsState['projectsById'])
+		},
+		setSFTPUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], usage: number }>) => {
+			const project = state.projectsById[action.payload.projectId]
+			if (project) {
+				project.sftpUsage = action.payload.usage
+			}
+		},
+		setGlobusUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], usage: number }>) => {
+			const project = state.projectsById[action.payload.projectId]
+			if (project) {
+				project.globusUsage = action.payload.usage
+			}
 		},
 		setError: (state, action: PayloadAction<SerializedError>) => {
 			state.loading = false
