@@ -88,14 +88,14 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 	}, [])
 	dispatch(ProjectsStateActions.setSFTPUsage({ projectId , usage: readsets.reduce((usage, readset) => {
 		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset && dataset.requests.find((r) => r.type === 'SFTP')) {
+		if (dataset && dataset.requests.find((r) => r.type === 'SFTP' && r.status !== 'QUEUED')) {
 			return usage + readset.total_size
 		}
 		return usage
 	}, 0)}))
 	dispatch(ProjectsStateActions.setGlobusUsage({ projectId , usage: readsets.reduce((usage, readset) => {
 		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset && dataset.requests.find((r) => r.type === 'GLOBUS')) {
+		if (dataset && dataset.requests.find((r) => r.type === 'GLOBUS' && r.status !== 'QUEUED')) {
 			return usage + readset.total_size
 		}
 		return usage
