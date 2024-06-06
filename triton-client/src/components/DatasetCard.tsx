@@ -80,15 +80,19 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			if (req) {
 				const { type, status, expiry_date } = req
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }}>
-					{type}
-					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
-					{status === 'SUCCESS' ? expiry_date ?? '?' : status}
+					<Space>
+						{type}
+						{"|"}
+						{status === 'SUCCESS' ? expiry_date ?? '?' : status}
+					</Space>
 				</Button>
 			} else {
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested} onClick={() => request(type)}>
-					{type}
-					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
-					AVAILABLE
+					<Space>
+						{type}
+						{"|"}
+						AVAILABLE
+					</Space>
 				</Button>
 			}
 		})
