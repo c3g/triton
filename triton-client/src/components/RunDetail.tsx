@@ -4,8 +4,9 @@ import DatasetList from './DatasetList'
 import { useEffect } from 'react'
 import { selectConstants } from '../store/constants'
 import { fetchConstants } from '../store/thunks'
-import { Col, Row } from 'antd'
-import DataSize from './DataSize'
+
+import './RunDetail.scss'
+import { unitWithMagnitude } from '../functions'
 
 function RunDetail() {
 	const dispatch = useAppDispatch()
@@ -16,6 +17,9 @@ function RunDetail() {
 	const project = useAppSelector((state) => state.projectsState.projectsById[runsByName[runName]?.external_project_id ?? -1])
 	const constants = useAppSelector(selectConstants)
 
+	const globusUnitWithMagnitude = unitWithMagnitude(constants.globus_project_size)
+	const sftpUnitWithMagnitude = unitWithMagnitude(constants.sftp_project_size)
+
 	useEffect(() => {
 		dispatch(fetchConstants())
 	}, [dispatch])
@@ -25,20 +29,22 @@ function RunDetail() {
 			{runsByName[runName] && (
 				<>
 					{ project &&
-						<div style={{
-							backgroundColor: 'white',
-							marginBottom: '0.5rem',
-							paddingRight: '1.5rem',
-							width: '25rem',
-							textAlign: 'center',
-						}}>
-							<Row>
-								<Col span={6}>Globus:</Col> <Col span={6}>{<DataSize size={project.globusUsage} />}</Col> <Col span={6}>of</Col> <Col span={6}>{<DataSize size={constants.globus_project_size} />}</Col>
-							</Row>
-							<Row>
-								<Col span={6}>SFTP:</Col> <Col span={6}>{<DataSize size={project.sftpUsage} />}</Col> <Col span={6}>of</Col> <Col span={6}>{<DataSize size={constants.sftp_project_size} />}</Col>
-							</Row>
-						</div>
+						<span id={"RunDetail-capacity"}>
+							<table>
+								<tr>
+									<td>Globus:</td>
+									{dataSize(project.globusUsage).map((x) => <td key={x}>{x}</td>)}
+									<td>of</td>
+									{dataSize(constants.globus_project_size).map((x) => <td key={x}>{x}</td>)}
+								</tr>
+								<tr>
+									<td>SFTP:</td>
+									{dataSize(project.sftpUsage).map((x) => <td key={x}>{x}</td>)}
+									<td>of</td>
+									{dataSize(constants.sftp_project_size).map((x) => <td key={x}>{x}</td>)}
+								</tr>
+							</table>
+						</span>
 					}
 					<DatasetList
 						runName={runName}
@@ -47,6 +53,14 @@ function RunDetail() {
 			)}
 		</div>
 	)
+}
+
+function dataSize(size: number) {
+	const { unit, magnitude } = unitWithMagnitude(size)
+	return [
+		(size / magnitude).toFixed(2),
+		unit,
+	]
 }
 
 export default RunDetail

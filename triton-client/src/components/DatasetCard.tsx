@@ -4,8 +4,8 @@ import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
-import DataSize from './DataSize'
 import { selectConstants } from '../store/constants'
+import { unitWithMagnitude } from '../functions'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -142,6 +142,19 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		</div>
 	</div>
 	) : <Spin />
+}
+
+interface SizeProps {
+	size: number
+}
+
+function DataSize({ size }: SizeProps) {
+	const { unit, magnitude } = unitWithMagnitude(size)
+	return (
+		<>
+			{(size / magnitude).toFixed(2)} {unit}
+		</>
+	)
 }
 
 export default DatasetCard
