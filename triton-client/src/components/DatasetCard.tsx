@@ -1,5 +1,5 @@
-import { Button, Divider, Modal, Space, Spin, Typography } from 'antd'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Button, Modal, Space, Spin, Typography } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
@@ -20,6 +20,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const alreadyRequested = dataset ? dataset.requests.length > 0 : false
+
+	const [creatingRequest, setCreatingRequest] = useState(false)
+	const dispatchCreateRequest = useCallback(async (type: DownloadRequestType) => {
+		if (dataset) {
+			setCreatingRequest(true)
+			await dispatch(createDownloadRequest(dataset.external_project_id, datasetID, type)).finally(() => setCreatingRequest(false))
+		}
+	}, [dataset, datasetID, dispatch])
 
 	const readsets = useMemo(() => {
 		return readsetsByDatasetId[datasetID]?.readsets.reduce((readsets, id) => {
@@ -44,28 +52,28 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 					Modal.confirm({
 						title: `Globus Project Quota Exceeded`,
 						content: 'The total size of the datasets will exceed the Globus project quota. This dataset will be queued until space is freed.',
-						onOk: () => dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'GLOBUS')).catch((e) => console.error(e)),
+						onOk: () => dispatchCreateRequest('GLOBUS').catch((e) => console.error(e)),
 						okText: 'Continue',
 						cancelText: 'Cancel',
 					})
 				} else {
-					dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'GLOBUS')).catch((e) => console.error(e))
+					dispatchCreateRequest('GLOBUS').catch((e) => console.error(e))
 				}
 			} else if (downloadType === 'SFTP') {
 				if (project.sftpUsage + totalSize > constants.sftp_project_size) {
 					Modal.confirm({
 						title: 'SFTP Project Quota Exceeded',
 						content: 'The total size of the datasets will exceed the SFTP project quota. This dataset will be queued until space is freed.',
-						onOk: () => dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'SFTP')).catch((e) => console.error(e)),
+						onOk: () => dispatchCreateRequest('SFTP').catch((e) => console.error(e)),
 						okText: 'Continue',
 						cancelText: 'Cancel',
 					})
 				} else {
-					dispatch(createDownloadRequest(dataset.external_project_id, datasetID, 'SFTP')).catch((e) => console.error(e))
+					dispatchCreateRequest('SFTP').catch((e) => console.error(e))
 				}
 			}
 		}
-	}, [constants.globus_project_size, constants.sftp_project_size, dataset, datasetID, dispatch, project, totalSize])
+	}, [constants.globus_project_size, constants.sftp_project_size, dataset, dispatchCreateRequest, project, totalSize])
 
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {
@@ -79,7 +87,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			const req = requestByType[type]
 			if (req) {
 				const { type, status, expiry_date } = req
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }}>
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={creatingRequest}>
 					<Space>
 						{type}
 						{"|"}
@@ -87,7 +95,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 					</Space>
 				</Button>
 			} else {
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested} onClick={() => request(type)}>
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || creatingRequest} onClick={() => request(type)}>
 					<Space>
 						{type}
 						{"|"}
@@ -96,7 +104,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				</Button>
 			}
 		})
-	}, [alreadyRequested, request, requestByType, supportedDownloadType, totalSize])
+	}, [alreadyRequested, creatingRequest, request, requestByType, supportedDownloadType, totalSize])
 
 	return dataset ? (<div
 		style={{
