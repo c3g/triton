@@ -15,7 +15,7 @@ interface DatasetCardProps {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
-	const project = useAppSelector((state) => state.projectsState.projectsById[dataset?.external_project_id ?? -1])
+	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
 	const constants = useAppSelector(selectConstants)
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
