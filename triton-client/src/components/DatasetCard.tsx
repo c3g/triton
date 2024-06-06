@@ -21,11 +21,11 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const alreadyRequested = dataset ? dataset.requests.length > 0 : false
 
-	const [creatingRequest, setCreatingRequest] = useState(false)
+	const [updatingRequest, setUpdatingRequest] = useState(false)
 	const dispatchCreateRequest = useCallback(async (type: DownloadRequestType) => {
 		if (dataset) {
-			setCreatingRequest(true)
-			await dispatch(createDownloadRequest(dataset.external_project_id, datasetID, type)).finally(() => setCreatingRequest(false))
+			setUpdatingRequest(true)
+			await dispatch(createDownloadRequest(dataset.external_project_id, datasetID, type)).finally(() => setUpdatingRequest(false))
 		}
 	}, [dataset, datasetID, dispatch])
 
@@ -75,7 +75,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			const req = requestByType[type]
 			if (req) {
 				const { type, status, expiry_date } = req
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={creatingRequest}>
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={updatingRequest}>
 					<Space>
 						{type}
 						{"|"}
@@ -86,7 +86,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 					</Space>
 				</Button>
 			} else {
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || creatingRequest} onClick={() => request(type)}>
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest} onClick={() => request(type)}>
 					<Space>
 						{type}
 						{"|"}
@@ -95,7 +95,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				</Button>
 			}
 		})
-	}, [alreadyRequested, creatingRequest, request, requestByType, supportedDownloadType, totalSize])
+	}, [alreadyRequested, updatingRequest, request, requestByType, supportedDownloadType, totalSize])
 
 	return dataset ? (<div
 		style={{
