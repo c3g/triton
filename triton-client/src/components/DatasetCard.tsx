@@ -47,33 +47,21 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
 	const request = useCallback((downloadType: DownloadRequestType) => {
 		if (dataset && project && totalSize) {
-			if (downloadType === 'GLOBUS') {
-				if (project.globusUsage + totalSize > constants.globus_project_size) {
-					Modal.confirm({
-						title: `Globus Project Quota Exceeded`,
-						content: 'The total size of the datasets will exceed the Globus project quota. This dataset will be queued until space is freed.',
-						onOk: () => dispatchCreateRequest('GLOBUS').catch((e) => console.error(e)),
-						okText: 'Continue',
-						cancelText: 'Cancel',
-					})
-				} else {
-					dispatchCreateRequest('GLOBUS').catch((e) => console.error(e))
-				}
-			} else if (downloadType === 'SFTP') {
-				if (project.sftpUsage + totalSize > constants.sftp_project_size) {
-					Modal.confirm({
-						title: 'SFTP Project Quota Exceeded',
-						content: 'The total size of the datasets will exceed the SFTP project quota. This dataset will be queued until space is freed.',
-						onOk: () => dispatchCreateRequest('SFTP').catch((e) => console.error(e)),
-						okText: 'Continue',
-						cancelText: 'Cancel',
-					})
-				} else {
-					dispatchCreateRequest('SFTP').catch((e) => console.error(e))
-				}
+			const diskUsage = project.diskUsage[downloadType]
+			const diskCapacity = constants.diskCapacity[downloadType]
+			if (diskUsage + totalSize > diskCapacity) {
+				Modal.confirm({
+					title: `${downloadType} Project Quota Exceeded`,
+					content: `The total size of the datasets will exceed the ${downloadType} project quota. This dataset will be queued until space is freed.`,
+					onOk: () => dispatchCreateRequest(downloadType).catch((e) => console.error(e)),
+					okText: 'Continue',
+					cancelText: 'Cancel',
+				})
+			} else {
+				dispatchCreateRequest(downloadType).catch((e) => console.error(e))
 			}
 		}
-	}, [constants.globus_project_size, constants.sftp_project_size, dataset, dispatchCreateRequest, project, totalSize])
+	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
 
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {

@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit'
-import { TritonProject } from '../api/api-types'
+import { DownloadRequestType, TritonProject } from '../api/api-types'
 import { RootState } from './store'
 
 export interface ProjectState extends TritonProject {
-	sftpUsage: number
-	globusUsage: number
+	diskUsage: Record<DownloadRequestType, number>
 }
 
 export interface ProjectsState {
@@ -33,22 +32,22 @@ export const projectsSlice = createSlice({
 			state.projectsById = state.projects.reduce((acc, project) => {
 				acc[project.external_id] = {
 					...project,
-					sftpUsage: 0,
-					globusUsage: 0,
+					diskUsage: {
+						GLOBUS: 0,
+						SFTP: 0,
+					},
 				}
 				return acc
 			}, {} as ProjectsState['projectsById'])
 		},
-		setSFTPUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], usage: number }>) => {
-			const project = state.projectsById[action.payload.projectId]
+		setDiskUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], diskUsage: ProjectState['diskUsage'] }>) => {
+			const { projectId, diskUsage } = action.payload
+			const project = state.projectsById[projectId]
 			if (project) {
-				project.sftpUsage = action.payload.usage
-			}
-		},
-		setGlobusUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], usage: number }>) => {
-			const project = state.projectsById[action.payload.projectId]
-			if (project) {
-				project.globusUsage = action.payload.usage
+				project.diskUsage = {
+					...project.diskUsage,
+					...diskUsage,
+				}
 			}
 		},
 		setError: (state, action: PayloadAction<SerializedError>) => {

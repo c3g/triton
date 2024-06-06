@@ -7,6 +7,7 @@ import { fetchConstants } from '../store/thunks'
 
 import './RunDetail.scss'
 import { unitWithMagnitude } from '../functions'
+import { DownloadRequestType } from '../api/api-types'
 
 function RunDetail() {
 	const dispatch = useAppDispatch()
@@ -29,18 +30,14 @@ function RunDetail() {
 						<span id={"RunDetail-capacity"}>
 							<table>
 								<tbody>
-									<tr>
-										<td>Globus:</td>
-										{dataSize(project.globusUsage).map((x) => <td key={x}>{x}</td>)}
-										<td>of</td>
-										{dataSize(constants.globus_project_size).map((x) => <td key={x}>{x}</td>)}
-									</tr>
-									<tr>
-										<td>SFTP:</td>
-										{dataSize(project.sftpUsage).map((x) => <td key={x}>{x}</td>)}
-										<td>of</td>
-										{dataSize(constants.sftp_project_size).map((x) => <td key={x}>{x}</td>)}
-									</tr>
+									{(['GLOBUS', 'SFTP'] as DownloadRequestType[]).map((type) => (
+										<tr key={type}>
+											<td>{type}:</td>
+											{dataSize(project.diskUsage[type]).map((x) => <td key={x}>{x}</td>)}
+											<td>of</td>
+											{dataSize(constants.diskCapacity[type]).map((x) => <td key={x}>{x}</td>)}
+										</tr>
+									))}
 								</tbody>
 							</table>
 						</span>

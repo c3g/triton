@@ -3,7 +3,7 @@ import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonProject, T
 import { AuthActions } from './auth'
 import { DatasetFilesStateActions } from './datasetFiles'
 import { DatasetsStateActions } from './datasets'
-import { ProjectsStateActions } from './projects'
+import { ProjectState, ProjectsStateActions } from './projects'
 import { ReadsetsStateActions } from './readsets'
 import { RunsStateActions } from './runs'
 import { ConstantsStateActions } from './constants'
@@ -86,20 +86,20 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		}
 		return readsets
 	}, [])
-	dispatch(ProjectsStateActions.setSFTPUsage({ projectId , usage: readsets.reduce((usage, readset) => {
+	const diskUsage: ProjectState['diskUsage'] = {
+		'GLOBUS': 0,
+		'SFTP': 0,
+	}
+	for (const readset of readsets) {
 		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset && dataset.requests.find((r) => r.type === 'SFTP' && r.status !== 'QUEUED')) {
-			return usage + readset.total_size
+		if (dataset) {
+			const request = dataset.requests.find((r) => r.status !== 'QUEUED')
+			if (request) {
+				diskUsage[request.type] = (diskUsage[request.type] ?? 0) + readset.total_size
+			}
 		}
-		return usage
-	}, 0)}))
-	dispatch(ProjectsStateActions.setGlobusUsage({ projectId , usage: readsets.reduce((usage, readset) => {
-		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset && dataset.requests.find((r) => r.type === 'GLOBUS' && r.status !== 'QUEUED')) {
-			return usage + readset.total_size
-		}
-		return usage
-	}, 0)}))
+	}
+	dispatch(ProjectsStateActions.setDiskUsage({ projectId, diskUsage }))
 }
 
 export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {

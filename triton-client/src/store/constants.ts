@@ -1,20 +1,24 @@
 import { PayloadAction, SerializedError, createSlice } from "@reduxjs/toolkit"
-import { TritonConstants } from "../api/api-types"
+import { DownloadRequestType, TritonConstants } from "../api/api-types"
 
-export interface ConstantsState extends Omit<TritonConstants, 'id'> {}
+export interface ConstantsState {
+    diskCapacity: Record<DownloadRequestType, number>
+}
 
 const initialState: ConstantsState = {
-    globus_project_size: 0,
-    sftp_project_size: 0
+    diskCapacity: {
+        GLOBUS: 0,
+        SFTP: 0,
+    },
 }
 
 export const constantsSlice = createSlice({
     name: "constants",
     initialState,
     reducers: {
-        setConstants: (state, action: PayloadAction<ConstantsState>) => {
-            state.globus_project_size = action.payload.globus_project_size
-            state.sftp_project_size = action.payload.sftp_project_size
+        setConstants: (state, action: PayloadAction<TritonConstants>) => {
+            state.diskCapacity.GLOBUS = action.payload.globus_project_size
+            state.diskCapacity.SFTP = action.payload.sftp_project_size
         },
         setError(state, action: PayloadAction<SerializedError>) {
             console.error('Error fetching constants:', action.payload)
