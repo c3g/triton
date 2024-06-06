@@ -17,9 +17,6 @@ function RunDetail() {
 	const project = useAppSelector((state) => state.projectsState.projectsById[runsByName[runName]?.external_project_id ?? -1])
 	const constants = useAppSelector(selectConstants)
 
-	const globusUnitWithMagnitude = unitWithMagnitude(constants.globus_project_size)
-	const sftpUnitWithMagnitude = unitWithMagnitude(constants.sftp_project_size)
-
 	useEffect(() => {
 		dispatch(fetchConstants())
 	}, [dispatch])
@@ -31,18 +28,20 @@ function RunDetail() {
 					{ project &&
 						<span id={"RunDetail-capacity"}>
 							<table>
-								<tr>
-									<td>Globus:</td>
-									{dataSize(project.globusUsage).map((x) => <td key={x}>{x}</td>)}
-									<td>of</td>
-									{dataSize(constants.globus_project_size).map((x) => <td key={x}>{x}</td>)}
-								</tr>
-								<tr>
-									<td>SFTP:</td>
-									{dataSize(project.sftpUsage).map((x) => <td key={x}>{x}</td>)}
-									<td>of</td>
-									{dataSize(constants.sftp_project_size).map((x) => <td key={x}>{x}</td>)}
-								</tr>
+								<tbody>
+									<tr>
+										<td>Globus:</td>
+										{dataSize(project.globusUsage).map((x) => <td key={x}>{x}</td>)}
+										<td>of</td>
+										{dataSize(constants.globus_project_size).map((x) => <td key={x}>{x}</td>)}
+									</tr>
+									<tr>
+										<td>SFTP:</td>
+										{dataSize(project.sftpUsage).map((x) => <td key={x}>{x}</td>)}
+										<td>of</td>
+										{dataSize(constants.sftp_project_size).map((x) => <td key={x}>{x}</td>)}
+									</tr>
+								</tbody>
 							</table>
 						</span>
 					}
