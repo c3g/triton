@@ -95,7 +95,7 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		if (dataset) {
 			const [request] = dataset.requests
 			if (request) {
-				diskUsage[request.type] = (diskUsage[request.type] ?? 0) + readset.total_size
+				diskUsage[request.type] = diskUsage[request.type] + readset.total_size
 			}
 		}
 	}
