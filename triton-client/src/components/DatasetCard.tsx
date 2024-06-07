@@ -80,7 +80,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 						{type}
 						{"|"}
 						{status === 'SUCCESS'
-							? [status, "|", `Expires: ${expiry_date ? expiry_date : "???"}`]
+							? [status, "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
 							: status
 						}
 					</Space>
