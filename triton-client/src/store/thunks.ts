@@ -93,7 +93,7 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 	for (const readset of readsets) {
 		const dataset = getState().datasetsState.datasetsById[readset.dataset]
 		if (dataset) {
-			const request = dataset.requests.find((r) => r.status !== 'QUEUED')
+			const [request] = dataset.requests
 			if (request) {
 				diskUsage[request.type] = (diskUsage[request.type] ?? 0) + readset.total_size
 			}
