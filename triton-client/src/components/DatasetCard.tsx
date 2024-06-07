@@ -86,7 +86,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 					</Space>
 				</Button>
 			} else {
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest} onClick={() => request(type)}>
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest || !dataset || !project} onClick={() => request(type)}>
 					<Space>
 						{type}
 						{"|"}
@@ -95,7 +95,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				</Button>
 			}
 		})
-	}, [alreadyRequested, updatingRequest, request, requestByType, supportedDownloadType, totalSize])
+	}, [supportedDownloadType, requestByType, updatingRequest, totalSize, alreadyRequested, dataset, project, request])
 
 	return dataset ? (<div
 		style={{
