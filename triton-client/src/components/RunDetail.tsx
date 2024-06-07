@@ -8,6 +8,7 @@ import { fetchConstants } from '../store/thunks'
 import './RunDetail.scss'
 import { unitWithMagnitude } from '../functions'
 import { DownloadRequestType } from '../api/api-types'
+import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 
 function RunDetail() {
 	const dispatch = useAppDispatch()
@@ -30,7 +31,7 @@ function RunDetail() {
 						<span id={"RunDetail-capacity"}>
 							<table>
 								<tbody>
-									{(['GLOBUS', 'SFTP'] as DownloadRequestType[]).map((type) => (
+									{(SUPPORTED_DOWNLOAD_TYPES).map((type) => (
 										<tr key={type}>
 											<td>{type}:</td>
 											{dataSize(project.diskUsage[type]).map((x) => <td key={x}>{x}</td>)}

@@ -1,11 +1,12 @@
 import { Button, Modal, Space, Spin, Typography } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
 import { selectConstants } from '../store/constants'
 import { unitWithMagnitude } from '../functions'
+import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -69,20 +70,24 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			return requestByType
 		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
 	[dataset?.requests])
-	const supportedDownloadType: DownloadRequestType[] = useMemo(() => ['SFTP', 'GLOBUS'], [])
 	const requestDetails = useMemo(() => {
-		return supportedDownloadType.map((type) => {
+		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
 			if (req) {
 				const { type, status, expiry_date } = req
+				let statusDescription: ReactNode
+				if (status === "SUCCESS") {
+					statusDescription = ["SUCCESS", "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
+				} else if (status === "FAILED") {
+					statusDescription = "FAILED"
+				} else {
+					statusDescription = "QUEUED"
+				}
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={updatingRequest}>
 					<Space>
 						{type}
 						{"|"}
-						{status === 'SUCCESS'
-							? [status, "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
-							: status
-						}
+						{statusDescription}
 					</Space>
 				</Button>
 			} else {
@@ -95,7 +100,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				</Button>
 			}
 		})
-	}, [supportedDownloadType, requestByType, updatingRequest, totalSize, alreadyRequested, dataset, project, request])
+	}, [requestByType, updatingRequest, totalSize, alreadyRequested, dataset, project, request])
 
 	return dataset ? (<div
 		style={{
