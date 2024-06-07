@@ -54,3 +54,4 @@ create table constants (
     globus_project_size INTEGER not null,
     sftp_project_size   INTEGER not null
 );
+insert into constants (http_project_size, globus_project_size, sftp_project_size) values (0, 1000000000000, 1000000000000)
