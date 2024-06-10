@@ -58,7 +58,7 @@ async function getToken(): Promise<string> {
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
 	const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
-	const oathConfig = {
+	const oauthConfig = {
 		method: 'POST',
 		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
@@ -70,19 +70,19 @@ async function requestToken() {
 		httpsAgent,
 	}
 	logger.debug({
-		method: oathConfig.method,
-		baseURL: oathConfig.baseURL,
-		url: oathConfig.url,
+		method: oauthConfig.method,
+		baseURL: oauthConfig.baseURL,
+		url: oauthConfig.url,
 		headers: {
 			// TODO: Redact the Authorization header
-			Authorization: oathConfig.headers.Authorization,
+			Authorization: oauthConfig.headers.Authorization,
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
 		httpsAgent,
 	}, 'Magic OAuth Request')
 	try {
-		const response = await axios.request<MagicAuthResponse>(oathConfig)
+		const response = await axios.request<MagicAuthResponse>(oauthConfig)
 		logger.debug({
 			status: response.status,
 			// TODO: Redact token data
