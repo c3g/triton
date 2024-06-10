@@ -15,9 +15,10 @@
  * To make Magic api calls, use `getAuthorizedAxios` to get an Axios instance
  * containing the proper authorization headers.
  */
-import axios, { AxiosInstance, AxiosProxyConfig } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import config from '../../config'
 import { logger } from '../logger'
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 /** Typing for the auth response */
 export interface MagicAuthResponse {
@@ -33,12 +34,7 @@ let currentTokenPromise: Promise<string> | undefined
 let authorizedAxios: AxiosInstance | undefined
 
 const clientPortalConfig = config.client_portal
-const httpsProxy = new URL(clientPortalConfig.httpsProxy)
-const axiosProxyConfig: AxiosProxyConfig = {
-	host: httpsProxy.hostname,
-	port: Number(httpsProxy.port),
-	protocol: 'http'
-}
+const httpsAgent = new HttpsProxyAgent(clientPortalConfig.httpsProxy)
 
 async function getToken(): Promise<string> {
 	// If we already have the token then just return it.
@@ -71,7 +67,7 @@ async function requestToken() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
-		proxy: axiosProxyConfig,
+		httpsAgent,
 	})
 
 	// TODO
@@ -108,7 +104,7 @@ const getAuthorizedAxios = async () => {
 			Authorization: `Bearer ${token}`,
 		},
 		baseURL: `${clientPortalConfig.url}/hercules`, // all api calls use hercules endpoint
-		proxy: axiosProxyConfig,
+		httpsAgent,
 	})
 
 	// TODO Should we include an interceptor that catches 403 errors
