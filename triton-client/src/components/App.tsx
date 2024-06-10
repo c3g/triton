@@ -13,7 +13,8 @@ import './Common.scss'
 
 import { Alert, Layout, Spin } from 'antd'
 import { TritonProject } from '../api/api-types'
-import { fetchLoginStatus, fetchProjects } from '../store/thunks'
+import { fetchLoginStatus, fetchProjects, fetchConstants } from '../store/thunks'
+import { selectConstants } from '../store/constants'
 
 const { Sider, Content } = Layout
 

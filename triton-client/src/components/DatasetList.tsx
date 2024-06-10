@@ -10,7 +10,7 @@ interface DatasetListProps {
 function DatasetList({ runName }: DatasetListProps) {
 	const datasetIDs = useAppSelector((state) => state.runsState.runsByName[runName]?.datasets)
 
-	const render = useMemo(() => {
+	const renderDatasets = useMemo(() => {
 		if (datasetIDs === undefined)
 			return <Spin />
 		if (datasetIDs.length === 0)
@@ -35,7 +35,7 @@ function DatasetList({ runName }: DatasetListProps) {
 				gap: '0.25rem',
 			}}
 		>
-			{render}
+			{renderDatasets}
 		</div>
 	)
 }

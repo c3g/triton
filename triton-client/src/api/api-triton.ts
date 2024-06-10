@@ -2,6 +2,7 @@ import {
 	ApiReply,
 	ExternalProjectID,
 	IsLoggedInData,
+	TritonConstants,
 	TritonCreateRequestBody,
 	TritonCreateRequestResponse,
 	TritonDataset,
@@ -94,6 +95,10 @@ export async function createDownloadRequest(body: TritonCreateRequestBody) {
 	)
 }
 
+export async function getConstants() {
+	return await tritonGet<TritonConstants>('download/constants/')
+}
+
 export default {
 	fetchLoginStatus,
 	listProjects,
@@ -102,4 +107,5 @@ export default {
 	listReadsetsForDataset,
 	listDatasetFilesForReadset,
 	createDownloadRequest,
+	getConstants,
 }

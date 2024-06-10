@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit'
-import { TritonProject } from '../api/api-types'
+import { DownloadRequestType, TritonProject } from '../api/api-types'
 import { RootState } from './store'
-import { ItemsById } from './utils'
+
+export interface ProjectState extends TritonProject {
+	diskUsage: Record<DownloadRequestType, number>
+}
 
 export interface ProjectsState {
 	loading: boolean
 	projects: TritonProject[]
-	projectsById: Record<TritonProject['external_id'], TritonProject | undefined> // External project ID is used as key
+	projectsById: Record<TritonProject['external_id'], ProjectState | undefined> // External project ID is used as key
 	error?: SerializedError
 }
 
@@ -27,9 +30,25 @@ export const projectsSlice = createSlice({
 			state.loading = false
 			state.projects = action.payload
 			state.projectsById = state.projects.reduce((acc, project) => {
-				acc[project.external_id] = project
+				acc[project.external_id] = {
+					...project,
+					diskUsage: {
+						GLOBUS: 0,
+						SFTP: 0,
+					},
+				}
 				return acc
 			}, {} as ProjectsState['projectsById'])
+		},
+		setDiskUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], diskUsage: ProjectState['diskUsage'] }>) => {
+			const { projectId, diskUsage } = action.payload
+			const project = state.projectsById[projectId]
+			if (project) {
+				project.diskUsage = {
+					...project.diskUsage,
+					...diskUsage,
+				}
+			}
 		},
 		setError: (state, action: PayloadAction<SerializedError>) => {
 			state.loading = false

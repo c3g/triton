@@ -104,6 +104,10 @@ export async function createActions(db: Kysely<Database>) {
 	
 	}
 
+	async function getConstants() {
+		return await db.selectFrom('constants').selectAll().executeTakeFirstOrThrow()
+	}
+
 	return {
 		listRequestsByDatasetId,
 		listRequests,
@@ -111,12 +115,13 @@ export async function createActions(db: Kysely<Database>) {
 		getRequestByID,
 		createRequest,
 		deleteRequest,
-    deleteCancelledRequest,
+		deleteCancelledRequest,
 		insertFiles,
 		listFilesByDatasetId,
 		listReadyContacts,
 		removeContact,
 		updateNotificationDate,
+		getConstants,
 	}
 }
 

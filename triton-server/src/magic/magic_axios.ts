@@ -34,7 +34,7 @@ let currentTokenPromise: Promise<string> | undefined
 let authorizedAxios: AxiosInstance | undefined
 
 const clientPortalConfig = config.client_portal
-const httpsAgent = new HttpsProxyAgent(clientPortalConfig.httpsProxy)
+const httpsAgent = process.env.NODE_ENV === 'production' ? new HttpsProxyAgent(clientPortalConfig.httpsProxy) : undefined
 
 async function getToken(): Promise<string> {
 	// If we already have the token then just return it.

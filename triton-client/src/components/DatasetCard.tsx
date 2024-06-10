@@ -1,10 +1,12 @@
-import { Button, Checkbox, Divider, Space, Spin, Tag, Typography } from 'antd'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Button, Modal, Space, Spin, Typography } from 'antd'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { createDownloadRequest, fetchReadsets } from '../store/thunks'
-import { sizeUnitWithScalar } from '../functions'
+import { selectConstants } from '../store/constants'
+import { unitWithMagnitude } from '../functions'
+import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -14,9 +16,19 @@ interface DatasetCardProps {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
+	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
+	const constants = useAppSelector(selectConstants)
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const alreadyRequested = dataset ? dataset.requests.length > 0 : false
+
+	const [updatingRequest, setUpdatingRequest] = useState(false)
+	const dispatchCreateRequest = useCallback(async (type: DownloadRequestType) => {
+		if (dataset) {
+			setUpdatingRequest(true)
+			await dispatch(createDownloadRequest(dataset.external_project_id, datasetID, type)).finally(() => setUpdatingRequest(false))
+		}
+	}, [dataset, datasetID, dispatch])
 
 	const readsets = useMemo(() => {
 		return readsetsByDatasetId[datasetID]?.readsets.reduce((readsets, id) => {
@@ -35,10 +47,22 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	}, [datasetID, dispatch])
 
 	const request = useCallback((downloadType: DownloadRequestType) => {
-		if (dataset) {
-			dispatch(createDownloadRequest(dataset.external_project_id, datasetID, downloadType)).catch((e) => console.error(e))
+		if (dataset && project && totalSize) {
+			const diskUsage = project.diskUsage[downloadType]
+			const diskCapacity = constants.diskCapacity[downloadType]
+			if (diskUsage + totalSize > diskCapacity) {
+				Modal.confirm({
+					title: `${downloadType} Project Quota Exceeded`,
+					content: `The total size of the datasets will exceed the ${downloadType} project quota. This dataset will be queued until space is freed.`,
+					onOk: () => dispatchCreateRequest(downloadType).catch((e) => console.error(e)),
+					okText: 'Continue',
+					cancelText: 'Cancel',
+				})
+			} else {
+				dispatchCreateRequest(downloadType).catch((e) => console.error(e))
+			}
 		}
-	}, [dataset, datasetID, dispatch])
+	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
 
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {
@@ -46,26 +70,37 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			return requestByType
 		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
 	[dataset?.requests])
-	const supportedDownloadType: DownloadRequestType[] = useMemo(() => ['SFTP', 'GLOBUS'], [])
 	const requestDetails = useMemo(() => {
-		return supportedDownloadType.map((type) => {
+		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
 			if (req) {
 				const { type, status, expiry_date } = req
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }}>
-					{type}
-					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
-					{status === 'SUCCESS' ? expiry_date ?? '?' : status}
+				let statusDescription: ReactNode
+				if (status === "SUCCESS") {
+					statusDescription = ["SUCCESS", "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
+				} else if (status === "FAILED") {
+					statusDescription = "FAILED"
+				} else {
+					statusDescription = "QUEUED"
+				}
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={updatingRequest}>
+					<Space>
+						{type}
+						{"|"}
+						{statusDescription}
+					</Space>
 				</Button>
 			} else {
-				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested} onClick={() => request(type)}>
-					{type}
-					<Divider type={'vertical'} style={{ backgroundColor: 'black' }}/>
-					AVAILABLE
+				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest || !dataset || !project} onClick={() => request(type)}>
+					<Space>
+						{type}
+						{"|"}
+						AVAILABLE
+					</Space>
 				</Button>
 			}
 		})
-	}, [alreadyRequested, request, requestByType, supportedDownloadType, totalSize])
+	}, [requestByType, updatingRequest, totalSize, alreadyRequested, dataset, project, request])
 
 	return dataset ? (<div
 		style={{
@@ -102,18 +137,17 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	) : <Spin />
 }
 
-export default DatasetCard
-
-
 interface SizeProps {
 	size: number
 }
 
 function DataSize({ size }: SizeProps) {
-	const { unit, size: magnitude } = sizeUnitWithScalar(size)
+	const { unit, magnitude } = unitWithMagnitude(size)
 	return (
 		<>
 			{(size / magnitude).toFixed(2)} {unit}
 		</>
 	)
 }
+
+export default DatasetCard
