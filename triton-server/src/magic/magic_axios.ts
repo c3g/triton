@@ -74,7 +74,8 @@ async function requestToken() {
 		baseURL: oathConfig.baseURL,
 		url: oathConfig.url,
 		headers: {
-			Authorization: 'Basic [REDACTED]',
+			// TODO: Redact the Authorization header
+			Authorization: oathConfig.headers.Authorization,
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
@@ -82,7 +83,11 @@ async function requestToken() {
 	}, 'Magic OAuth Request')
 	try {
 		const response = await axios.request<MagicAuthResponse>(oathConfig)
-		logger.debug({ status: response.status, data: '[REDACTED]' }, 'Magic OAuth Response')
+		logger.debug({
+			status: response.status,
+			// TODO: Redact token data
+			data: response.data
+		}, 'Magic OAuth Response')
 
 		// TODO
 		// TODO verify that the response matches the expected interface
