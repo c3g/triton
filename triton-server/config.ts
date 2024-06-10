@@ -14,7 +14,8 @@ const TRITON_ENVIRONMENTS = {
 	LIMS_PASSWORD: '',
 	SFTP_SERVER: '',
 	SFTP_PORT: '',
-	ERROR_MONITORING_EMAIL: ''
+	ERROR_MONITORING_EMAIL: '',
+	HTTPS_PROXY: '',
 }
 
 const missingEnvVars: string[] = []
@@ -57,6 +58,7 @@ export default {
 	},
 
 	client_portal: {
+		https_proxy: TRITON_ENVIRONMENTS.HTTPS_PROXY,
 		// Hercules login page url - the user logs in on this page.
 		loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
 		// Api endpoint base url

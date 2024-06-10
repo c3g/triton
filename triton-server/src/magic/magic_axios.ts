@@ -15,7 +15,7 @@
  * To make Magic api calls, use `getAuthorizedAxios` to get an Axios instance
  * containing the proper authorization headers.
  */
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosProxyConfig } from 'axios'
 import config from '../../config'
 import { logger } from '../logger'
 
@@ -33,6 +33,12 @@ let currentTokenPromise: Promise<string> | undefined
 let authorizedAxios: AxiosInstance | undefined
 
 const clientPortalConfig = config.client_portal
+const httpsProxy = new URL(clientPortalConfig.https_proxy)
+const axiosProxyConfig: AxiosProxyConfig = {
+	host: httpsProxy.hostname,
+	port: Number(httpsProxy.port),
+	protocol: httpsProxy.protocol,
+}
 
 async function getToken(): Promise<string> {
 	// If we already have the token then just return it.
@@ -55,16 +61,17 @@ async function getToken(): Promise<string> {
 
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
-  const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
+	const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
 	const response = await axios.request<MagicAuthResponse>({
 		method: 'POST',
 		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
 		headers: {
-      Authorization: credentials,
+			Authorization: credentials,
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		data: 'grant_type=client_credentials',
+		proxy: axiosProxyConfig,
 	})
 
 	// TODO
@@ -101,6 +108,7 @@ const getAuthorizedAxios = async () => {
 			Authorization: `Bearer ${token}`,
 		},
 		baseURL: `${clientPortalConfig.url}/hercules`, // all api calls use hercules endpoint
+		proxy: axiosProxyConfig,
 	})
 
 	// TODO Should we include an interceptor that catches 403 errors
