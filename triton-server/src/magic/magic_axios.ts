@@ -58,7 +58,7 @@ async function getToken(): Promise<string> {
 async function requestToken() {
 	// Post an oauth request to hercules using the configured magic credentials and url
 	const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString('base64')}`
-	const response = await axios.request<MagicAuthResponse>({
+	const oathConfig = {
 		method: 'POST',
 		baseURL: clientPortalConfig.url,
 		url: '/oauth/token',
@@ -68,26 +68,44 @@ async function requestToken() {
 		},
 		data: 'grant_type=client_credentials',
 		httpsAgent,
-	})
+	}
+	logger.debug({
+		method: oathConfig.method,
+		baseURL: oathConfig.baseURL,
+		url: oathConfig.url,
+		headers: {
+			Authorization: 'Basic [REDACTED]',
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		data: 'grant_type=client_credentials',
+		httpsAgent,
+	}, 'Magic Oath')
+	try {
+		const response = await axios.request<MagicAuthResponse>(oathConfig)
+		logger.debug({ status: response.status, data: '[REDACTED]' }, 'Magic Oath Response')
 
-	// TODO
-	// TODO verify that the response matches the expected interface
-	// TODO verify what response we receive if there is an auth error
-	// TODO log auth errors
-	// TODO decide on how to handle errors
+		// TODO
+		// TODO verify that the response matches the expected interface
+		// TODO verify what response we receive if there is an auth error
+		// TODO log auth errors
+		// TODO decide on how to handle errors
 
-	// Set the currentToken module variable
-	const auth = response.data
-	currentToken = auth.access_token
+		// Set the currentToken module variable
+		const auth = response.data
+		currentToken = auth.access_token
 
-	// Set a timer to flush the token when it reaches its expiry time.
-	// The next call to getToken() will request a new token from hercules.
-	setTimeout(() => {
-		currentToken = undefined
-		authorizedAxios = undefined
-	}, (auth.expires_in - 1) * 1000)
+		// Set a timer to flush the token when it reaches its expiry time.
+		// The next call to getToken() will request a new token from hercules.
+		setTimeout(() => {
+			currentToken = undefined
+			authorizedAxios = undefined
+		}, (auth.expires_in - 1) * 1000)
 
-	return currentToken
+		return currentToken
+	} catch (error) {
+		logger.error({ error }, 'Magic Oath Error')
+		throw error
+	}
 }
 
 const getAuthorizedAxios = async () => {
