@@ -21,7 +21,7 @@ export interface ClientConfig {
 // Get the config that matches the environment
 function getConfig(): ClientConfig {
 	switch (
-		process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
+	process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
 	) {
 		case 'development':
 			return {
@@ -29,7 +29,7 @@ function getConfig(): ClientConfig {
 			}
 		default:
 			return {
-				apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}/api/`),
+				apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}api/`),
 			}
 	}
 }

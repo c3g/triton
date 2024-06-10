@@ -38,7 +38,7 @@ function userParams(userID: string, userToken: string) {
  * @returns
  */
 async function checkUserAuthenticated(axios: AxiosInstance, userID: string, userToken: string): Promise<boolean> {
-	const response = await axios.get<MagicReply<boolean>>('/userAuthenticated', userParams(userID, userToken))
+	const response = await axios.get<MagicReply<boolean>>('/userAuthenticated/', userParams(userID, userToken))
 	const reply = response.data
 
 	if (isReplyOkay(reply)) {
@@ -85,7 +85,7 @@ async function getMagic<T>(axiosConfig: AxiosRequestConfig) {
 export const getUserProjects = async (userID: string, userToken: string) => {
 	return await getMagic<UserProjects>({
 		method: 'get',
-		url: '/userProjects',
+		url: '/userProjects/',
 		params: {
 			userID,
 		},
@@ -101,7 +101,7 @@ export const getUserProjects = async (userID: string, userToken: string) => {
 export const getUserDetails = async (userID: string, userToken: string) => {
 	return await getMagic<UserDetails>({
 		method: 'get',
-		url: '/userDetails',
+		url: '/userDetails/',
 		params: {
 			userID,
 		},
@@ -118,7 +118,7 @@ export const getUserDetails = async (userID: string, userToken: string) => {
 export const getProjectUsers = async (projectId: string) => {
 	return await getMagic<ProjectUsers>({
 		method: 'get',
-		url: '/projectUsers',
+		url: '/projectUsers/',
 		params: {
 			projectId,
 		},

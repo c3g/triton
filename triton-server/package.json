@@ -46,6 +46,7 @@
 		"express-session": "^1.17.3",
 		"express-session-sqlite": "2.1.1",
 		"helmet": "^5.1.1",
+		"https-proxy-agent": "^7.0.4",
 		"jwt-decode": "^3.1.2",
 		"kysely": "^0.26.3",
 		"memorystore": "^1.6.7",
