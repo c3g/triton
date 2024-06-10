@@ -58,7 +58,7 @@ export default {
 	},
 
 	client_portal: {
-		https_proxy: TRITON_ENVIRONMENTS.HTTPS_PROXY,
+		httpsProxy: TRITON_ENVIRONMENTS.HTTPS_PROXY,
 		// Hercules login page url - the user logs in on this page.
 		loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
 		// Api endpoint base url
@@ -79,8 +79,8 @@ export default {
 		url: TRITON_ENVIRONMENTS.CLIENT_ORIGIN,
 	},
 
-  request_service: {
-    tick_frequency: 30000 /* miliseconds */
-  }
+	request_service: {
+		tick_frequency: 30000 /* miliseconds */
+	}
 }
 

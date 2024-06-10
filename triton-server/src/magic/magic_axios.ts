@@ -33,7 +33,7 @@ let currentTokenPromise: Promise<string> | undefined
 let authorizedAxios: AxiosInstance | undefined
 
 const clientPortalConfig = config.client_portal
-const httpsProxy = new URL(clientPortalConfig.https_proxy)
+const httpsProxy = new URL(clientPortalConfig.httpsProxy)
 const axiosProxyConfig: AxiosProxyConfig = {
 	host: httpsProxy.hostname,
 	port: Number(httpsProxy.port),
