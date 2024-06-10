@@ -79,10 +79,10 @@ async function requestToken() {
 		},
 		data: 'grant_type=client_credentials',
 		httpsAgent,
-	}, 'Magic Oath')
+	}, 'Magic OAuth Request')
 	try {
 		const response = await axios.request<MagicAuthResponse>(oathConfig)
-		logger.debug({ status: response.status, data: '[REDACTED]' }, 'Magic Oath Response')
+		logger.debug({ status: response.status, data: '[REDACTED]' }, 'Magic OAuth Response')
 
 		// TODO
 		// TODO verify that the response matches the expected interface
@@ -103,7 +103,7 @@ async function requestToken() {
 
 		return currentToken
 	} catch (error) {
-		logger.error({ error }, 'Magic Oath Error')
+		logger.error({ error }, 'Magic OAuth Error')
 		throw error
 	}
 }
