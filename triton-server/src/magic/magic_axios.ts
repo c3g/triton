@@ -37,7 +37,7 @@ const httpsProxy = new URL(clientPortalConfig.httpsProxy)
 const axiosProxyConfig: AxiosProxyConfig = {
 	host: httpsProxy.hostname,
 	port: Number(httpsProxy.port),
-	protocol: httpsProxy.protocol,
+	protocol: 'https'
 }
 
 async function getToken(): Promise<string> {
