@@ -96,7 +96,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const requestDetails = useMemo(() => {
 		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
-			if (req && !!!req.should_delete) {
+			if (req && !req.should_delete) {
 				const { type, status, expiry_date } = req
         const actions: StagingAction[] = [
           {action: {name: "Unstage dataset", actionCall: () => deleteRequest()}, icon: <CloseCircleOutlined style={{color: '#c9162b'}}/>}

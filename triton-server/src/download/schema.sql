@@ -19,10 +19,9 @@ create table requests (
 
     should_delete tinyint not null default 0,
 
-    unique(type, dataset_id)
 );
 
-create index idx_dataset_request on requests(dataset_id);
+create unique index idx_dataset_request on requests(dataset_id);
 
 
 create table files (
