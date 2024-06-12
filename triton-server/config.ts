@@ -15,7 +15,7 @@ const TRITON_ENVIRONMENTS = {
 	SFTP_SERVER: '',
 	SFTP_PORT: '',
 	ERROR_MONITORING_EMAIL: '',
-	HTTPS_PROXY: '',
+	TRITON_HTTPS_PROXY: '',
 }
 
 const missingEnvVars: string[] = []
@@ -58,7 +58,7 @@ export default {
 	},
 
 	client_portal: {
-		httpsProxy: TRITON_ENVIRONMENTS.HTTPS_PROXY,
+		httpsProxy: TRITON_ENVIRONMENTS.TRITON_HTTPS_PROXY,
 		// Hercules login page url - the user logs in on this page.
 		loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
 		// Api endpoint base url
@@ -80,7 +80,6 @@ export default {
 	},
 
 	request_service: {
-		tick_frequency: 30000 /* miliseconds */
-	}
+		tick_frequency: 30000 /* miliseconds */,
+	},
 }
-
