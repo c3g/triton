@@ -27,7 +27,9 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const constants = useAppSelector(selectConstants)
 	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
-  const [activeRequest, setActiveRequest] = useState<DownloadRequest>()
+  const activeRequest = useMemo<DownloadRequest | undefined>(() => {
+    return dataset?.requests[0] ?? undefined
+  }, [dataset?.requests])
 	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
@@ -53,15 +55,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	useEffect(() => {
 		dispatch(fetchReadsets(datasetID))
 	}, [datasetID, dispatch])
-
-  useEffect(() => {
-    if (dataset && dataset.requests.length > 0) {
-      setActiveRequest(dataset?.requests[0])
-    }
-    else {
-      setActiveRequest(undefined)
-    }
-  },[dataset, dataset?.requests])
 
 	const request = useCallback((downloadType: DownloadRequestType) => {
 		if (dataset && project && totalSize) {
