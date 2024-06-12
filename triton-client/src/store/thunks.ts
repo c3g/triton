@@ -1,5 +1,5 @@
 import apiTriton from '../api/api-triton'
-import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonProject, TritonReadset } from '../api/api-types'
+import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonReadset } from '../api/api-types'
 import { AuthActions } from './auth'
 import { DatasetFilesStateActions } from './datasetFiles'
 import { DatasetsStateActions } from './datasets'
@@ -153,12 +153,24 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
 		}
 	}
 
-export const fetchConstants = () => async (dispatch: AppDispatch, getState: () => RootState) => {
-	try {
-		const constants = await apiTriton.getConstants()
-		dispatch(ConstantsStateActions.setConstants(constants))
-	} catch (err) {
-		dispatch(ConstantsStateActions.setError(convertToSerializedError(err)))
-		throw err
-	}
-}
+  export const fetchConstants = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+    try {
+      const constants = await apiTriton.getConstants()
+      dispatch(ConstantsStateActions.setConstants(constants))
+    } catch (err) {
+      dispatch(ConstantsStateActions.setError(convertToSerializedError(err)))
+      throw err
+    }
+  }
+
+  export const deleteDownloadRequest = (projectId: ExternalProjectID, datasetID: number) =>
+    async (dispatch: AppDispatch, getState: () => RootState) => {
+      try {
+        const response = await apiTriton.deleteDownloadRequest(datasetID)
+        // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
+        dispatch(DatasetsStateActions.setDownloadRequest(response))
+      } catch (err: any) {
+        dispatch(DatasetsStateActions.setError({ projectId, error: convertToSerializedError(err) }))
+        throw err
+      }
+    }

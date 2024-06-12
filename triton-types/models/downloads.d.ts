@@ -29,7 +29,6 @@ export interface DownloadRequestRecord {
 	readonly requester?: string
 	readonly notification_date?: string
 	readonly should_delete: 0 | 1 // default 0 (false)
-  readonly is_cancelled: 0 | 1 // default 0 (false)
 }
 
 // make sure that the correct types are used in each operation.

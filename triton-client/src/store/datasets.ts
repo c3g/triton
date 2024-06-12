@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit'
-import { TritonCreateRequestResponse, TritonDataset, TritonProject } from '../api/api-types'
+import { TritonDataset, TritonRequestResponse, TritonProject } from '../api/api-types'
 
 export interface DatasetsState {
 	readonly datasetsById: Record<TritonDataset['id'], TritonDataset | undefined>
@@ -45,7 +45,7 @@ export const datasetsSlice = createSlice({
 				datasets: datasets.map((d) => d.id),
 			}
 		},
-		setDownloadRequest(state, action: PayloadAction<TritonCreateRequestResponse>) {
+		setDownloadRequest(state, action: PayloadAction<TritonRequestResponse>) {
 			const { request } = action.payload
 			state.datasetsById[+request.dataset_id]?.requests.push(request)
 		},

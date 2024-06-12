@@ -3,7 +3,7 @@ import asyncHandler from 'express-async-handler'
 import { dataHandler, errorHandler } from './handlers'
 import { defaultDatabaseActions } from './actions'
 import { getFreezeManAuthenticatedAPI } from '../freezeman/api'
-import { DownloadRequestType, NewDownloadFile } from './download-types'
+import { NewDownloadFile } from './download-types'
 import { TritonCreateRequestBody, TritonCreateRequestResponse } from './api-types'
 const router = express.Router()
 
@@ -43,16 +43,14 @@ router.post(
 	})
 )
 
-// POST request deletion
+// DELETE request deletion
 router.delete(
 	'/delete-request/',
 	asyncHandler(async (req: Request, res: Response) => {
-		const datasetID = req.query.datasetID
-		const type = req.query.type
+		const datasetID = req.query.dataset_id
 		const { deleteRequest } = await defaultDatabaseActions()
-
 		try {
-			const result = await deleteRequest(String(datasetID), type as DownloadRequestType)
+			const result = await deleteRequest(String(datasetID))
 			dataHandler(res)(result)
 		} catch (error) {
 			errorHandler(res)(error)

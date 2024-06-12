@@ -9,9 +9,10 @@ import {
 	TritonDatasetFile,
 	TritonProject,
 	TritonReadset,
+  TritonRequestResponse,
 	TritonRun,
 } from './api-types'
-import { tritonGet, TRITON_API_BASE_URL, tritonPost } from './api-fetch'
+import { tritonGet, tritonPost, tritonDelete, TRITON_API_BASE_URL } from './api-fetch'
 
 /**
  * Asks the Triton server if the user is logged in.
@@ -96,7 +97,11 @@ export async function createDownloadRequest(body: TritonCreateRequestBody) {
 }
 
 export async function getConstants() {
-	return await tritonGet<TritonConstants>('download/constants/')
+	return await tritonGet<TritonConstants>(`download/constants/`)
+}
+
+export async function deleteDownloadRequest(datasetID: TritonDataset['id']) {
+  return await tritonDelete<TritonRequestResponse>(`download/delete-request?dataset_id=${datasetID}`)
 }
 
 export default {
@@ -108,4 +113,5 @@ export default {
 	listDatasetFilesForReadset,
 	createDownloadRequest,
 	getConstants,
+  deleteDownloadRequest,
 }

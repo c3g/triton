@@ -80,13 +80,17 @@ export interface TritonDatasetFile {
 }
 
 export interface TritonCreateRequestBody {
-	projectID: ExternalProjectID,
-	datasetID: number,
+	projectID: ExternalProjectID
+	datasetID: number
 	type: DownloadRequestType
-}
-export interface TritonCreateRequestResponse {
-	files: DownloadFile[];
-	request: DownloadRequest
 }
 
 export interface TritonConstants extends Constants {}
+
+export interface TritonRequestResponse {
+  request: DownloadRequest
+}
+
+export interface TritonCreateRequestResponse extends TritonRequestResponse {
+	files: DownloadFile[]
+}

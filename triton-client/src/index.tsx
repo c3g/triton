@@ -4,7 +4,6 @@ import { Provider } from 'react-redux'
 import { store } from './store/store'
 import App from './components/App'
 
-import 'antd/dist/antd.css' // or 'antd/dist/antd.less'
 import './index.css'
 
 // Log the environment that was used to build the client so that we can verify
