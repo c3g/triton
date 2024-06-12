@@ -30,7 +30,9 @@ export const fetchProjects = () => async (dispatch: AppDispatch, getState: () =>
 		dispatch(ProjectsStateActions.setLoading())
 		const projects = await apiTriton.listProjects()
 		// console.debug(`Loaded projects succesfully: ${projects}`)
-    const uniqueProjects : TritonProject[] = Array.from(new Set(projects))
+    const uniqueProjects : TritonProject[] = Array.from(new Map(projects.map((project) => {
+      return [JSON.stringify(project), project]
+    })).values())
 		dispatch(ProjectsStateActions.setProjects(uniqueProjects))
 		dispatch(RunsStateActions.initializeRunsByProjectId(uniqueProjects))
 		dispatch(DatasetsStateActions.initializeDatasetsByProjectId(uniqueProjects))
