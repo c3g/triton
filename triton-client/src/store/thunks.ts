@@ -1,5 +1,5 @@
 import apiTriton from '../api/api-triton'
-import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonReadset } from '../api/api-types'
+import { DownloadRequestType, ExternalProjectID, TritonProject, TritonDataset, TritonReadset } from '../api/api-types'
 import { AuthActions } from './auth'
 import { DatasetFilesStateActions } from './datasetFiles'
 import { DatasetsStateActions } from './datasets'
@@ -30,9 +30,10 @@ export const fetchProjects = () => async (dispatch: AppDispatch, getState: () =>
 		dispatch(ProjectsStateActions.setLoading())
 		const projects = await apiTriton.listProjects()
 		// console.debug(`Loaded projects succesfully: ${projects}`)
-		dispatch(ProjectsStateActions.setProjects(projects))
-		dispatch(RunsStateActions.initializeRunsByProjectId(projects))
-		dispatch(DatasetsStateActions.initializeDatasetsByProjectId(projects))
+    const uniqueProjects : TritonProject[] = Array.from(new Set(projects))
+		dispatch(ProjectsStateActions.setProjects(uniqueProjects))
+		dispatch(RunsStateActions.initializeRunsByProjectId(uniqueProjects))
+		dispatch(DatasetsStateActions.initializeDatasetsByProjectId(uniqueProjects))
 	} catch (err: any) {
 		dispatch(ProjectsStateActions.setError(convertToSerializedError(err)))
 		throw err
