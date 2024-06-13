@@ -31,7 +31,7 @@ export const fetchProjects = () => async (dispatch: AppDispatch, getState: () =>
 		const projects = await apiTriton.listProjects()
 		// console.debug(`Loaded projects succesfully: ${projects}`)
     const uniqueProjects : TritonProject[] = Array.from(new Map(projects.map((project) => {
-      return [JSON.stringify(project), project]
+      return [project.external_id, project]
     })).values())
 		dispatch(ProjectsStateActions.setProjects(uniqueProjects))
 		dispatch(RunsStateActions.initializeRunsByProjectId(uniqueProjects))
