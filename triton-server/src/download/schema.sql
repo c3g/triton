@@ -55,7 +55,7 @@ type TEXT CHECK( type IN ('HTTP', 'SFTP', 'GLOBUS') ) NOT NULL,
    creation_date text,
 
    project_id text not null, should_delete tinyint not null default 0, requester       text,
-   notification_date text,
+   notification_date text
   );
 CREATE INDEX idx_dataset_files on files(dataset_id);
 CREATE UNIQUE INDEX idx_dataset_request on requests(dataset_id);
