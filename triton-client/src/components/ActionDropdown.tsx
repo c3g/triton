@@ -1,15 +1,19 @@
 import { ReactElement } from "react"
 import type { MenuProps } from 'antd'
 import { Dropdown } from 'antd'
-import { StagingAction } from './DatasetCard'
 
-interface dropdownProps {
-  button: ReactElement
-  actions: StagingAction[]
+export interface StagingAction {
+  action: { name: string, actionCall: () => void }
+  icon: ReactElement
 }
 
-export function ActionDropdown(props: dropdownProps) : ReactElement {
-  const { button, actions } = props
+export interface ActionDropdownProps {
+  button: ReactElement
+  actions: StagingAction[]
+  disabled?: boolean
+}
+
+export function ActionDropdown({ button, actions, disabled }: ActionDropdownProps) : ReactElement {
   const items: MenuProps['items'] = actions.map((a: StagingAction) => {
           return {  key: a.action.name,
                     label: a.action.name,
@@ -19,7 +23,7 @@ export function ActionDropdown(props: dropdownProps) : ReactElement {
   })
 
   return (
-    <Dropdown menu={{items}} placement="bottom" arrow={{ pointAtCenter: true }}>
+    <Dropdown menu={{items}} placement="bottom" arrow={{ pointAtCenter: true }} disabled={disabled}>
       {button}
     </Dropdown>)
 }
