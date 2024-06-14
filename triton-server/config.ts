@@ -1,4 +1,3 @@
-import path from 'path'
 import 'dotenv/config'
 
 const TRITON_ENVIRONMENTS = {
@@ -16,6 +15,7 @@ const TRITON_ENVIRONMENTS = {
 	SFTP_PORT: '',
 	ERROR_MONITORING_EMAIL: '',
 	TRITON_HTTPS_PROXY: '',
+	DOWNLOAD_DATABASE_PATH: '',
 }
 
 const missingEnvVars: string[] = []
@@ -41,11 +41,7 @@ export default {
 	},
 
 	paths: {
-		data: path.join(__dirname, 'data'),
-		database: path.join(__dirname, 'data', 'app.db'),
-		downloadDB: path.join(__dirname, 'data', 'downloads.db'),
-
-		workCompleteFile: path.join(__dirname, 'data', 'work-complete.json'),
+		downloadDB: TRITON_ENVIRONMENTS.DOWNLOAD_DATABASE_PATH,
 	},
 
 	mail: {
