@@ -1,4 +1,3 @@
-import path from 'path'
 import 'dotenv/config'
 
 const TRITON_ENVIRONMENTS = {
