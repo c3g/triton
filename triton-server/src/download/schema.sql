@@ -17,7 +17,7 @@ create table requests (
     requester       text,
     notification_date text, -- ISO8601
 
-    should_delete tinyint not null default 0,
+    should_delete tinyint not null default 0
 
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE historical_requests (
     requester       text,
     notification_date text, -- ISO8601
 
-    should_delete tinyint not null default 0,
+    should_delete tinyint not null default 0
 );
 
 
@@ -57,7 +57,7 @@ CREATE TABLE historical_files (
    id INTEGER PRIMARY KEY ASC,
    dataset_id  text not null,
    source      text not null, -- absolute path
-   destination text not null, -- filename
+   destination text not null -- filename
 );
 
 
@@ -77,4 +77,3 @@ create table constants (
     globus_project_size INTEGER not null,
     sftp_project_size   INTEGER not null
 );
-insert into constants (http_project_size, globus_project_size, sftp_project_size) values (0, 1000000000000, 1000000000000)
