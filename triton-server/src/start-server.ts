@@ -9,6 +9,7 @@ import * as http from 'http'
 import { Express } from 'express'
 import server from '../src/server'
 import { initializeFreezemanAPIAuthorization } from './freezeman/authToken'
+import { defaultDatabaseActions } from './download/actions'
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? 'production'
 
@@ -30,6 +31,8 @@ function startup() {
 async function startServer() {
 	// Create express server
 	try {
+		const { getConstants } = await defaultDatabaseActions()
+		await getConstants() // throws if constants are not available
 		initializeFreezemanAPIAuthorization()
 		await createServer(server, centralPort)
 		console.log(`Server running on port ${centralPort}`)
