@@ -16,7 +16,7 @@ const TRITON_ENVIRONMENTS = {
 	SFTP_PORT: '',
 	ERROR_MONITORING_EMAIL: '',
 	TRITON_HTTPS_PROXY: '',
-	DATABASE_PATH: '',
+	DOWNLOAD_DATABASE_PATH: '',
 }
 
 const missingEnvVars: string[] = []
@@ -42,7 +42,7 @@ export default {
 	},
 
 	paths: {
-		downloadDB: TRITON_ENVIRONMENTS.DATABASE_PATH,
+		downloadDB: TRITON_ENVIRONMENTS.DOWNLOAD_DATABASE_PATH,
 	},
 
 	mail: {
