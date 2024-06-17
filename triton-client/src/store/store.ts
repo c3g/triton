@@ -8,18 +8,20 @@ import ReadsetsReducer, { ReadsetsState, ReadsetsStateAction } from './readsets'
 import DatasetFilesReducer, { DatasetFilesState, DatasetFilesStateAction } from './datasetFiles'
 import RunsReducer, { RunsState, RunsStateAction } from './runs'
 import ConstantsReducers, { ConstantsState, ConstantsStateAction } from './constants'
+import RequestReducers, { RequestsState, RequestsStateAction } from './requests'
 
 export interface RootState {
 	readonly auth: AuthState
 	readonly projectsState: ProjectsState
 	readonly runsState: RunsState
 	readonly datasetsState: DatasetsState
+	readonly requestsState: RequestsState
 	readonly readsetsState: ReadsetsState
 	readonly datasetFilesState: DatasetFilesState
 	readonly constants: ConstantsState
 }
 
-export type AppAction = AuthAction | ProjectsStateAction | DatasetStateAction | ReadsetsStateAction | DatasetFilesStateAction | RunsStateAction | ConstantsStateAction
+export type AppAction = AuthAction | ProjectsStateAction | DatasetStateAction | RequestsStateAction | ReadsetsStateAction | DatasetFilesStateAction | RunsStateAction | ConstantsStateAction
 
 const loggerMiddleware: [Middleware<{}, RootState>] | [] =
 	process.env.NODE_ENV === 'development'
@@ -36,6 +38,7 @@ export const store = configureStore({
 		projectsState: ProjectsReducer,
 		runsState: RunsReducer,
 		datasetsState: DatasetsReducer,
+		requestsState: RequestReducers,
 		readsetsState: ReadsetsReducer,
 		datasetFilesState: DatasetFilesReducer,
 		constants: ConstantsReducers,

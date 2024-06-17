@@ -8,6 +8,7 @@ import { ReadsetsStateActions } from './readsets'
 import { RunsStateActions } from './runs'
 import { ConstantsStateActions } from './constants'
 import { AppDispatch, RootState, convertToSerializedError } from './store'
+import { RequestsStateActions } from './requests'
 
 export const fetchLoginStatus = () => async (dispatch: AppDispatch, getState: () => RootState) => {
 	if (getState().auth.loading) return
@@ -61,6 +62,8 @@ export const fetchDatasets = (runName: TritonRun['name']) => async (dispatch: Ap
 		// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
 		dispatch(DatasetsStateActions.setDatasets(datasets))
 
+		datasets.forEach((dataset) => dispatch(RequestsStateActions.setRequests(dataset.requests)))
+
 		return datasets
 	} catch (err: any) {
 		throw err
@@ -79,9 +82,9 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		'SFTP': 0,
 	}
 	for (const readset of readsets) {
-		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset) {
-			const [request] = dataset.requests
+		const requestIds = getState().requestsState.requestsByDatasetId[readset.dataset]
+		if (requestIds && requestIds.length > 0) {
+			const request = getState().requestsState.requestById[requestIds[0]]
 			if (request) {
 				diskUsage[request.type] = diskUsage[request.type] + readset.total_size
 			}
@@ -125,7 +128,7 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
 		try {
 			const response = await apiTriton.createDownloadRequest({ projectID: projectId, datasetID, type } )
 			// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
-			dispatch(DatasetsStateActions.setDownloadRequest(response))
+			dispatch(RequestsStateActions.setRequests([response.request]))
 			dispatch(updateProjectUsage(projectId))
 		} catch (err: any) {
 			throw err
@@ -147,7 +150,7 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
       try {
         const response = await apiTriton.deleteDownloadRequest(datasetID)
         // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
-        dispatch(DatasetsStateActions.setDownloadRequest(response))
+        dispatch(RequestsStateActions.setRequests([response.request]))
       } catch (err: any) {
         throw err
       }

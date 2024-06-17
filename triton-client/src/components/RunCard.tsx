@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { TritonDataset, TritonRun } from '../api/api-types'
 import { useAppSelector } from '../store/hooks'
 import { useMemo } from 'react'
+import { DatasetState } from '../store/datasets'
 
 const { Text } = Typography
 
@@ -13,7 +14,7 @@ export interface RunCardProps {
 export function RunCard({ run }: RunCardProps) {
 	const datasetsById = useAppSelector((state) => state.datasetsState.datasetsById)
 	const datasets = useMemo(() => {
-		return run.datasets.reduce<TritonDataset[]>((datasets, id) => {
+		return run.datasets.reduce<DatasetState[]>((datasets, id) => {
 			const dataset = datasetsById[id]
 			if (dataset) {
 				datasets.push(dataset)

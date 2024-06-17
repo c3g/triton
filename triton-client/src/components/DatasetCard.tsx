@@ -24,12 +24,24 @@ export interface StagingAction {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
+
+	const requestIds = useAppSelector((state) => state.requestsState.requestsByDatasetId[datasetID])
+	const requestStates = useAppSelector((state) => state.requestsState.requestById)
+	const requests = useMemo(() => {
+		return requestIds?.map((id) => requestStates[id]).reduce<DownloadRequest[]>((requests, request) => {
+			if (request) {
+				requests.push(request)
+			}
+			return requests
+		}, [])
+	}, [requestIds, requestStates])
+
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
 	const constants = useAppSelector(selectConstants)
 	const activeRequest = useMemo<DownloadRequest | undefined>(() => {
-		return dataset?.requests[0] ?? undefined
-	}, [dataset?.requests])
+		return requests && requests[0] ? requests[0] : undefined
+	}, [requests])
 	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
@@ -76,12 +88,12 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))
 	}, [datasetID, dispatch])
 
-	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
+	const requestByType = useMemo(() => (requests ?? []).reduce(
 		(requestByType, request) => {
 			requestByType[request.type] = request
 			return requestByType
 		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
-	[dataset?.requests])
+	[requests])
 	const requestDetails = useMemo(() => {
 		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]

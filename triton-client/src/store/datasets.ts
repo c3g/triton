@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TritonDataset, TritonRequestResponse } from '../api/api-types'
+import { TritonDataset } from '../api/api-types'
+
+export interface DatasetState extends Omit<TritonDataset, 'requests'> {}
 
 export interface DatasetsState {
-	readonly datasetsById: Record<TritonDataset['id'], TritonDataset | undefined>
+	readonly datasetsById: Record<DatasetState['id'], DatasetState | undefined>
 }
 
 const initialState: DatasetsState = {
@@ -16,10 +18,6 @@ export const datasetsSlice = createSlice({
 		setDatasets: (state, action: PayloadAction<TritonDataset[]>) => {
 			const datasets = action.payload
 			datasets.forEach((d) => (state.datasetsById[d.id] = d))
-		},
-		setDownloadRequest(state, action: PayloadAction<TritonRequestResponse>) {
-			const { request } = action.payload
-			state.datasetsById[+request.dataset_id]?.requests.push(request)
 		},
 	},
 })
