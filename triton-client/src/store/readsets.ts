@@ -17,11 +17,9 @@ export const readsetsSlice = createSlice({
 	reducers: {
 		setReadsets: (state, action: PayloadAction<TritonReadset[]>) => {
 			const readsets = action.payload
-			state.readsetsById = readsets.reduce((readsetsById, readset) => {
-				readsetsById[readset.id] = readset
-
-				return state.readsetsById
-			}, state.readsetsById)
+			readsets.forEach((readset) => {
+				state.readsetsById[readset.id] = readset
+			})
 		},
 	},
 })

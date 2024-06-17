@@ -26,11 +26,9 @@ export const datasetFilesSlice = createSlice({
 			action: PayloadAction<TritonDatasetFile[]>
 		) => {
 			const datasetFiles = action.payload
-
-			state.datasetFilesById = datasetFiles.reduce((datasetFilesById, datasetFile) => {
-				datasetFilesById[datasetFile.datasetFile.id] = datasetFile
-				return datasetFilesById
-			}, state.datasetFilesById)
+			datasetFiles.forEach((datasetFile) => {
+				state.datasetFilesById[datasetFile.datasetFile.id] = datasetFile
+			})
 		},
 	},
 })

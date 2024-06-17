@@ -29,16 +29,15 @@ export const projectsSlice = createSlice({
 		setProjects: (state, action: PayloadAction<TritonProject[]>) => {
 			state.loading = false
 			state.projects = action.payload
-			state.projectsById = state.projects.reduce((acc, project) => {
-				acc[project.external_id] = {
+			action.payload.forEach((project) => {
+				state.projectsById[project.external_id] = {
 					...project,
 					diskUsage: {
 						GLOBUS: 0,
 						SFTP: 0,
 					},
 				}
-				return acc
-			}, {} as ProjectsState['projectsById'])
+			})
 		},
 		setDiskUsage: (state, action: PayloadAction<{ projectId: TritonProject['external_id'], diskUsage: ProjectState['diskUsage'] }>) => {
 			const { projectId, diskUsage } = action.payload
