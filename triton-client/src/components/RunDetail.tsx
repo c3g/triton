@@ -7,7 +7,6 @@ import { fetchConstants } from '../store/thunks'
 
 import './RunDetail.scss'
 import { unitWithMagnitude } from '../functions'
-import { DownloadRequestType } from '../api/api-types'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 
 function RunDetail() {

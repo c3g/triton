@@ -1,6 +1,6 @@
 import { Button, Modal, Space, Spin, Typography } from 'antd'
 import { ReactNode, ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
-import { DownloadRequest, DownloadRequestType } from '../api/api-types'
+import { DownloadRequest, DownloadRequestType, TritonReadset } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { deleteDownloadRequest, createDownloadRequest, fetchReadsets } from '../store/thunks'
@@ -9,6 +9,7 @@ import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { ActionDropdown } from './ActionDropdown'
+import { store } from '../store/store'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -23,13 +24,12 @@ export interface StagingAction {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
+	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
 	const constants = useAppSelector(selectConstants)
-	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
-	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
-  const activeRequest = useMemo<DownloadRequest | undefined>(() => {
-    return dataset?.requests[0] ?? undefined
-  }, [dataset?.requests])
+	const activeRequest = useMemo<DownloadRequest | undefined>(() => {
+		return dataset?.requests[0] ?? undefined
+	}, [dataset?.requests])
 	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
@@ -41,16 +41,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	}, [dataset, datasetID, dispatch])
 
 	const readsets = useMemo(() => {
-		return readsetsByDatasetId[datasetID]?.readsets.reduce((readsets, id) => {
-			const readset = readsetsById[id]
-			if (readset) {
-				readsets ??= []
+		return Object.values(readsetsById).reduce<TritonReadset[]>((readsets, readset) => {
+			if (readset && readset.dataset === datasetID) {
 				readsets.push(readset)
 			}
 			return readsets
-		}, [] as ReadsetState[] | undefined)
-	}, [datasetID, readsetsByDatasetId, readsetsById])
-	const totalSize = useMemo(() => readsets?.reduce((total, r) => total + r.total_size, 0), [readsets])
+		}, [])
+	}, [datasetID, readsetsById])
+	const totalSize = useMemo(() => readsets.reduce((total, r) => total + r.total_size, 0), [readsets])
 
 	useEffect(() => {
 		dispatch(fetchReadsets(datasetID))
@@ -73,12 +71,10 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			}
 		}
 	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
-
-  const deleteRequest = useCallback(() => {
-		if (dataset) {
-			dispatch(deleteDownloadRequest(dataset.external_project_id, datasetID)).catch((e) => console.error(e))
-		}
-	}, [dataset, datasetID, dispatch])
+	
+	const deleteRequest = useCallback(() => {
+		dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))
+	}, [datasetID, dispatch])
 
 	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
 		(requestByType, request) => {
