@@ -1,6 +1,6 @@
 import { Button, Modal, Space, Spin, Typography } from 'antd'
 import { ReactNode, ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
-import { DownloadRequest, DownloadRequestType, TritonReadset } from '../api/api-types'
+import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
 import { deleteDownloadRequest, createDownloadRequest, fetchReadsets } from '../store/thunks'
@@ -41,7 +41,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	}, [dataset, datasetID, dispatch])
 
 	const readsets = useMemo(() => {
-		return Object.values(readsetsById).reduce<TritonReadset[]>((readsets, readset) => {
+		return Object.values(readsetsById).reduce<ReadsetState[]>((readsets, readset) => {
 			if (readset && readset.dataset === datasetID) {
 				readsets.push(readset)
 			}
