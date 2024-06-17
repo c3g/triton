@@ -1,11 +1,15 @@
-import { DatasetState } from "./store/datasets"
-import { RequestState, RequestsState } from "./store/requests"
+import { createSelector } from "@reduxjs/toolkit"
+import { RequestState } from "./store/requests"
+import { RootState } from "./store/store"
 
-export function selectRequestByDatasetId(requestById: RequestsState['requestById'], datasetId: DatasetState['id']) {
+
+
+const selectRequestById = (state: RootState) => state.requestsState.requestById
+export const selectRequestByDatasetId = createSelector([selectRequestById, (_, datasetID: number) => datasetID], (requestById, datasetID) => {
     return Object.values(requestById).reduce<RequestState[]>((requests, request) => {
-        if (request && Number(request.dataset_id) === datasetId) {
+        if (request && Number(request.dataset_id) === datasetID) {
             requests.push(request)
         }
         return requests
     }, [])
-}
+})

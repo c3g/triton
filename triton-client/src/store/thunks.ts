@@ -83,7 +83,7 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		'SFTP': 0,
 	}
 	for (const readset of readsets) {
-		const requests = selectRequestByDatasetId(getState().requestsState.requestById, readset.dataset)
+		const requests = selectRequestByDatasetId(getState(), readset.dataset)
 		requests.forEach((request) => {
 			diskUsage[request.type] = diskUsage[request.type] + readset.total_size
 		})

@@ -24,11 +24,7 @@ export interface StagingAction {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
-
-	const requestById = useAppSelector((state) => state.requestsState.requestById)
-	const requests = useMemo(() => {
-		return selectRequestByDatasetId(requestById, datasetID)
-	}, [datasetID, requestById])
+	const requests = useAppSelector((state) => selectRequestByDatasetId(state, datasetID))
 
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
@@ -113,7 +109,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                                   </Space>
                                </Button>)
 
-				return <ActionDropdown button={buttonStagingActive} actions={actions}/>
+				return <ActionDropdown key={type} button={buttonStagingActive} actions={actions}/>
 			} else {
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest || !dataset || !project} onClick={() => request(type)}>
                   <Space>
