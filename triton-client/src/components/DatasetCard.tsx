@@ -9,7 +9,7 @@ import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { ActionDropdown } from './ActionDropdown'
-import { store } from '../store/store'
+import { selectRequestByDatasetId } from '../selectors'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -25,16 +25,10 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
 
-	const requestIds = useAppSelector((state) => state.requestsState.requestsByDatasetId[datasetID])
-	const requestStates = useAppSelector((state) => state.requestsState.requestById)
+	const requestById = useAppSelector((state) => state.requestsState.requestById)
 	const requests = useMemo(() => {
-		return requestIds?.map((id) => requestStates[id]).reduce<DownloadRequest[]>((requests, request) => {
-			if (request) {
-				requests.push(request)
-			}
-			return requests
-		}, [])
-	}, [requestIds, requestStates])
+		return selectRequestByDatasetId(requestById, datasetID)
+	}, [datasetID, requestById])
 
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)

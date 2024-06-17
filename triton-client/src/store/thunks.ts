@@ -9,6 +9,7 @@ import { RunsStateActions } from './runs'
 import { ConstantsStateActions } from './constants'
 import { AppDispatch, RootState, convertToSerializedError } from './store'
 import { RequestsStateActions } from './requests'
+import { selectRequestByDatasetId } from '../selectors'
 
 export const fetchLoginStatus = () => async (dispatch: AppDispatch, getState: () => RootState) => {
 	if (getState().auth.loading) return
@@ -82,13 +83,10 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		'SFTP': 0,
 	}
 	for (const readset of readsets) {
-		const requestIds = getState().requestsState.requestsByDatasetId[readset.dataset]
-		if (requestIds && requestIds.length > 0) {
-			const request = getState().requestsState.requestById[requestIds[0]]
-			if (request) {
-				diskUsage[request.type] = diskUsage[request.type] + readset.total_size
-			}
-		}
+		const requests = selectRequestByDatasetId(getState().requestsState.requestById, readset.dataset)
+		requests.forEach((request) => {
+			diskUsage[request.type] = diskUsage[request.type] + readset.total_size
+		})
 	}
 	dispatch(ProjectsStateActions.setDiskUsage({ projectId, diskUsage }))
 }
