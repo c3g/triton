@@ -102,7 +102,7 @@ router.get(
 )
 
 router.get(
-	'/runs-requests/',
+	'/list-requests/',
 	asyncHandler(async (req, res) => {
 		const idParam = req.query.dataset_ids as string
 		const ids = idParam.split(',')

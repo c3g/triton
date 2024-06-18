@@ -76,7 +76,7 @@ export async function listDatasetsByIds(datasetIDs: Array<TritonDataset['id']>) 
 
 export async function listRequestsByDatasetIds(datasetIDs: Array<TritonDataset['id']>) {
 	const idList = datasetIDs.join(',')
-	return await tritonGet<TritonRequest[]>(`runs-requests?dataset_ids=${idList}`)
+	return await tritonGet<TritonRequest[]>(`list-requests?dataset_ids=${idList}`)
 }
 
 export async function listRunsForProjects(externalProjectIds: ExternalProjectID[]){
