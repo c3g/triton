@@ -5,6 +5,8 @@ import { defaultDatabaseActions } from './actions'
 import { getFreezeManAuthenticatedAPI } from '../freezeman/api'
 import { NewDownloadFile } from './download-types'
 import { TritonCreateRequestBody, TritonCreateRequestResponse } from './api-types'
+import path from 'path'
+
 const router = express.Router()
 
 // GET list request
@@ -24,7 +26,8 @@ router.post(
 			}
 			const freezemanFiles = (await freezeManAPI.DatasetFile.list(datasets[0].files)).data.results
 			const downloadFiles: NewDownloadFile[] = freezemanFiles.map((file) => {
-				return { dataset_id: String(datasetID), source: file.file_path, destination: file.readset.sample_name }
+				const fileName = path.basename(file.file_path)
+				return { dataset_id: String(datasetID), source: file.file_path, destination: fileName }
 			})
 			const result: TritonCreateRequestResponse = await createRequest(
 				{
