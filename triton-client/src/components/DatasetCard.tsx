@@ -9,7 +9,7 @@ import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { ActionDropdown } from './ActionDropdown'
-import { selectRequestByDatasetId } from '../selectors'
+import { selectRequestOfDatasetId } from '../selectors'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -24,14 +24,11 @@ export interface StagingAction {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
-	const requests = useAppSelector((state) => selectRequestByDatasetId(state, datasetID))
+	const activeRequest = useAppSelector((state) => selectRequestOfDatasetId(state, datasetID))
 
 	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
 	const constants = useAppSelector(selectConstants)
-	const activeRequest = useMemo<DownloadRequest | undefined>(() => {
-		return requests && requests[0] ? requests[0] : undefined
-	}, [requests])
 	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
@@ -78,12 +75,17 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))
 	}, [datasetID, dispatch])
 
-	const requestByType = useMemo(() => (requests ?? []).reduce(
-		(requestByType, request) => {
-			requestByType[request.type] = request
-			return requestByType
-		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
-	[requests])
+	const requestByType = useMemo(() => {
+		const requestByType: Record<DownloadRequestType, DownloadRequest | undefined> = {
+			GLOBUS: undefined,
+			SFTP: undefined,
+		}
+		if (activeRequest) {
+			requestByType[activeRequest.type] = activeRequest
+		}
+		return requestByType
+	}, [activeRequest])
+
 	const requestDetails = useMemo(() => {
 		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
