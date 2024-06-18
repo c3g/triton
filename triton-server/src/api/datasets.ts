@@ -1,6 +1,6 @@
 import { defaultDatabaseActions } from '../download/actions'
 import { getFreezeManAuthenticatedAPI } from '../freezeman/api'
-import { TritonDataset, TritonDatasetFile, TritonReadset, TritonRun } from './api-types'
+import { TritonDataset, TritonRequest, TritonDatasetFile, TritonReadset, TritonRun } from './api-types'
 
 export async function listRunsByExternalProjectId(externalProjectIds: string[]): Promise<TritonRun[]> {
 	const freezemanApi = await getFreezeManAuthenticatedAPI()
@@ -38,12 +38,17 @@ export async function listDatasetsByIds(datasetIds: string[]): Promise<TritonDat
 	const freezemanApi = await getFreezeManAuthenticatedAPI()
 	const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
 	const datasets = datasetsResponse.data.results
+	return [...datasets]
+}
 
-	const { listRequestsByDatasetId } = await defaultDatabaseActions()
-	return await Promise.all(datasets.map(async (dataset) => ({
-		...dataset,
-		requests: await listRequestsByDatasetId(dataset.id.toString())
-	})))
+export async function listRequests(datasetIds: Array<TritonDataset['id']>): Promise<TritonRequest[]> {
+	const { listRequestByDatasetId } = await defaultDatabaseActions()
+	return (await Promise.all(datasetIds.map(async (datasetId) => await listRequestByDatasetId(datasetId.toString())))).reduce<TritonRequest[]>((requests, request) => {
+		if (request) {
+			requests.push(request)
+		}
+		return requests
+	}, [])
 }
 
 export async function listReadsetsByDataset(datasetId: TritonDataset['id']): Promise<TritonReadset[]> {

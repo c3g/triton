@@ -9,6 +9,7 @@ import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { ActionDropdown } from './ActionDropdown'
+import { selectRequestOfDatasetId } from '../selectors'
 
 const { Text } = Typography
 interface DatasetCardProps {
@@ -23,13 +24,11 @@ export interface StagingAction {
 function DatasetCard({ datasetID }: DatasetCardProps) {
 	const dispatch = useAppDispatch()
 	const dataset = useAppSelector((state) => state.datasetsState.datasetsById[datasetID])
+	const activeRequest = useAppSelector((state) => selectRequestOfDatasetId(state, datasetID))
+
+	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
 	const project = useAppSelector((state) => dataset?.external_project_id ? state.projectsState.projectsById[dataset.external_project_id] : undefined)
 	const constants = useAppSelector(selectConstants)
-	const readsetsByDatasetId = useAppSelector((state) => state.readsetsState.readsetsByDatasetId)
-	const readsetsById = useAppSelector((state) => state.readsetsState.readsetsById)
-  const activeRequest = useMemo<DownloadRequest | undefined>(() => {
-    return dataset?.requests[0] ?? undefined
-  }, [dataset?.requests])
 	const alreadyRequested = !!activeRequest
 
 	const [updatingRequest, setUpdatingRequest] = useState(false)
@@ -41,16 +40,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 	}, [dataset, datasetID, dispatch])
 
 	const readsets = useMemo(() => {
-		return readsetsByDatasetId[datasetID]?.readsets.reduce((readsets, id) => {
-			const readset = readsetsById[id]
-			if (readset) {
-				readsets ??= []
+		return Object.values(readsetsById).reduce<ReadsetState[]>((readsets, readset) => {
+			if (readset && readset.dataset === datasetID) {
 				readsets.push(readset)
 			}
 			return readsets
-		}, [] as ReadsetState[] | undefined)
-	}, [datasetID, readsetsByDatasetId, readsetsById])
-	const totalSize = useMemo(() => readsets?.reduce((total, r) => total + r.total_size, 0), [readsets])
+		}, [])
+	}, [datasetID, readsetsById])
+	const totalSize = useMemo(() => readsets.reduce((total, r) => total + r.total_size, 0), [readsets])
 
 	useEffect(() => {
 		dispatch(fetchReadsets(datasetID))
@@ -73,19 +70,22 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			}
 		}
 	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
+	
+	const deleteRequest = useCallback(() => {
+		dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))
+	}, [datasetID, dispatch])
 
-  const deleteRequest = useCallback(() => {
-		if (dataset) {
-			dispatch(deleteDownloadRequest(dataset.external_project_id, datasetID)).catch((e) => console.error(e))
+	const requestByType = useMemo(() => {
+		const requestByType: Record<DownloadRequestType, DownloadRequest | undefined> = {
+			GLOBUS: undefined,
+			SFTP: undefined,
 		}
-	}, [dataset, datasetID, dispatch])
+		if (activeRequest) {
+			requestByType[activeRequest.type] = activeRequest
+		}
+		return requestByType
+	}, [activeRequest])
 
-	const requestByType = useMemo(() => (dataset?.requests ?? []).reduce(
-		(requestByType, request) => {
-			requestByType[request.type] = request
-			return requestByType
-		}, {} as Record<DownloadRequestType, DownloadRequest | undefined>),
-	[dataset?.requests])
 	const requestDetails = useMemo(() => {
 		return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
 			const req = requestByType[type]
@@ -111,7 +111,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                                   </Space>
                                </Button>)
 
-				return <ActionDropdown button={buttonStagingActive} actions={actions}/>
+				return <ActionDropdown key={type} button={buttonStagingActive} actions={actions}/>
 			} else {
 				return <Button key={type} style={{ paddingLeft: '4', paddingRight: '4' }} disabled={!totalSize || alreadyRequested || updatingRequest || !dataset || !project} onClick={() => request(type)}>
                   <Space>

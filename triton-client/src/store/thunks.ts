@@ -1,5 +1,5 @@
 import apiTriton from '../api/api-triton'
-import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonReadset } from '../api/api-types'
+import { DownloadRequestType, ExternalProjectID, TritonDataset, TritonReadset, TritonRun } from '../api/api-types'
 import { AuthActions } from './auth'
 import { DatasetFilesStateActions } from './datasetFiles'
 import { DatasetsStateActions } from './datasets'
@@ -8,6 +8,8 @@ import { ReadsetsStateActions } from './readsets'
 import { RunsStateActions } from './runs'
 import { ConstantsStateActions } from './constants'
 import { AppDispatch, RootState, convertToSerializedError } from './store'
+import { RequestsStateActions } from './requests'
+import { selectRequestOfDatasetId } from '../selectors'
 
 export const fetchLoginStatus = () => async (dispatch: AppDispatch, getState: () => RootState) => {
 	if (getState().auth.loading) return
@@ -31,8 +33,6 @@ export const fetchProjects = () => async (dispatch: AppDispatch, getState: () =>
 		const projects = await apiTriton.listProjects()
 		// console.debug(`Loaded projects succesfully: ${projects}`)
 		dispatch(ProjectsStateActions.setProjects(projects))
-		dispatch(RunsStateActions.initializeRunsByProjectId(projects))
-		dispatch(DatasetsStateActions.initializeDatasetsByProjectId(projects))
 	} catch (err: any) {
 		dispatch(ProjectsStateActions.setError(convertToSerializedError(err)))
 		throw err
@@ -40,41 +40,51 @@ export const fetchProjects = () => async (dispatch: AppDispatch, getState: () =>
 }
 
 export const fetchRuns = (externalProjectId: ExternalProjectID) => async (dispatch: AppDispatch, getState: () => RootState) => {
-	if (getState().runsState.runsByProjectId[externalProjectId]?.loading) return
-
 	try {
-		dispatch(RunsStateActions.setLoading(externalProjectId))
 		const runs = await apiTriton.listRunsForProjects([externalProjectId])
 		// console.info('Loaded runs succesfully', runs)
-		dispatch(RunsStateActions.setRunsByProjectId({ projectId: externalProjectId, runs }))
+		dispatch(RunsStateActions.setRuns(runs))
 		// console.info(getState().runsState.runsById)
 		return runs
 	} catch (err: any) {
-		dispatch(DatasetsStateActions.setError({ projectId: externalProjectId, error: convertToSerializedError(err) }))
 		throw err
 	}
 }
 
-export const fetchDatasets = (externalProjectId: ExternalProjectID) => async (dispatch: AppDispatch, getState: () => RootState) => {
-	if (getState().datasetsState.datasetsByProjectId[externalProjectId]?.loading) return
-	
+export const fetchDatasets = (runName: TritonRun['name']) => async (dispatch: AppDispatch, getState: () => RootState) => {
 	try {
-		dispatch(DatasetsStateActions.setLoading(externalProjectId))
-		const datasetIds = Object.values(getState().runsState.runsByName).reduce<number[]>((datasetIDs, run) => {
-			if (run) {
-				datasetIDs.push(...run.datasets)
-			}
-			return datasetIDs
-		}, [])
+		const run = getState().runsState.runsByName[runName]
+		if (!run) {
+			return []
+		}
+
 		// console.info(datasetIds)
-		const datasets = await apiTriton.listDatasetsByIds(datasetIds)
+		const datasets = await apiTriton.listDatasetsByIds(run.datasets)
 		// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
-		dispatch(DatasetsStateActions.setDatasetsByProjectId({ projectId: externalProjectId, datasets }))
-		dispatch(ReadsetsStateActions.initializeReadsetsByDatasetIds(datasets))
+		dispatch(DatasetsStateActions.setDatasets(datasets))
 
 		return datasets
 	} catch (err: any) {
-		dispatch(DatasetsStateActions.setError({ projectId: externalProjectId, error: convertToSerializedError(err) }))
+		throw err
+	}
+}
+
+export const fetchRequests = (datasetIds: Array<TritonDataset['id']>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+	try {
+		const requests = await apiTriton.listRequestsByDatasetIds(datasetIds)
+		// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
+		dispatch(RequestsStateActions.setRequests(requests))
+		const projectIDs: Set<string> = new Set()
+		for (const datasetId of datasetIds) {
+			const projectId = getState().datasetsState.datasetsById[datasetId]?.external_project_id
+			if (projectId) {
+				projectIDs.add(projectId)
+			}
+		}
+		projectIDs.forEach((projectId) => dispatch(updateProjectUsage(projectId)))
+
+		return requests
+	} catch (err: any) {
 		throw err
 	}
 }
@@ -91,25 +101,19 @@ const updateProjectUsage = (projectId: ExternalProjectID) => async (dispatch: Ap
 		'SFTP': 0,
 	}
 	for (const readset of readsets) {
-		const dataset = getState().datasetsState.datasetsById[readset.dataset]
-		if (dataset) {
-			const [request] = dataset.requests
-			if (request) {
-				diskUsage[request.type] = diskUsage[request.type] + readset.total_size
-			}
+		const request = selectRequestOfDatasetId(getState(), readset.dataset)
+		if (request) {
+			diskUsage[request.type] = diskUsage[request.type] + readset.total_size
 		}
 	}
 	dispatch(ProjectsStateActions.setDiskUsage({ projectId, diskUsage }))
 }
 
 export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {
-	if (getState().readsetsState.readsetsByDatasetId[datasetId]?.loading) return
-
 	try {
-		dispatch(ReadsetsStateActions.setLoading(datasetId))
 		const readsets = await apiTriton.listReadsetsForDataset(datasetId)
 		// console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
-		dispatch(ReadsetsStateActions.setReadsetsByDatasetId({ datasetId, readsets }))
+		dispatch(ReadsetsStateActions.setReadsets(readsets))
 
 		const projectId = getState().datasetsState.datasetsById[datasetId]?.external_project_id
 		if (projectId) {
@@ -118,23 +122,18 @@ export const fetchReadsets = (datasetId: TritonDataset['id']) => async (dispatch
 
 		return readsets
 	} catch (err: any) {
-		dispatch(ReadsetsStateActions.setError({ datasetId, error: convertToSerializedError(err) }))
 		throw err
 	}
 }
 
 export const fetchDatasetFiles = (readsetId: TritonReadset['id']) => async (dispatch: AppDispatch, getState: () => RootState) => {
-	if (getState().datasetFilesState.datasetFilesByReadsetId[readsetId]?.loading) return
-
 	try {
-		dispatch(DatasetFilesStateActions.setLoading(readsetId))
 		const datasetFiles = await apiTriton.listDatasetFilesForReadset(readsetId)
 		// console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
-		dispatch(DatasetFilesStateActions.setDatasetFilesByReadsetId({ readsetId, datasetFiles }))
+		dispatch(DatasetFilesStateActions.setDatasetFiles(datasetFiles))
 
 		return datasetFiles
 	} catch (err: any) {
-		dispatch(DatasetFilesStateActions.setError({ readsetId, error: convertToSerializedError(err) }))
 		throw err
 	}
 }
@@ -145,10 +144,9 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
 		try {
 			const response = await apiTriton.createDownloadRequest({ projectID: projectId, datasetID, type } )
 			// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
-			dispatch(DatasetsStateActions.setDownloadRequest(response))
+			dispatch(RequestsStateActions.setRequests([response.request]))
 			dispatch(updateProjectUsage(projectId))
 		} catch (err: any) {
-			dispatch(DatasetsStateActions.setError({ projectId, error: convertToSerializedError(err) }))
 			throw err
 		}
 	}
@@ -163,14 +161,13 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
     }
   }
 
-  export const deleteDownloadRequest = (projectId: ExternalProjectID, datasetID: number) =>
+  export const deleteDownloadRequest = (datasetID: number) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
       try {
         const response = await apiTriton.deleteDownloadRequest(datasetID)
         // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
-        dispatch(DatasetsStateActions.setDownloadRequest(response))
+        dispatch(RequestsStateActions.setRequests([response.request]))
       } catch (err: any) {
-        dispatch(DatasetsStateActions.setError({ projectId, error: convertToSerializedError(err) }))
         throw err
       }
     }

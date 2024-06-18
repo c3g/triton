@@ -1,8 +1,7 @@
 import { useEffect, useMemo } from 'react'
-import { TritonProject, TritonRun } from '../api/api-types'
-import { isNullish } from '../functions'
+import { TritonDataset, TritonProject, TritonRun } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { fetchDatasets, fetchRuns } from '../store/thunks'
+import { fetchDatasets, fetchRequests, fetchRuns } from '../store/thunks'
 import { RunCard } from './RunCard'
 
 export interface ProjectCardProps {
@@ -12,20 +11,28 @@ export interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
 	const dispatch = useAppDispatch()
 
-	const runsByProjectId = useAppSelector((state) => state.runsState.runsByProjectId[project.external_id])
 	const runsByName = useAppSelector((state) => state.runsState.runsByName)
 	const runs = useMemo(
-		() => runsByProjectId.runs.map((name) => runsByName[name]).filter((run) => !isNullish(run)) as TritonRun[],
-		[runsByName, runsByProjectId.runs]
+		() => {
+			return Object.values(runsByName).reduce<TritonRun[]>((runs, run) => {
+				if (run && run.external_project_id === project.external_id) {
+					runs.push(run)
+				}
+				return runs
+			}, [])
+		},
+		[project.external_id, runsByName]
 	)
 
 	useEffect(() => {
-		dispatch(fetchRuns(project.external_id))
-			.then((runs) => {
-				if (runs && runs.length > 0) {
-					dispatch(fetchDatasets(project.external_id))
-				}
-			})
+		(async () => {
+			const runs = await dispatch(fetchRuns(project.external_id))
+			const datasets: TritonDataset[] = []
+			for (const run of runs) {
+				datasets.push(...await dispatch(fetchDatasets(run.name)))
+			}
+			await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
+		})()
 	}, [dispatch, project.external_id])
 
 	return (

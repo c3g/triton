@@ -12,8 +12,8 @@ import { createSQLite } from './sqlite-database'
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
-	async function listRequestsByDatasetId(datasetId: DownloadDatasetID) : Promise<DownloadRequest[]> {
-		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().execute()
+	async function listRequestByDatasetId(datasetId: DownloadDatasetID) : Promise<DownloadRequest | undefined> {
+		return await db.selectFrom('requests').where('dataset_id', '=', datasetId).selectAll().executeTakeFirst()
 	}
 
 	async function listRequests() {
@@ -104,7 +104,7 @@ export async function createActions(db: Kysely<Database>) {
 	}
 
 	return {
-		listRequestsByDatasetId,
+		listRequestByDatasetId,
 		listRequests,
 		getRequest,
 		getRequestByID,

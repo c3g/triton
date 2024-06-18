@@ -8,8 +8,8 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getUserDetails, isUserAuthenticated } from '../magic/magic_api'
-import { ApiReply, IsLoggedInData, TritonDataset, TritonDatasetFile, TritonProject, TritonReadset, TritonRun, User } from './api-types'
-import { listDatasetFilesByDataset, listDatasetsByIds, listReadsetsByDataset, listRunsByExternalProjectId } from './datasets'
+import { ApiReply, IsLoggedInData, TritonDataset, TritonDatasetFile, TritonProject, TritonReadset, TritonRequest, TritonRun, User } from './api-types'
+import { listDatasetFilesByDataset, listDatasetsByIds, listReadsetsByDataset, listRequests, listRunsByExternalProjectId } from './datasets'
 import { listUserProjects } from './project'
 
 const router = express.Router()
@@ -98,6 +98,23 @@ router.get(
 
 		const datasets = await listDatasetsByIds(ids)
 		res.json(okReply<TritonDataset[]>(datasets))
+	})
+)
+
+router.get(
+	'/list-requests/',
+	asyncHandler(async (req, res) => {
+		const idParam = req.query.dataset_ids as string
+		const ids = idParam.split(',')
+
+		// At least one project ID must be specified
+		if (ids.length === 0) {
+			res.status(400).send('external_project_ids must contain at least one hercules project ID')
+			return
+		}
+
+		const requests = await listRequests(ids.map((id) => Number(id)))
+		res.json(okReply<TritonRequest[]>(requests))
 	})
 )
 
