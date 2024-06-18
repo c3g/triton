@@ -63,9 +63,27 @@ export const fetchDatasets = (runName: TritonRun['name']) => async (dispatch: Ap
 		// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
 		dispatch(DatasetsStateActions.setDatasets(datasets))
 
-		datasets.forEach((dataset) => dispatch(RequestsStateActions.setRequests(dataset.requests)))
-
 		return datasets
+	} catch (err: any) {
+		throw err
+	}
+}
+
+export const fetchRequests = (datasetIds: Array<TritonDataset['id']>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+	try {
+		const requests = await apiTriton.listRequestsByDatasetIds(datasetIds)
+		// console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
+		dispatch(RequestsStateActions.setRequests(requests))
+		const projectIDs: Set<string> = new Set()
+		for (const datasetId of datasetIds) {
+			const projectId = getState().datasetsState.datasetsById[datasetId]?.external_project_id
+			if (projectId) {
+				projectIDs.add(projectId)
+			}
+		}
+		projectIDs.forEach((projectId) => dispatch(updateProjectUsage(projectId)))
+
+		return requests
 	} catch (err: any) {
 		throw err
 	}

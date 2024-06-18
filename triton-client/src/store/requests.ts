@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { DownloadRequest } from '../api/api-types'
+import { TritonRequest } from '../api/api-types'
 
-export interface RequestState extends DownloadRequest {}
+export interface RequestState extends TritonRequest {}
 
 export interface RequestsState {
 	readonly requestById: Record<RequestState['id'], RequestState | undefined>
@@ -15,7 +15,7 @@ export const requestsSlice = createSlice({
 	name: 'requests',
 	initialState,
 	reducers: {
-		setRequests: (state, action: PayloadAction<DownloadRequest[]>) => {
+		setRequests: (state, action: PayloadAction<TritonRequest[]>) => {
 			const requests = action.payload
 			requests.forEach((d) => {
 				state.requestById[d.id] = d

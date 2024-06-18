@@ -9,7 +9,8 @@ import {
 	TritonDatasetFile,
 	TritonProject,
 	TritonReadset,
-  TritonRequestResponse,
+	TritonRequest,
+	TritonRequestResponse,
 	TritonRun,
 } from './api-types'
 import { tritonGet, tritonPost, tritonDelete, TRITON_API_BASE_URL } from './api-fetch'
@@ -73,6 +74,11 @@ export async function listDatasetsByIds(datasetIDs: Array<TritonDataset['id']>) 
 	return await tritonGet<TritonDataset[]>(`runs-datasets?ids=${idList}`)
 }
 
+export async function listRequestsByDatasetIds(datasetIDs: Array<TritonDataset['id']>) {
+	const idList = datasetIDs.join(',')
+	return await tritonGet<TritonRequest[]>(`runs-requests?dataset_ids=${idList}`)
+}
+
 export async function listRunsForProjects(externalProjectIds: ExternalProjectID[]){
 	const idList = externalProjectIds.join(',')
 	return await tritonGet<TritonRun[]>(`project-runs?external_project_ids=${idList}`)
@@ -109,9 +115,10 @@ export default {
 	listProjects,
 	listRunsForProjects,
 	listDatasetsByIds,
+	listRequestsByDatasetIds,
 	listReadsetsForDataset,
 	listDatasetFilesForReadset,
 	createDownloadRequest,
 	getConstants,
-  deleteDownloadRequest,
+	deleteDownloadRequest,
 }

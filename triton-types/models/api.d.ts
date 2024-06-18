@@ -56,9 +56,9 @@ export interface TritonProject {
 	readonly external_name: string // Magic project name
 }
 
-export interface TritonDataset extends Omit<Dataset, 'files'> {
-	requests: DownloadRequest[]
-}
+export interface TritonDataset extends Omit<Dataset, 'files'> {}
+
+export interface TritonRequest extends DownloadRequest {}
 
 export interface TritonRun {
 	external_project_id: ExternalProjectID // Project this run belongs to

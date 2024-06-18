@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
-import { TritonProject, TritonRun } from '../api/api-types'
+import { TritonDataset, TritonProject, TritonRun } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { fetchDatasets, fetchRuns } from '../store/thunks'
+import { fetchDatasets, fetchRequests, fetchRuns } from '../store/thunks'
 import { RunCard } from './RunCard'
 
 export interface ProjectCardProps {
@@ -25,14 +25,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
 	)
 
 	useEffect(() => {
-		dispatch(fetchRuns(project.external_id))
-			.then((runs) => {
-				if (runs && runs.length > 0) {
-					runs.forEach((run) => {
-						dispatch(fetchDatasets(run.name))
-					})
-				}
-			})
+		(async () => {
+			const runs = await dispatch(fetchRuns(project.external_id))
+			const datasets: TritonDataset[] = []
+			for (const run of runs) {
+				datasets.push(...await dispatch(fetchDatasets(run.name)))
+			}
+			await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
+		})()
 	}, [dispatch, project.external_id])
 
 	return (
