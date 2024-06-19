@@ -22,9 +22,9 @@ export interface DownloadRequestRecord {
 	readonly project_id: string
 
 	readonly creation_date: ColumnType<string, string, never>
-	readonly completion_date?: ColumnType<string, never, string>
-	readonly expiry_date?: ColumnType<string, string, never>
-	readonly failure_date?: ColumnType<string, string, string>
+	readonly completion_date?: ColumnType<string, never, never>
+	readonly expiry_date?: ColumnType<string, never, string>
+	readonly failure_date?: ColumnType<string, never, never>
 
 	readonly requester?: string
 	readonly notification_date?: string
@@ -69,5 +69,6 @@ interface ConstantsRecord {
 	readonly id: 1
 	readonly globus_project_size: number
 	readonly sftp_project_size: number
+	readonly expiry_days: number
 }
 export type Constants = Selectable<ConstantsRecord>
