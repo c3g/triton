@@ -57,9 +57,6 @@ export async function createActions(db: Kysely<Database>) {
 	}
 
 	async function extendRequest(datasetID: DownloadDatasetID) {
-		const request = await getRequest(datasetID)
-		if (request.status !== 'SUCCESS') throw new Error('Cannot extend a request that is not successful')
-
 		const extensionSize: number = (await db.selectFrom('constants').select('extension_size').executeTakeFirstOrThrow()).extension_size
 		const now = new Date()
 		const expiryDate = new Date(now.setDate(now.getDate() + extensionSize)).toISOString()
