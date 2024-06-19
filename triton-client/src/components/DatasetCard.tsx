@@ -3,11 +3,11 @@ import { ReactNode, ReactElement, useCallback, useEffect, useMemo, useState } fr
 import { DownloadRequest, DownloadRequestType } from '../api/api-types'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { ReadsetState } from '../store/readsets'
-import { deleteDownloadRequest, createDownloadRequest, fetchReadsets } from '../store/thunks'
+import { deleteDownloadRequest, createDownloadRequest, fetchReadsets, extendStagingRequest } from '../store/thunks'
 import { selectConstants } from '../store/constants'
 import { unitWithMagnitude } from '../functions'
 import { SUPPORTED_DOWNLOAD_TYPES } from '../constants'
-import { CloseCircleOutlined } from '@ant-design/icons'
+import { CloseCircleOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { ActionDropdown } from './ActionDropdown'
 import { selectRequestOfDatasetId } from '../selectors'
 
@@ -71,10 +71,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 		}
 	}, [constants.diskCapacity, dataset, dispatchCreateRequest, project, totalSize])
 	
-	const deleteRequest = useCallback(() => {
-		dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))
-	}, [datasetID, dispatch])
-
 	const requestByType = useMemo(() => {
 		const requestByType: Record<DownloadRequestType, DownloadRequest | undefined> = {
 			GLOBUS: undefined,
@@ -92,7 +88,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 			if (req && !req.should_delete) {
 				const { type, status, expiry_date } = req
         const actions: StagingAction[] = [
-          {action: {name: "Unstage dataset", actionCall: () => deleteRequest()}, icon: <CloseCircleOutlined style={{color: '#c9162b'}}/>}
+          {action: {name: "Unstage dataset", actionCall: () => dispatch(deleteDownloadRequest(datasetID)).catch((e) => console.error(e))}, icon: <CloseCircleOutlined style={{color: '#c9162b'}}/>},
+		  {action: {name: "Extend staging", actionCall: () => dispatch(extendStagingRequest(datasetID)).catch((e) => console.error(e))}, icon: <PlusCircleOutlined style={{color: '#097969'}}/>},
         ]
 
         let statusDescription: ReactNode
@@ -122,7 +119,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 				       </Button>
       }
     })
-	}, [alreadyRequested, dataset, project, request, updatingRequest, deleteRequest, activeRequest?.type, requestByType, totalSize])
+	}, [activeRequest?.type, alreadyRequested, dataset, datasetID, dispatch, project, request, requestByType, totalSize, updatingRequest])
 
 	return dataset ? (<div
 		style={{

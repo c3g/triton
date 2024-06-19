@@ -46,6 +46,20 @@ router.post(
 	})
 )
 
+router.post(
+	'/extend-request/',
+	asyncHandler(async (req: Request, res: Response) => {
+		const datasetID = req.query.dataset_id
+		const { extendRequest } = await defaultDatabaseActions()
+		try {
+			const result = await extendRequest(String(datasetID))
+			dataHandler(res)(result)
+		} catch (error) {
+			errorHandler(res)(error)
+		}
+	}
+))
+
 // DELETE request deletion
 router.delete(
 	'/delete-request/',

@@ -56,6 +56,23 @@ export async function createActions(db: Kysely<Database>) {
 		})
 	}
 
+	async function extendRequest(datasetID: DownloadDatasetID) {
+		const request = await getRequest(datasetID)
+		if (request.status !== 'SUCCESS') throw new Error('Cannot extend a request that is not successful')
+
+		const extensionSize: number = (await db.selectFrom('constants').select('extension_size').executeTakeFirstOrThrow()).extension_size
+		const now = new Date()
+		const expiryDate = new Date(now.setDate(now.getDate() + extensionSize)).toISOString()
+
+		return await db
+			.updateTable('requests')
+			.set({ expiry_date: expiryDate })
+			.where('dataset_id', '=', datasetID)
+			.where('status', '=', 'SUCCESS')
+			.returningAll()
+			.executeTakeFirstOrThrow()
+	}
+
 	async function deleteRequest(datasetID: DownloadDatasetID) {
 		const deletedRequest = await db.updateTable('requests').set({ should_delete: 1 }).where('dataset_id', '=', datasetID).returningAll().executeTakeFirstOrThrow()
     return {request: deletedRequest}
@@ -109,6 +126,7 @@ export async function createActions(db: Kysely<Database>) {
 		getRequest,
 		getRequestByID,
 		createRequest,
+		extendRequest,
 		deleteRequest,
 		insertFiles,
 		listFilesByDatasetId,

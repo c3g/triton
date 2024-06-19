@@ -17,8 +17,8 @@ export const requestsSlice = createSlice({
 	reducers: {
 		setRequests: (state, action: PayloadAction<TritonRequest[]>) => {
 			const requests = action.payload
-			requests.forEach((d) => {
-				state.requestById[d.id] = d
+			requests.forEach((r) => {
+				state.requestById[r.id] = r
 			})
 		},
 	},

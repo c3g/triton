@@ -171,3 +171,13 @@ export const createDownloadRequest = (projectId: ExternalProjectID, datasetID: n
         throw err
       }
     }
+
+export const extendStagingRequest = (datasetID: number) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+	try {
+	  const response = await apiTriton.extendStagingRequest(datasetID)
+	  dispatch(RequestsStateActions.setRequests([response]))
+	} catch (err: any) {
+	  throw err
+	}
+  }

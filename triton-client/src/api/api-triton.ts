@@ -110,6 +110,10 @@ export async function deleteDownloadRequest(datasetID: TritonDataset['id']) {
   return await tritonDelete<TritonRequestResponse>(`download/delete-request?dataset_id=${datasetID}`)
 }
 
+export async function extendStagingRequest(datasetID: TritonDataset['id']) {
+  return await tritonPost<TritonRequest>(`download/extend-request?dataset_id=${datasetID}`)
+}
+
 export default {
 	fetchLoginStatus,
 	listProjects,
@@ -120,5 +124,6 @@ export default {
 	listDatasetFilesForReadset,
 	createDownloadRequest,
 	getConstants,
-	deleteDownloadRequest,
+  deleteDownloadRequest,
+  extendStagingRequest,
 }
