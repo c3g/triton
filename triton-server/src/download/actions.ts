@@ -57,7 +57,7 @@ export async function createActions(db: Kysely<Database>) {
 	}
 
 	async function extendRequest(datasetID: DownloadDatasetID) {
-		const extensionSize: number = (await db.selectFrom('constants').select('extension_size').executeTakeFirstOrThrow()).extension_size
+		const extensionSize: number = (await db.selectFrom('constants').select('expiry_days').executeTakeFirstOrThrow()).expiry_days
 		const now = new Date()
 		const expiryDate = new Date(now.setDate(now.getDate() + extensionSize)).toISOString()
 

@@ -69,6 +69,6 @@ interface ConstantsRecord {
 	readonly id: 1
 	readonly globus_project_size: number
 	readonly sftp_project_size: number
-	readonly extension_size: number
+	readonly expiry_days: number
 }
 export type Constants = Selectable<ConstantsRecord>
