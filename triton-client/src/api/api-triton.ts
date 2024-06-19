@@ -124,6 +124,6 @@ export default {
 	listDatasetFilesForReadset,
 	createDownloadRequest,
 	getConstants,
-  deleteDownloadRequest,
-  extendStagingRequest,
+	deleteDownloadRequest,
+	extendStagingRequest,
 }
