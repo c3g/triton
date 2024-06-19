@@ -97,7 +97,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
         let statusDescription: ReactNode
 				if (status === "SUCCESS") {
-					statusDescription = ["AVAILABLE", "|", `Expires: ${expiry_date ? expiry_date : "-"}`]
+					statusDescription = ["AVAILABLE", "|", `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`]
 				} else if (status === "FAILED") {
 					statusDescription = "FAILED"
 				} else {
