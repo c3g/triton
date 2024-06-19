@@ -76,5 +76,5 @@ create table constants (
     http_project_size   INTEGER not null,
     globus_project_size INTEGER not null,
     sftp_project_size   INTEGER not null,
-    expiry_days      INTEGER not null default 7
+    expiry_days         INTEGER not null default 7
 );
