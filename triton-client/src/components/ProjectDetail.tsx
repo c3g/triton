@@ -14,6 +14,7 @@ import { dataSize } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { TritonDataset, TritonRun } from "../api/api-types"
 import {
+    Button,
     Col,
     Collapse,
     CollapseProps,
@@ -21,12 +22,14 @@ import {
     Row,
     Space,
     Typography,
+    notification,
 } from "antd"
 import DatasetList from "./DatasetList"
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
 } from "../selectors"
+import { resetPassword } from "../api/api-triton"
 
 const { Text, Title } = Typography
 
@@ -65,6 +68,46 @@ function ProjectDetail() {
         <div style={{ margin: "0rem 0.5rem" }}>
             {project && (
                 <>
+                    <Button
+                        onClick={() => {
+                            resetPassword(projectExternalId, "SFTP")
+                                .then(() =>
+                                    notification.success({
+                                        message: "Password Reset",
+                                        description: `The SFTP password is being reset for the project ${project.external_name}.`,
+                                    }),
+                                )
+                                .catch(() =>
+                                    notification.error({
+                                        message: "Error",
+                                        description: `The SFTP password could not be reset for the project ${project.external_name}.`,
+                                    }),
+                                )
+                        }}
+                        style={{ float: "right" }}
+                    >
+                        Reset <b>SFTP</b> Password
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            resetPassword(projectExternalId, "GLOBUS")
+                                .then(() =>
+                                    notification.success({
+                                        message: "Password Reset",
+                                        description: `The Globus password is being reset for the project ${project.external_name}.`,
+                                    }),
+                                )
+                                .catch(() =>
+                                    notification.error({
+                                        message: "Error",
+                                        description: `The Globus password could not be reset for the project ${project.external_name}.`,
+                                    }),
+                                )
+                        }}
+                        style={{ float: "right" }}
+                    >
+                        Reset <b>Globus</b> Password
+                    </Button>
                     <Title level={2} style={{ marginTop: "0.5rem" }}>
                         {project.external_name}
                     </Title>
