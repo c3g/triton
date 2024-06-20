@@ -1,6 +1,5 @@
 # Ignore artifacts
 .storybook
 build
-node_modules
 public
 storbook-static
