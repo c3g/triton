@@ -6,8 +6,7 @@
     "scripts": {
         "start-production": "NODE_ENV=production ts-node src/start-server.ts",
         "start": "NODE_ENV=development nodemon src/start-server.ts",
-        "debug": "NODE_ENV=development DEBUG=epress-session nodemon src/start-server.ts",
-        "prettier": "prettier --check ."
+        "debug": "NODE_ENV=development DEBUG=epress-session nodemon src/start-server.ts"
     },
     "nodemonConfig": {
         "ext": "*.ts",
