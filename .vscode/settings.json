@@ -14,5 +14,6 @@
   "typescript.format.enable": true,
   "javascript.format.enable": true,
   "prettier.enableDebugLogs": true,
-  "sequencediagrams.diagram.style": "simple"
+  "sequencediagrams.diagram.style": "simple",
+  "eslint.workingDirectories": [{ "mode": "auto" }]
 }
