@@ -1,36 +1,22 @@
-import { Button, Modal, Space, Spin, Typography } from "antd"
-import {
-    ReactNode,
-    ReactElement,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from "react"
+import { Button, Col, Modal, Row, Space, Spin } from "antd"
+import { ReactNode, useCallback, useMemo, useState } from "react"
 import { DownloadRequest, DownloadRequestType } from "../api/api-types"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { ReadsetState } from "../store/readsets"
 import {
     deleteDownloadRequest,
     createDownloadRequest,
-    fetchReadsets,
     extendStagingRequest,
 } from "../store/thunks"
 import { selectConstants } from "../store/constants"
-import { unitWithMagnitude } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { ActionDropdown } from "./ActionDropdown"
+import { ActionDropdown, ActionDropdownProps } from "./ActionDropdown"
 import { selectRequestOfDatasetId } from "../selectors"
+import { DataSize } from "./shared"
 
-const { Text } = Typography
 interface DatasetCardProps {
     datasetID: number
-}
-
-export interface StagingAction {
-    action: { name: string; actionCall: () => void }
-    icon: ReactElement
 }
 
 function DatasetCard({ datasetID }: DatasetCardProps) {
@@ -86,10 +72,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         [readsets],
     )
 
-    useEffect(() => {
-        dispatch(fetchReadsets(datasetID))
-    }, [datasetID, dispatch])
-
     const request = useCallback(
         (downloadType: DownloadRequestType) => {
             if (dataset && project && totalSize) {
@@ -139,9 +121,9 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const requestDetails = useMemo(() => {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
             const req = requestByType[type]
-            if (req && !req.should_delete) {
-                const { type, status, expiry_date } = req
-                const actions: StagingAction[] = [
+            if (req && !req.should_delete && req.status !== "FAILED") {
+                const { type, status } = req
+                const actions: ActionDropdownProps["actions"] = [
                     {
                         action: {
                             name: "Unstage dataset",
@@ -170,13 +152,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
                 let statusDescription: ReactNode
                 if (status === "SUCCESS") {
-                    statusDescription = [
-                        "AVAILABLE",
-                        "|",
-                        `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`,
-                    ]
-                } else if (status === "FAILED") {
-                    statusDescription = "FAILED"
+                    statusDescription = "DOWNLOAD"
                 } else {
                     statusDescription = "QUEUED"
                 }
@@ -185,6 +161,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         key={type}
                         style={{ paddingLeft: "4", paddingRight: "4" }}
                         disabled={updatingRequest}
+                        onClick={() => {
+                            if (status === "SUCCESS") {
+                                Modal.info({
+                                    title: `Dataset successfully staged`,
+                                    content: `You can now download the dataset using the instruction sent to your email.`,
+                                })
+                            }
+                        }}
                     >
                         <Space>
                             {type}
@@ -202,6 +186,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     />
                 )
             } else {
+                let statusDescription: ReactNode
+                if (req && req.should_delete) {
+                    statusDescription = "UNSTAGING"
+                } else if (req?.status === "FAILED") {
+                    statusDescription = "FAILED"
+                } else {
+                    statusDescription = "STAGE"
+                }
                 return (
                     <Button
                         key={type}
@@ -213,14 +205,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                             !dataset ||
                             !project
                         }
-                        onClick={() => request(type)}
+                        onClick={() =>
+                            req?.status !== "FAILED" && request(type)
+                        }
                     >
                         <Space>
                             {type}
                             {"|"}
-                            {alreadyRequested && type === activeRequest.type
-                                ? "UNSTAGING"
-                                : "READY"}
+                            {statusDescription}
                         </Space>
                     </Button>
                 )
@@ -239,54 +231,29 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         updatingRequest,
     ])
 
+    const expiration = useMemo(() => {
+        const expiry_date = activeRequest?.expiry_date
+        return `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`
+    }, [])
+
     return dataset ? (
-        <div
-            style={{
-                backgroundColor: "white",
-                paddingLeft: "1rem",
-                paddingTop: "1rem",
-                paddingRight: "1rem",
-                height: "4rem",
-            }}
-        >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Space>
-                    {
-                        // left
-                    }
-                    <Text strong>Dataset #{dataset.id}</Text>
-                </Space>
-                <Space>
-                    {
-                        // middle
-                        requestDetails
-                    }
-                </Space>
-                <Space>
-                    {
-                        // right
-                    }
-                    <div>
-                        {!totalSize ? <Spin /> : <DataSize size={totalSize} />}
-                    </div>
-                </Space>
-            </div>
-        </div>
+        <Row justify={"space-between"} gutter={32}>
+            <Col span={3}>Dataset #{dataset.id}</Col>
+            {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
+                cols.push(
+                    <Col key={`requestDetails-${i}`} span={3}>
+                        {r}
+                    </Col>,
+                )
+                return cols
+            }, [])}
+            <Col span={3}>{activeRequest && expiration}</Col>
+            <Col span={3} style={{ textAlign: "right" }}>
+                {totalSize ? <DataSize size={totalSize} /> : <Spin />}
+            </Col>
+        </Row>
     ) : (
         <Spin />
-    )
-}
-
-interface SizeProps {
-    size: number
-}
-
-function DataSize({ size }: SizeProps) {
-    const { unit, magnitude } = unitWithMagnitude(size)
-    return (
-        <>
-            {(size / magnitude).toFixed(2)} {unit}
-        </>
     )
 }
 

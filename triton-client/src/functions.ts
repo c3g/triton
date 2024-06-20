@@ -20,3 +20,8 @@ export function unitWithMagnitude(size: number) {
 
     return BYTE
 }
+
+export function dataSize(size: number) {
+    const { unit, magnitude } = unitWithMagnitude(size)
+    return [(size / magnitude).toFixed(2), unit] as const
+}
