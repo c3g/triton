@@ -1,5 +1,3 @@
-.vscode/
-
 ./triton-client/build/
 ./triton-client/public/
 
