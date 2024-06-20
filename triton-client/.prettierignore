@@ -1,5 +1,0 @@
-# Ignore artifacts
-.storybook
-build
-public
-storbook-static

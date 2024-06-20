@@ -1,0 +1,18 @@
+{
+    "name": "triton",
+    "version": "0.0.0",
+    "description": "The triton project is an end user portal for data delivery, where clients can download the dataset files associated with their projects. It acts as an extension to the Hercules project.",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "LGPLv3",
+    "devDependencies": {
+        "@eslint/js": "^9.5.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-react": "^7.34.3",
+        "globals": "^15.6.0",
+        "prettier": "3.3.2",
+        "typescript-eslint": "^7.13.1"
+    }
+}

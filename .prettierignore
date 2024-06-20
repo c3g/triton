@@ -1,0 +1,5 @@
+./triton-client/build/
+./triton-client/public/
+
+./triton-server/data/
+./triton-server/scripts/
