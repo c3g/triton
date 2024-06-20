@@ -1,5 +1,8 @@
 ./triton-client/build/
 ./triton-client/public/
+!./triton-client/public/**/*.html
+!./triton-client/public/**/*.js
+!./triton-client/public/**/*.json
 
 ./triton-server/data/
 ./triton-server/scripts/
