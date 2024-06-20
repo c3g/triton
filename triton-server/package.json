@@ -4,16 +4,15 @@
 	"description": "Triton data delivery backend",
 	"main": "src/start-server.ts",
 	"scripts": {
-		"start-production": "NODE_ENV=production npx ts-node src/start-server.ts",
-		"test": "jest --setupFiles ./config.ts",
-		"start": "NODE_ENV=development npx nodemon src/start-server.ts",
-		"debug": "NODE_ENV=development DEBUG=express-session npx nodemon src/start-server.ts"
+		"start-production": "NODE_ENV=production ts-node src/start-server.ts",
+		"start": "NODE_ENV=development nodemon src/start-server.ts",
+		"debug": "NODE_ENV=development DEBUG=epress-session nodemon src/start-server.ts",
+		"prettier": "prettier --check ."
 	},
 	"nodemonConfig": {
 		"ext": "*.ts",
 		"watch": [
 			"config.ts",
-			"jest.config.ts",
 			"package-lock.json",
 			"src",
 			"tsconfig.json",
@@ -63,22 +62,12 @@
 		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.13",
 		"@types/express-session": "^1.17.5",
-		"@types/jest": "^28.1.8",
 		"@types/node": "^18.7.11",
 		"@types/serve-favicon": "^2.5.3",
 		"@types/sqlite3": "^3.1.8",
-		"@typescript-eslint/eslint-plugin": "^5.34.0",
-		"eslint": "^8.22.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-config-standard-with-typescript": "^22.0.0",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-n": "^15.2.5",
-		"eslint-plugin-promise": "^6.0.0",
-		"jest": "^28.1.3",
 		"nodemon": "^3.0.1",
 		"pino-pretty": "^10.0.1",
 		"prettier": "2.7.1",
-		"ts-jest": "^28.0.8",
 		"ts-node": "^10.9.1",
 		"typescript": "^4.7.4"
 	}
