@@ -1,5 +1,6 @@
 import {
     ApiReply,
+    DownloadRequestType,
     ExternalProjectID,
     IsLoggedInData,
     TritonConstants,
@@ -140,6 +141,16 @@ export async function extendStagingRequest(datasetID: TritonDataset["id"]) {
     return await tritonPost<TritonRequest>(
         `download/extend-request?dataset_id=${datasetID}`,
     )
+}
+
+export async function resetPassword(
+    projectID: ExternalProjectID,
+    type: DownloadRequestType,
+) {
+    return await tritonPost<ApiReply<undefined>>(`download/reset-password/`, {
+        body: JSON.stringify({ projectID, type }),
+        headers: { "Content-Type": "application/json" },
+    })
 }
 
 export default {

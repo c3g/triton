@@ -34,25 +34,27 @@ export function start() {
             contacts
                 .filter((contact) => contact.depth)
                 .map(async (contact) => {
-                    await broadcastEmailsOfProject(
-                        contact.project_id,
-                        async (send) => {
-                            await send(
-                                getCredentialSubjectFor(contact),
-                                getCredentialMessageFor(contact),
-                            )
-                        },
-                    )
-
-                    logger.info(`[contacts] Removing contact ${contact.id}`)
-                    await db
-                        .removeContact(contact.project_id, contact.type)
-                        .catch((error) =>
-                            logger.error(
-                                error,
-                                `[contacts] Could not remove contact ${contact.id}`,
-                            ),
+                    if (contact.password_reset === 0) {
+                        await broadcastEmailsOfProject(
+                            contact.project_id,
+                            async (send) => {
+                                await send(
+                                    getCredentialSubjectFor(contact),
+                                    getCredentialMessageFor(contact),
+                                )
+                            },
                         )
+
+                        logger.info(`[contacts] Removing contact ${contact.id}`)
+                        await db
+                            .removeContact(contact.project_id, contact.type)
+                            .catch((error) =>
+                                logger.error(
+                                    error,
+                                    `[contacts] Could not remove contact ${contact.id}`,
+                                ),
+                            )
+                    }
                 }),
         )
 
