@@ -2,6 +2,3 @@
 bin
 data
 scripts
-*.json
-!package.json
-!package-lock.json

@@ -3,6 +3,3 @@
 build
 public
 storbook-static
-*.json
-!package.json
-!package-lock.json
