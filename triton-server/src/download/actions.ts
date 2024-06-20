@@ -157,6 +157,28 @@ export async function createActions(db: Kysely<Database>) {
             .executeTakeFirstOrThrow()
     }
 
+    async function resetContactPassword(
+        projectID: Contact["project_id"],
+        type: Contact["type"],
+    ): Promise<Contact | undefined> {
+        return await db
+            .insertInto("contacts")
+            .values({
+                project_id: projectID,
+                type: type,
+                status: "MODIFIED",
+                depth: "",
+                password_reset: 1, // don't send email for this contact
+            })
+            .onConflict((oc) =>
+                oc.columns(["project_id", "type"]).doUpdateSet({
+                    depth: "",
+                }),
+            )
+            .returningAll()
+            .executeTakeFirst()
+    }
+
     async function updateNotificationDate(requestID: DownloadRequestID) {
         return await db
             .updateTable("requests")
@@ -185,6 +207,7 @@ export async function createActions(db: Kysely<Database>) {
         listFilesByDatasetId,
         listReadyContacts,
         removeContact,
+        resetContactPassword,
         updateNotificationDate,
         getConstants,
     }

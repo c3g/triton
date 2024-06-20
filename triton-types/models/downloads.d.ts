@@ -65,9 +65,10 @@ export type DownloadDatasetID = DownloadRequest["dataset_id"]
 interface ContactRecord {
     readonly id: Generated<number>
     readonly project_id: string
-    readonly depth: string | null
+    readonly depth: string
     readonly status: "NEW" | "MODIFIED"
     readonly type: "SFTP" | "GLOBUS"
+    readonly password_reset: 0 | 1
 }
 export type Contact = Selectable<ContactRecord>
 

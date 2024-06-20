@@ -100,4 +100,14 @@ router.get(
     }),
 )
 
+router.post(
+    "/reset-password/",
+    asyncHandler(async (req: Request, res: Response) => {
+        const { projectID, type } = req.body
+        const { resetContactPassword } = await defaultDatabaseActions()
+        await resetContactPassword(projectID, type)
+        dataHandler(res)(undefined)
+    }),
+)
+
 export default router
