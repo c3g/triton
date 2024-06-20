@@ -6,19 +6,14 @@ import { selectProjects, selectProjectsLoading } from "../store/projects"
 
 import LandingPage from "./Landing"
 import ProjectCardList from "./ProjectCardList"
-import RunDetail from "./RunDetail"
+import ProjectDetail from "./ProjectDetail"
 
 import "./App.scss"
 import "./Common.scss"
 
 import { Alert, Layout, Spin } from "antd"
 import { TritonProject } from "../api/api-types"
-import {
-    fetchLoginStatus,
-    fetchProjects,
-    fetchConstants,
-} from "../store/thunks"
-import { selectConstants } from "../store/constants"
+import { fetchLoginStatus, fetchProjects } from "../store/thunks"
 
 const { Sider, Content } = Layout
 
@@ -98,8 +93,8 @@ function App() {
                                     }
                                 />
                                 <Route
-                                    path="/run/:runName"
-                                    element={<RunDetail />}
+                                    path="/project/:projectExternalId/"
+                                    element={<ProjectDetail />}
                                 />
                                 <Route
                                     path="*"

@@ -1,7 +1,7 @@
+import { useNavigate } from "react-router-dom"
 import { TritonProject } from "../api/api-types"
 import "./Common.scss"
-import { ProjectCard } from "./ProjectCard"
-import { Collapse, Typography } from "antd"
+import { Button, Typography } from "antd"
 
 const { Title } = Typography
 
@@ -10,37 +10,22 @@ interface ProjectCardListProps {
 }
 
 function ProjectCardList({ projects }: ProjectCardListProps) {
+    const navigate = useNavigate()
     return (
         <>
-            <div style={{ padding: "1rem" }}>
-                <Title level={2}>Projects</Title>
-                <Collapse style={{ border: "none" }}>
-                    {projects.map((project) => (
-                        <Collapse.Panel
-                            key={project.external_id}
-                            header={
-                                <Typography.Text strong>
-                                    {project.external_name}
-                                </Typography.Text>
-                            }
-                            showArrow={false}
-                            style={{
-                                borderStyle: "solid",
-                                borderWidth: "thin",
-                                borderColor: "lightgray",
-                                borderRadius: "7px",
-                                marginBottom: "0.5rem",
-                                padding: "9px",
-                            }}
-                        >
-                            <ProjectCard
-                                key={project.external_id}
-                                project={project}
-                            />
-                        </Collapse.Panel>
-                    ))}
-                </Collapse>
-            </div>
+            <Title level={2}>Projects</Title>
+            {projects.map((project) => (
+                <Button
+                    key={project.external_id}
+                    block
+                    style={{ width: "90%", margin: "0 1rem" }}
+                    onClick={() => navigate(`/project/${project.external_id}/`)}
+                >
+                    <Typography.Text strong>
+                        {project.external_name}
+                    </Typography.Text>
+                </Button>
+            ))}
         </>
     )
 }

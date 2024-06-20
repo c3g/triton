@@ -1,4 +1,4 @@
-import { Empty, Spin } from "antd"
+import { Divider, Empty, Spin } from "antd"
 import { useMemo } from "react"
 import { useAppSelector } from "../store/hooks"
 import DatasetCard from "./DatasetCard"
@@ -23,8 +23,15 @@ function DatasetList({ runName }: DatasetListProps) {
                 />
             )
         if (datasetIDs.length > 0) {
-            return datasetIDs.map((datasetID) => {
-                return <DatasetCard key={datasetID} datasetID={datasetID} />
+            return datasetIDs.map((datasetID, index) => {
+                return (
+                    <>
+                        <DatasetCard key={datasetID} datasetID={datasetID} />
+                        {index < datasetIDs.length - 1 ? (
+                            <Divider style={{ margin: "0.5rem 0" }} />
+                        ) : null}
+                    </>
+                )
             })
         }
     }, [datasetIDs])
