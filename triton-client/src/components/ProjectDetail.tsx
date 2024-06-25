@@ -5,15 +5,24 @@ import { selectConstants } from "../store/constants"
 import {
     fetchConstants,
     fetchDatasets,
+    fetchReadsets,
     fetchRequests,
     fetchRuns,
 } from "../store/thunks"
 
-import "./RunDetail.scss"
 import { unitWithMagnitude } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { TritonDataset, TritonRun } from "../api/api-types"
-import { Collapse, CollapseProps, Space, Typography } from "antd"
+import {
+    Col,
+    Collapse,
+    CollapseProps,
+    Flex,
+    Progress,
+    Row,
+    Space,
+    Typography,
+} from "antd"
 import DatasetList from "./DatasetList"
 import {
     selectDisksUsageByRunName,
@@ -37,13 +46,13 @@ function ProjectDetail() {
                 datasets.push(...(await dispatch(fetchDatasets(run.name))))
             }
             await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
+            await Promise.all(
+                datasets.map(async (dataset) =>
+                    dispatch(fetchReadsets(dataset.id)),
+                ),
+            )
         })()
     }, [dispatch, projectExternalId])
-
-    const constants = useAppSelector(selectConstants)
-    useEffect(() => {
-        dispatch(fetchConstants())
-    }, [dispatch])
 
     const runsByName = useAppSelector((state) => state.runsState.runsByName)
     const runs = useMemo(() => {
@@ -59,28 +68,7 @@ function ProjectDetail() {
         <div style={{ margin: "1rem 0.5rem" }}>
             {project && (
                 <>
-                    <span id={"RunDetail-capacity"}>
-                        <table>
-                            <tbody>
-                                {SUPPORTED_DOWNLOAD_TYPES.map((type) => (
-                                    <tr key={type}>
-                                        <td>{type}:</td>
-                                        {dataSize(project.diskUsage[type]).map(
-                                            (x) => (
-                                                <td key={x}>{x}</td>
-                                            ),
-                                        )}
-                                        <td>of</td>
-                                        {dataSize(
-                                            constants.diskCapacity[type],
-                                        ).map((x) => (
-                                            <td key={x}>{x}</td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </span>
+                    <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <Collapse items={runs.map((run) => runItem(run))} />
                 </>
             )}
@@ -117,9 +105,69 @@ function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
     }
 }
 
+function ProjectDiskUsage({
+    projectExternalId,
+}: {
+    projectExternalId: string
+}) {
+    const dispatch = useAppDispatch()
+    const constants = useAppSelector(selectConstants)
+    useEffect(() => {
+        dispatch(fetchConstants())
+    }, [dispatch])
+
+    const diskUsage = useAppSelector(
+        (state) =>
+            state.projectsState.projectsById[projectExternalId]?.diskUsage,
+    )
+
+    return (
+        <>
+            {SUPPORTED_DOWNLOAD_TYPES.map((type) => {
+                const usage = diskUsage ? diskUsage[type] : 0
+                const capacity = constants.diskCapacity[type]
+                const [scaledUsage, usageUnit] = diskUsage
+                    ? dataSize(diskUsage[type])
+                    : []
+                const [scaledCapacity, capacityUnit] = dataSize(
+                    constants.diskCapacity[type],
+                )
+                return (
+                    <Row key={type} gutter={[16, 16]}>
+                        <Col span={1}>
+                            <b>{`${type}`}</b>
+                        </Col>
+                        {/** essential whitespaces... */}
+                        <Col></Col>
+                        <Col
+                            span={3}
+                        >{`${scaledUsage} ${usageUnit} / ${scaledCapacity} ${capacityUnit}`}</Col>
+                        {/** essential whitespaces... */}
+                        <Col></Col>
+                        <Col pull={1}>
+                            <Progress
+                                percent={(usage / capacity) * 100}
+                                strokeColor={
+                                    usage < capacity ? "#1890ff" : "#f5222d"
+                                }
+                                format={() => (
+                                    <Text
+                                        color={"black"}
+                                    >{`${((usage / capacity) * 100).toFixed(2)}%`}</Text>
+                                )}
+                                size={[800, 20]}
+                            />
+                        </Col>
+                    </Row>
+                )
+            })}
+        </>
+    )
+}
+
 function dataSize(size: number) {
     const { unit, magnitude } = unitWithMagnitude(size)
-    return [(size / magnitude).toFixed(2), unit]
+    return [(size / magnitude).toFixed(2), unit] as const
 }
 
 export default ProjectDetail
