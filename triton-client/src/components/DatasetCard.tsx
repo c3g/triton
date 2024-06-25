@@ -1,5 +1,5 @@
 import { Button, Modal, Space, Spin, Typography } from "antd"
-import { ReactNode, ReactElement, useCallback, useMemo, useState } from "react"
+import { ReactNode, useCallback, useMemo, useState } from "react"
 import { DownloadRequest, DownloadRequestType } from "../api/api-types"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { ReadsetState } from "../store/readsets"
@@ -12,17 +12,12 @@ import { selectConstants } from "../store/constants"
 import { unitWithMagnitude } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { ActionDropdown } from "./ActionDropdown"
+import { ActionDropdown, ActionDropdownProps } from "./ActionDropdown"
 import { selectRequestOfDatasetId } from "../selectors"
 
 const { Text } = Typography
 interface DatasetCardProps {
     datasetID: number
-}
-
-export interface StagingAction {
-    action: { name: string; actionCall: () => void }
-    icon: ReactElement
 }
 
 function DatasetCard({ datasetID }: DatasetCardProps) {
@@ -129,7 +124,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
             const req = requestByType[type]
             if (req && !req.should_delete) {
                 const { type, status, expiry_date } = req
-                const actions: StagingAction[] = [
+                const actions: ActionDropdownProps["actions"] = [
                     {
                         action: {
                             name: "Unstage dataset",
