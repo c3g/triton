@@ -13,8 +13,12 @@ import "./RunDetail.scss"
 import { unitWithMagnitude } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { TritonDataset, TritonRun } from "../api/api-types"
-import { Collapse, Space, Typography } from "antd"
+import { Collapse, CollapseProps, Space, Typography } from "antd"
 import DatasetList from "./DatasetList"
+import {
+    selectDisksUsageByRunName,
+    selectRequestsByRunName,
+} from "../selectors"
 
 const { Text } = Typography
 
@@ -77,30 +81,40 @@ function ProjectDetail() {
                             </tbody>
                         </table>
                     </span>
-                    <Collapse>
-                        {runs.map((run) => (
-                            <Collapse.Panel
-                                extra={
-                                    <>
-                                        <Space>
-                                            <Text
-                                                strong
-                                            >{`${run.datasets.length} Datasets Available`}</Text>
-                                        </Space>
-                                    </>
-                                }
-                                key={run.name}
-                                header={<Text strong>{run.name}</Text>}
-                                showArrow={false}
-                            >
-                                <DatasetList runName={run.name} />
-                            </Collapse.Panel>
-                        ))}
-                    </Collapse>
+                    <Collapse items={runs.map((run) => runItem(run))} />
                 </>
             )}
         </div>
     )
+}
+
+function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
+    function Extra({ run }: { run: TritonRun }) {
+        const requests = useAppSelector((state) =>
+            selectRequestsByRunName(state, run.name),
+        )
+        const diskUsage = useAppSelector((state) =>
+            selectDisksUsageByRunName(state, run.name),
+        )
+        const constants = useAppSelector(selectConstants)
+        return (
+            <Space size={"middle"}>
+                {`SFTP: ${((diskUsage.SFTP / constants.diskCapacity.SFTP) * 100).toFixed(2)}%`}
+                {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
+                <Text
+                    strong
+                >{`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}</Text>
+            </Space>
+        )
+    }
+
+    return {
+        extra: <Extra run={run} />,
+        label: run.name,
+        key: run.name,
+        showArrow: true,
+        children: <DatasetList runName={run.name} />,
+    }
 }
 
 function dataSize(size: number) {
