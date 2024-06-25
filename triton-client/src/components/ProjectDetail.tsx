@@ -17,7 +17,6 @@ import {
     Col,
     Collapse,
     CollapseProps,
-    Flex,
     Progress,
     Row,
     Space,
@@ -29,7 +28,7 @@ import {
     selectRequestsByRunName,
 } from "../selectors"
 
-const { Text } = Typography
+const { Text, Title } = Typography
 
 function ProjectDetail() {
     const dispatch = useAppDispatch()
@@ -65,9 +64,12 @@ function ProjectDetail() {
     }, [projectExternalId, runsByName])
 
     return (
-        <div style={{ margin: "1rem 0.5rem" }}>
+        <div style={{ margin: "0rem 0.5rem" }}>
             {project && (
                 <>
+                    <Title level={2} style={{ marginTop: "0.5rem" }}>
+                        {project.external_name}
+                    </Title>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <Collapse items={runs.map((run) => runItem(run))} />
                 </>
@@ -98,7 +100,7 @@ function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
 
     return {
         extra: <Extra run={run} />,
-        label: run.name,
+        label: <b>{run.name}</b>,
         key: run.name,
         showArrow: true,
         children: <DatasetList runName={run.name} />,
