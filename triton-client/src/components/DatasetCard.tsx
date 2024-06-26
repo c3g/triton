@@ -161,6 +161,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         key={type}
                         style={{ paddingLeft: "4", paddingRight: "4" }}
                         disabled={updatingRequest}
+                        onClick={() => {
+                            if (status === "SUCCESS") {
+                                Modal.info({
+                                    title: `Dataset successfully staged`,
+                                    content: `You can now download the dataset using the instruction sent to your email.`,
+                                })
+                            }
+                        }}
                     >
                         <Space>
                             {type}
@@ -197,7 +205,9 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                             !dataset ||
                             !project
                         }
-                        onClick={() => request(type)}
+                        onClick={() =>
+                            req?.status !== "FAILED" && request(type)
+                        }
                     >
                         <Space>
                             {type}
