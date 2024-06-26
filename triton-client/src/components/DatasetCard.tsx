@@ -237,7 +237,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     }, [])
 
     return dataset ? (
-        <Row justify={"space-between"}>
+        <Row justify={"space-between"} gutter={32}>
             <Col span={2}>Dataset #{dataset.id}</Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
