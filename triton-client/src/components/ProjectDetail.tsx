@@ -152,13 +152,14 @@ function ProjectDiskUsage({
                                 strokeColor={
                                     usage < capacity ? "#1890ff" : "#f5222d"
                                 }
-                                format={() => (
-                                    <Text
-                                        color={"black"}
-                                    >{`${((usage / capacity) * 100).toFixed(2)}%`}</Text>
-                                )}
+                                showInfo={false}
                                 size={[800, 20]}
                             />
+                        </Col>
+                        <Col pull={1}>
+                            <Text>{`${((usage / capacity) * 100).toFixed(
+                                2,
+                            )}%`}</Text>
                         </Col>
                     </Row>
                 )
