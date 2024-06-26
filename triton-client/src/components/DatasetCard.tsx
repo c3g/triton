@@ -236,26 +236,25 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         return `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`
     }, [])
 
-    const totalColumn = 4
-    const averageColumnSpan = Math.floor(24 / totalColumn)
-
     return dataset ? (
         <Row justify={"space-between"}>
-            <Col span={averageColumnSpan}>Dataset #{dataset.id}</Col>
+            <Col span={2}>Dataset #{dataset.id}</Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
                     <Col
                         key={`requestDetails-${i}`}
-                        span={averageColumnSpan / requestDetails.length}
-                        pull={i === 0 ? 0 : 1}
+                        span={3}
+                        pull={i === 0 ? 0 : 3}
                     >
                         {r}
                     </Col>,
                 )
                 return cols
             }, [])}
-            <Col span={averageColumnSpan}>{activeRequest && expiration}</Col>
-            <Col>{totalSize ? <DataSize size={totalSize} /> : <Spin />}</Col>
+            <Col span={3}>{activeRequest && expiration}</Col>
+            <Col span={2} style={{ textAlign: "right" }}>
+                {totalSize ? <DataSize size={totalSize} /> : <Spin />}
+            </Col>
         </Row>
     ) : (
         <Spin />
