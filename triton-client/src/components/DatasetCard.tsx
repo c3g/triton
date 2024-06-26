@@ -230,7 +230,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const averageColumnSpan = Math.floor(24 / totalColumn)
 
     return dataset ? (
-        <Row>
+        <Row justify={"space-between"}>
             <Col span={averageColumnSpan}>Dataset #{dataset.id}</Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
