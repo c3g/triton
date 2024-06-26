@@ -236,12 +236,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                 cols.push(
                     <Col
                         key={`requestDetails-${i}`}
-                        span={
-                            i === 0
-                                ? 1
-                                : averageColumnSpan / requestDetails.length
-                        }
-                        pull={i === 0 ? 0 : 0}
+                        span={averageColumnSpan / requestDetails.length}
+                        pull={i === 0 ? 0 : 1}
                     >
                         {r}
                     </Col>,
