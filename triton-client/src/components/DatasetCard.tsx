@@ -1,4 +1,4 @@
-import { Button, Modal, Space, Spin, Typography } from "antd"
+import { Button, Col, Modal, Row, Space, Spin } from "antd"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { DownloadRequest, DownloadRequestType } from "../api/api-types"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
@@ -15,7 +15,6 @@ import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { ActionDropdown, ActionDropdownProps } from "./ActionDropdown"
 import { selectRequestOfDatasetId } from "../selectors"
 
-const { Text } = Typography
 interface DatasetCardProps {
     datasetID: number
 }
@@ -123,7 +122,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
             const req = requestByType[type]
             if (req && !req.should_delete && req.status !== "FAILED") {
-                const { type, status, expiry_date } = req
+                const { type, status } = req
                 const actions: ActionDropdownProps["actions"] = [
                     {
                         action: {
@@ -153,11 +152,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
                 let statusDescription: ReactNode
                 if (status === "SUCCESS") {
-                    statusDescription = [
-                        "DOWNLOAD",
-                        "|",
-                        `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`,
-                    ]
+                    statusDescription = "DOWNLOAD"
                 } else {
                     statusDescription = "QUEUED"
                 }
@@ -226,39 +221,36 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         updatingRequest,
     ])
 
+    const expiration = useMemo(() => {
+        const expiry_date = activeRequest?.expiry_date
+        return `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`
+    }, [])
+
+    const totalColumn = 4
+    const averageColumnSpan = Math.floor(24 / totalColumn)
+
     return dataset ? (
-        <div
-            style={{
-                backgroundColor: "white",
-                paddingLeft: "1rem",
-                paddingTop: "1rem",
-                paddingRight: "1rem",
-                height: "4rem",
-            }}
-        >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Space>
-                    {
-                        // left
-                    }
-                    <Text strong>Dataset #{dataset.id}</Text>
-                </Space>
-                <Space>
-                    {
-                        // middle
-                        requestDetails
-                    }
-                </Space>
-                <Space>
-                    {
-                        // right
-                    }
-                    <div>
-                        {!totalSize ? <Spin /> : <DataSize size={totalSize} />}
-                    </div>
-                </Space>
-            </div>
-        </div>
+        <Row>
+            <Col span={averageColumnSpan}>Dataset #{dataset.id}</Col>
+            {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
+                cols.push(
+                    <Col
+                        key={`requestDetails-${i}`}
+                        span={
+                            i === 0
+                                ? 1
+                                : averageColumnSpan / requestDetails.length
+                        }
+                        pull={i === 0 ? 0 : 0}
+                    >
+                        {r}
+                    </Col>,
+                )
+                return cols
+            }, [])}
+            <Col span={averageColumnSpan}>{activeRequest && expiration}</Col>
+            <Col>{totalSize ? <DataSize size={totalSize} /> : <Spin />}</Col>
+        </Row>
     ) : (
         <Spin />
     )
