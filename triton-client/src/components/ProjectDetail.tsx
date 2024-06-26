@@ -45,11 +45,9 @@ function ProjectDetail() {
                 datasets.push(...(await dispatch(fetchDatasets(run.name))))
             }
             await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
-            await Promise.all(
-                datasets.map(async (dataset) =>
-                    dispatch(fetchReadsets(dataset.id)),
-                ),
-            )
+            for (const dataset of datasets) {
+                await dispatch(fetchReadsets(dataset.id))
+            }
         })()
     }, [dispatch, projectExternalId])
 
