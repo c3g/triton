@@ -122,7 +122,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const requestDetails = useMemo(() => {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
             const req = requestByType[type]
-            if (req && !req.should_delete) {
+            if (req && !req.should_delete && req.status !== "FAILED") {
                 const { type, status, expiry_date } = req
                 const actions: ActionDropdownProps["actions"] = [
                     {
@@ -154,12 +154,10 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                 let statusDescription: ReactNode
                 if (status === "SUCCESS") {
                     statusDescription = [
-                        "AVAILABLE",
+                        "DOWNLOAD",
                         "|",
                         `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`,
                     ]
-                } else if (status === "FAILED") {
-                    statusDescription = "FAILED"
                 } else {
                     statusDescription = "QUEUED"
                 }
@@ -185,6 +183,14 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     />
                 )
             } else {
+                let statusDescription: ReactNode
+                if (req && req.should_delete) {
+                    statusDescription = "UNSTAGING"
+                } else if (req?.status === "FAILED") {
+                    statusDescription = "FAILED"
+                } else {
+                    statusDescription = "STAGE"
+                }
                 return (
                     <Button
                         key={type}
@@ -201,9 +207,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         <Space>
                             {type}
                             {"|"}
-                            {alreadyRequested && type === activeRequest.type
-                                ? "UNSTAGING"
-                                : "READY"}
+                            {statusDescription}
                         </Space>
                     </Button>
                 )
