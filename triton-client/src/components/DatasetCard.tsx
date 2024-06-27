@@ -244,7 +244,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     <Col
                         key={`requestDetails-${i}`}
                         span={3}
-                        pull={i === 0 ? 0 : 3}
+                        pull={i === 0 ? 0 : 2}
                     >
                         {r}
                     </Col>,
