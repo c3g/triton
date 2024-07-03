@@ -1,21 +1,21 @@
 {
-	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
-		"outDir": "dist",
-		"strict": true,
-		"baseUrl": "./",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true
-	},
-	"include": ["./src", "./*.ts"],
-	"exclude": ["node_modules/"],
-	"references": [
-		{
-			"path": "../triton-types"
-		}
-	]
-	// "ts-node": {
-	//   "esm": true
-	// }
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "outDir": "dist",
+        "strict": true,
+        "baseUrl": "./",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": ["./src", "./*.ts"],
+    "exclude": ["node_modules/"],
+    "references": [
+        {
+            "path": "../triton-types"
+        }
+    ]
+    // "ts-node": {
+    //   "esm": true
+    // }
 }

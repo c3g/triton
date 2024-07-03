@@ -21,14 +21,17 @@ export const constantsSlice = createSlice({
             state.diskCapacity.SFTP = action.payload.sftp_project_size
         },
         setError(state, action: PayloadAction<SerializedError>) {
-            console.error('Error fetching constants:', action.payload)
-        }
+            console.error("Error fetching constants:", action.payload)
+        },
     },
 })
 
-export type ConstantsStateAction = ReturnType<typeof constantsSlice.actions[keyof typeof constantsSlice.actions]>
+export type ConstantsStateAction = ReturnType<
+    (typeof constantsSlice.actions)[keyof typeof constantsSlice.actions]
+>
 export const ConstantsStateActions = constantsSlice.actions
 
 export default constantsSlice.reducer
 
-export const selectConstants = (state: { constants: ConstantsState }) => state.constants
+export const selectConstants = (state: { constants: ConstantsState }) =>
+    state.constants

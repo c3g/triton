@@ -4,7 +4,7 @@
  *
  * Other types which are private to the server should not be exported here.
  */
-export * from './api'
-export * from './downloads'
-export * from './freezeman'
-export * from './magic'
+export * from "./api"
+export * from "./downloads"
+export * from "./freezeman"
+export * from "./magic"

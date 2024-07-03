@@ -1,30 +1,32 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TritonRequest } from '../api/api-types'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { TritonRequest } from "../api/api-types"
 
 export interface RequestState extends TritonRequest {}
 
 export interface RequestsState {
-	readonly requestById: Record<RequestState['id'], RequestState | undefined>
+    readonly requestById: Record<RequestState["id"], RequestState | undefined>
 }
 
 const initialState: RequestsState = {
-	requestById: {},
+    requestById: {},
 }
 
 export const requestsSlice = createSlice({
-	name: 'requests',
-	initialState,
-	reducers: {
-		setRequests: (state, action: PayloadAction<TritonRequest[]>) => {
-			const requests = action.payload
-			requests.forEach((r) => {
-				state.requestById[r.id] = r
-			})
-		},
-	},
+    name: "requests",
+    initialState,
+    reducers: {
+        setRequests: (state, action: PayloadAction<TritonRequest[]>) => {
+            const requests = action.payload
+            requests.forEach((r) => {
+                state.requestById[r.id] = r
+            })
+        },
+    },
 })
 
 export const RequestsStateActions = requestsSlice.actions
-export type RequestsStateAction = ReturnType<typeof RequestsStateActions[keyof typeof RequestsStateActions]>
+export type RequestsStateAction = ReturnType<
+    (typeof RequestsStateActions)[keyof typeof RequestsStateActions]
+>
 
 export default requestsSlice.reducer

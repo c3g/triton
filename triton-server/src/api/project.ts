@@ -1,5 +1,5 @@
-import { getUserProjects } from '../magic/magic_api'
-import { TritonProject } from './api-types'
+import { getUserProjects } from "../magic/magic_api"
+import { TritonProject } from "./api-types"
 
 /**
  * Get the list of projects for the logged in user.
@@ -14,14 +14,17 @@ import { TritonProject } from './api-types'
  * @param userToken Magic user token
  * @returns TritonProject[]
  */
-export async function listUserProjects(userId: string, userToken: string): Promise<TritonProject[]> {
-	const magicProjects = await getUserProjects(userId, userToken)
+export async function listUserProjects(
+    userId: string,
+    userToken: string,
+): Promise<TritonProject[]> {
+    const magicProjects = await getUserProjects(userId, userToken)
 
-	return magicProjects.projects.map((userProject) => {
-		const tritonProject: TritonProject = {
-			external_id: userProject.projectNumber,
-			external_name: userProject.name,
-		}
-		return tritonProject
-	})
+    return magicProjects.projects.map((userProject) => {
+        const tritonProject: TritonProject = {
+            external_id: userProject.projectNumber,
+            external_name: userProject.name,
+        }
+        return tritonProject
+    })
 }

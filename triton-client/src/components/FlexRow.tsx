@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import React, { PropsWithChildren } from "react"
 
 /**
  * Creates a flexbox row that lays out its children so that the first
@@ -8,15 +8,15 @@ import React, { PropsWithChildren } from 'react'
  * @returns
  */
 export default function FlexRow({ children }: PropsWithChildren) {
-	return (
-		<div
-			style={{
-				display: 'flex',
-				flexDirection: 'row',
-				justifyContent: 'space-between',
-			}}
-		>
-			{children}
-		</div>
-	)
+    return (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+            }}
+        >
+            {children}
+        </div>
+    )
 }

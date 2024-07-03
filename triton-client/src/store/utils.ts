@@ -4,28 +4,31 @@
 export type ItemID = number | string
 
 export interface ItemsById<T> {
-	[key: ItemID]: T
+    [key: ItemID]: T
 }
 
 export interface ItemWithId {
-	id: ItemID
+    id: ItemID
 }
 
-export function createItemsById<T>(items: T[], idFunc: (item: T) => ItemID): ItemsById<T> {
-	const itemsById: ItemsById<T> = {}
-	items.reduce((acc, item) => {
-		const key = idFunc(item)
-		acc[key] = item
-		return acc
-	}, itemsById)
-	return itemsById
+export function createItemsById<T>(
+    items: T[],
+    idFunc: (item: T) => ItemID,
+): ItemsById<T> {
+    const itemsById: ItemsById<T> = {}
+    items.reduce((acc, item) => {
+        const key = idFunc(item)
+        acc[key] = item
+        return acc
+    }, itemsById)
+    return itemsById
 }
 
 /**
  * Defines a type where a key is mapped to an array of items.
  */
 export interface ItemsByIdArray<T> {
-	[key: ItemID]: T[]
+    [key: ItemID]: T[]
 }
 
 /**
@@ -36,15 +39,18 @@ export interface ItemsByIdArray<T> {
  * @param idFunc
  * @returns
  */
-export function createItemsByIdArray<T extends ItemWithId>(items: T[], idFunc: (item: T) => ItemID): ItemsByIdArray<T> {
-	const itemsByIdArray: ItemsByIdArray<T> = {}
-	items.reduce((acc, item) => {
-		const key = idFunc(item)
-		if (!acc[key]) {
-			acc[key] = []
-		}
-		acc[key].push(item)
-		return acc
-	}, itemsByIdArray)
-	return itemsByIdArray
+export function createItemsByIdArray<T extends ItemWithId>(
+    items: T[],
+    idFunc: (item: T) => ItemID,
+): ItemsByIdArray<T> {
+    const itemsByIdArray: ItemsByIdArray<T> = {}
+    items.reduce((acc, item) => {
+        const key = idFunc(item)
+        if (!acc[key]) {
+            acc[key] = []
+        }
+        acc[key].push(item)
+        return acc
+    }, itemsByIdArray)
+    return itemsByIdArray
 }

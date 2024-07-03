@@ -14,24 +14,26 @@
  */
 
 export interface ClientConfig {
-	// The base endpoint for the triton api, eg 'https://biobank.genome.mcgill.ca/triton/api/' (<< not the real url!)
-	apiBaseUrl: URL
+    // The base endpoint for the triton api, eg 'https://biobank.genome.mcgill.ca/triton/api/' (<< not the real url!)
+    apiBaseUrl: URL
 }
 
 // Get the config that matches the environment
 function getConfig(): ClientConfig {
-	switch (
-	process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
-	) {
-		case 'development':
-			return {
-				apiBaseUrl: new URL('http://localhost:3001/api/'),
-			}
-		default:
-			return {
-				apiBaseUrl: new URL(`${process.env.REACT_APP_SERVER_ORIGIN}api/`),
-			}
-	}
+    switch (
+        process.env.NODE_ENV // NODE_ENV is added to the app at build time by create-react-app
+    ) {
+        case "development":
+            return {
+                apiBaseUrl: new URL("http://localhost:3001/api/"),
+            }
+        default:
+            return {
+                apiBaseUrl: new URL(
+                    `${process.env.REACT_APP_SERVER_ORIGIN}api/`,
+                ),
+            }
+    }
 }
 
 // Export the config that matches the current build environment.

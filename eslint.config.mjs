@@ -11,7 +11,14 @@ export default [
     ...tseslint.configs.recommended,
     pluginReactConfig,
     { settings: { react: { version: "18.0.15" } } },
-    { ignores: ["triton-client/build/", "triton-client/public/", "triton-server/data/", "triton-server/scripts/"] },
+    {
+        ignores: [
+            "triton-client/build/",
+            "triton-client/public/",
+            "triton-server/data/",
+            "triton-server/scripts/",
+        ],
+    },
     {
         rules: {
             "react/react-in-jsx-scope": "off",
