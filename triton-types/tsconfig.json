@@ -1,13 +1,13 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"composite": true,
-		"rootDir": "models",
-		"declaration": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true,
-		"module": "esnext",
-		"moduleResolution": "node"
-	},
-	"include": ["models/*.d.ts"]
+    "compilerOptions": {
+        "target": "ESNext",
+        "composite": true,
+        "rootDir": "models",
+        "declaration": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "esnext",
+        "moduleResolution": "node"
+    },
+    "include": ["models/*.d.ts"]
 }

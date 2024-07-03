@@ -1,15 +1,16 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app),
 using the [cra-template-redux-typescript template](https://github.com/reduxjs/cra-template-redux-typescript)
 
-
 ## Linting and Formatting
+
 Please install the recommended ESLint extension, and ensure that the VS Code settings are enabled
 for linting and for formatting on save. Linting rules are defined in the .eslintrc.json file, which
 inherits the React linting rules.
 
 ## SCSS
+
 The sass compiler was added to the project dev dependencies to allow us to import scss files
 into our React components. Each component should have an accompanying scss file containing its
 styles, and the scss file should be imported into the component.

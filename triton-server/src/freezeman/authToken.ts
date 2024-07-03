@@ -1,8 +1,8 @@
-import Axios, { AxiosResponse } from 'axios'
-import config from '../../config'
-import { logger } from '../logger'
-import jwtDecode from 'jwt-decode'
-import { clearTimeout } from 'timers'
+import Axios, { AxiosResponse } from "axios"
+import config from "../../config"
+import { logger } from "../logger"
+import jwtDecode from "jwt-decode"
+import { clearTimeout } from "timers"
 
 /**
  * Freezeman API Auth Token Management
@@ -45,17 +45,17 @@ const LIMS_PASSWORD = config.lims.password
 
 // The freezeman auth tokens data structure.
 interface FreezemanAuthTokens {
-	readonly access: string
-	readonly refresh: string
+    readonly access: string
+    readonly refresh: string
 }
 
 // This is the data structure we get when we jwtDecode a freezeman
 // access or refresh token.
 interface DecodedToken {
-	exp: number // expiry date
-	jti: string // token
-	token_type: 'access' | 'refresh'
-	user_id: number // freezeman user id
+    exp: number // expiry date
+    jti: string // token
+    token_type: "access" | "refresh"
+    user_id: number // freezeman user id
 }
 
 // If a token request fails then we keep trying every N seconds to log in.
@@ -70,17 +70,17 @@ const DELAY_BEFORE_REFRESH = 90 // seconds
  * and to try to keep the code from becoming too complicated.
  */
 enum AuthLoopState {
-	IDLE = 'IDLE',
-	START_FETCH = 'START_FETCH',
-	SCHEDULE_REFRESH = 'SCHEDULE_REFRESH',
-	REFRESH_NOW = 'REFRESH_NOW',
-	ABORT = 'ABORT',
+    IDLE = "IDLE",
+    START_FETCH = "START_FETCH",
+    SCHEDULE_REFRESH = "SCHEDULE_REFRESH",
+    REFRESH_NOW = "REFRESH_NOW",
+    ABORT = "ABORT",
 }
 
-const loggingPrefix = 'Freezeman Auth'
+const loggingPrefix = "Freezeman Auth"
 
 function debugMsg(loopState: AuthLoopState, message: string) {
-	return `${loggingPrefix} [${loopState}]: ${message}`
+    return `${loggingPrefix} [${loopState}]: ${message}`
 }
 
 // The module maintains one instance of a FreezemanAPIAuthorization at
@@ -93,13 +93,13 @@ let authHandler: FreezemanAPIAuthorization | undefined
  * when triton-server starts up.
  */
 export function initializeFreezemanAPIAuthorization() {
-	// Sanity check
-	if (authHandler) {
-		authHandler.trash()
-	}
+    // Sanity check
+    if (authHandler) {
+        authHandler.trash()
+    }
 
-	authHandler = new FreezemanAPIAuthorization()
-	authHandler.init()
+    authHandler = new FreezemanAPIAuthorization()
+    authHandler.init()
 }
 
 /**
@@ -108,7 +108,7 @@ export function initializeFreezemanAPIAuthorization() {
  * @returns An access token or undefined
  */
 export function getAccessToken() {
-	return authHandler?.getAccessToken()
+    return authHandler?.getAccessToken()
 }
 
 /**
@@ -116,10 +116,10 @@ export function getAccessToken() {
  * response from freezeman.
  */
 export function handle401() {
-	// If we get an UNAUTHORIZED error from freezeman then trash the current
-	// authorization and begin a new one.
-	logger.debug(`Resetting auth due to 401 error`)
-	resetAuth()
+    // If we get an UNAUTHORIZED error from freezeman then trash the current
+    // authorization and begin a new one.
+    logger.debug(`Resetting auth due to 401 error`)
+    resetAuth()
 }
 
 /**
@@ -127,11 +127,11 @@ export function handle401() {
  * a new instance.
  */
 function resetAuth() {
-	logger.debug(`Freezeman Auth: resetting authorization`)
-	if (authHandler) {
-		authHandler.trash()
-	}
-	initializeFreezemanAPIAuthorization()
+    logger.debug(`Freezeman Auth: resetting authorization`)
+    if (authHandler) {
+        authHandler.trash()
+    }
+    initializeFreezemanAPIAuthorization()
 }
 
 /**
@@ -147,198 +147,234 @@ function resetAuth() {
  * instance die gracefully.
  */
 class FreezemanAPIAuthorization {
-	authTokens?: FreezemanAuthTokens
-	state = AuthLoopState.IDLE
+    authTokens?: FreezemanAuthTokens
+    state = AuthLoopState.IDLE
 
-	retryFetchTimer: ReturnType<typeof setTimeout> | undefined
-	refreshTimer: ReturnType<typeof setTimeout> | undefined
+    retryFetchTimer: ReturnType<typeof setTimeout> | undefined
+    refreshTimer: ReturnType<typeof setTimeout> | undefined
 
-	constructor() {
-		this.state = AuthLoopState.IDLE
-	}
+    constructor() {
+        this.state = AuthLoopState.IDLE
+    }
 
-	/**
-	 * Get the current freezeman access token.
-	 * @returns string or undefined
-	 */
-	getAccessToken() {
-		return this.authTokens?.access
-	}
+    /**
+     * Get the current freezeman access token.
+     * @returns string or undefined
+     */
+    getAccessToken() {
+        return this.authTokens?.access
+    }
 
-	/**
-	 * Fetch the initial auth token and start the refresh loop.
-	 */
-	init() {
-		this.#changeState(AuthLoopState.START_FETCH)
-	}
+    /**
+     * Fetch the initial auth token and start the refresh loop.
+     */
+    init() {
+        this.#changeState(AuthLoopState.START_FETCH)
+    }
 
-	/**
-	 * Stop the auth loop and clean up.
-	 */
-	trash() {
-		this.#changeState(AuthLoopState.ABORT)
-	}
+    /**
+     * Stop the auth loop and clean up.
+     */
+    trash() {
+        this.#changeState(AuthLoopState.ABORT)
+    }
 
-	/**
-	 * Transition from one state to another.
-	 * @param state AuthLoopState
-	 */
-	#changeState(state: AuthLoopState) {
-		this.state = state
-		try {
-			switch (this.state) {
-				case AuthLoopState.IDLE: {
-					// NOOP
-					break
-				}
+    /**
+     * Transition from one state to another.
+     * @param state AuthLoopState
+     */
+    #changeState(state: AuthLoopState) {
+        this.state = state
+        try {
+            switch (this.state) {
+                case AuthLoopState.IDLE: {
+                    // NOOP
+                    break
+                }
 
-				case AuthLoopState.START_FETCH: {
-					this.#fetchInitialToken()
-					break
-				}
+                case AuthLoopState.START_FETCH: {
+                    this.#fetchInitialToken()
+                    break
+                }
 
-				case AuthLoopState.SCHEDULE_REFRESH: {
-					this.#scheduleRefresh()
-					break
-				}
+                case AuthLoopState.SCHEDULE_REFRESH: {
+                    this.#scheduleRefresh()
+                    break
+                }
 
-				case AuthLoopState.REFRESH_NOW: {
-					this.#refreshToken()
-					break
-				}
+                case AuthLoopState.REFRESH_NOW: {
+                    this.#refreshToken()
+                    break
+                }
 
-				case AuthLoopState.ABORT: {
-					this.#abort()
-					break
-				}
-			}
-		} catch (error) {
-			// An unexpected error has occured and the auth state is in an uncertain state.
-			// Trash the authorization and start a new one. (This will never happen, of course...)
-			logger.error(`${loggingPrefix} Unexpected error in state loop.`)
-			logger.error(error)
-			resetAuth()
-		}
-	}
+                case AuthLoopState.ABORT: {
+                    this.#abort()
+                    break
+                }
+            }
+        } catch (error) {
+            // An unexpected error has occured and the auth state is in an uncertain state.
+            // Trash the authorization and start a new one. (This will never happen, of course...)
+            logger.error(`${loggingPrefix} Unexpected error in state loop.`)
+            logger.error(error)
+            resetAuth()
+        }
+    }
 
-	/**
-	 * Log in to freezeman to fetch a pair of tokens.
-	 * If an error occurs, set up a timer to retry the log in after N seconds.
-	 */
-	#fetchInitialToken() {
-		fetchToken(LIMS_USERNAME, LIMS_PASSWORD)
-			.then((auth) => {
-				// Ignore result if the auth was aborted while waiting for the response.
-				if (this.state !== AuthLoopState.ABORT) {
-					logger.debug(debugMsg(this.state, 'Received token.'))
-					this.authTokens = auth
-					this.#changeState(AuthLoopState.SCHEDULE_REFRESH)
-				}
-			})
-			.catch((error) => {
-				// Ignore result if the auth was aborted while waiting for the response.
-				if (this.state !== AuthLoopState.ABORT) {
-					logger.debug(debugMsg(this.state, 'Failed to fetch token'))
-					logger.error({ message: error.message, method: error.config.method, url: error.config.url })
+    /**
+     * Log in to freezeman to fetch a pair of tokens.
+     * If an error occurs, set up a timer to retry the log in after N seconds.
+     */
+    #fetchInitialToken() {
+        fetchToken(LIMS_USERNAME, LIMS_PASSWORD)
+            .then((auth) => {
+                // Ignore result if the auth was aborted while waiting for the response.
+                if (this.state !== AuthLoopState.ABORT) {
+                    logger.debug(debugMsg(this.state, "Received token."))
+                    this.authTokens = auth
+                    this.#changeState(AuthLoopState.SCHEDULE_REFRESH)
+                }
+            })
+            .catch((error) => {
+                // Ignore result if the auth was aborted while waiting for the response.
+                if (this.state !== AuthLoopState.ABORT) {
+                    logger.debug(debugMsg(this.state, "Failed to fetch token"))
+                    logger.error({
+                        message: error.message,
+                        method: error.config.method,
+                        url: error.config.url,
+                    })
 
-					// Try fetching again in N seconds
+                    // Try fetching again in N seconds
 
-					// Sanity check
-					if (this.retryFetchTimer) {
-						clearTimeout(this.retryFetchTimer)
-						this.retryFetchTimer = undefined
-						logger.debug(debugMsg(this.state, 'Retry timer is already scheduled!'))
-					}
+                    // Sanity check
+                    if (this.retryFetchTimer) {
+                        clearTimeout(this.retryFetchTimer)
+                        this.retryFetchTimer = undefined
+                        logger.debug(
+                            debugMsg(
+                                this.state,
+                                "Retry timer is already scheduled!",
+                            ),
+                        )
+                    }
 
-					this.retryFetchTimer = setTimeout(() => {
-						this.retryFetchTimer = undefined
-						this.#changeState(AuthLoopState.START_FETCH)
-					}, AUTH_RETRY_TIME * 1000)
-				}
-			})
-	}
+                    this.retryFetchTimer = setTimeout(() => {
+                        this.retryFetchTimer = undefined
+                        this.#changeState(AuthLoopState.START_FETCH)
+                    }, AUTH_RETRY_TIME * 1000)
+                }
+            })
+    }
 
-	/**
-	 * Compute the time at which the access token should be refreshed then set up a timer
-	 * to trigger the refresh.
-	 */
-	#scheduleRefresh() {
-		if (this.authTokens) {
-			// Set a timer to trigger DELAY_BEFORE_REFRESH seconds before the token is due to expire.
-			// (Unless it is due to expire sooner than DELAY_BEFORE_REFRESH seconds, or the token has
-			// already expired, in which case refresh immediately).
+    /**
+     * Compute the time at which the access token should be refreshed then set up a timer
+     * to trigger the refresh.
+     */
+    #scheduleRefresh() {
+        if (this.authTokens) {
+            // Set a timer to trigger DELAY_BEFORE_REFRESH seconds before the token is due to expire.
+            // (Unless it is due to expire sooner than DELAY_BEFORE_REFRESH seconds, or the token has
+            // already expired, in which case refresh immediately).
 
-			const decodedAccess = jwtDecode<DecodedToken>(this.authTokens.access)
-			const expiry = decodedAccess.exp // date in seconds
-			const now = Date.now() / 1000 // now in seconds
+            const decodedAccess = jwtDecode<DecodedToken>(
+                this.authTokens.access,
+            )
+            const expiry = decodedAccess.exp // date in seconds
+            const now = Date.now() / 1000 // now in seconds
 
-			const secondsUntilRefresh = expiry < now ? 0 : Math.max(expiry - now - DELAY_BEFORE_REFRESH, 0)
+            const secondsUntilRefresh =
+                expiry < now
+                    ? 0
+                    : Math.max(expiry - now - DELAY_BEFORE_REFRESH, 0)
 
-			logger.debug(debugMsg(this.state, `Will refresh token in ${secondsUntilRefresh} seconds.`))
+            logger.debug(
+                debugMsg(
+                    this.state,
+                    `Will refresh token in ${secondsUntilRefresh} seconds.`,
+                ),
+            )
 
-			// Sanity check
-			if (this.refreshTimer) {
-				clearTimeout(this.refreshTimer)
-				this.refreshTimer = undefined
-				logger.debug(debugMsg(this.state, 'Refresh timer is already scheduled!'))
-			}
+            // Sanity check
+            if (this.refreshTimer) {
+                clearTimeout(this.refreshTimer)
+                this.refreshTimer = undefined
+                logger.debug(
+                    debugMsg(this.state, "Refresh timer is already scheduled!"),
+                )
+            }
 
-			this.refreshTimer = setTimeout(() => {
-				this.refreshTimer = undefined
-				this.#changeState(AuthLoopState.REFRESH_NOW)
-			}, secondsUntilRefresh * 1000)
-		} else {
-			throw new Error(`Freezeman auth loop error: expected authTokens to be defined in REFRESH.`)
-		}
-	}
+            this.refreshTimer = setTimeout(() => {
+                this.refreshTimer = undefined
+                this.#changeState(AuthLoopState.REFRESH_NOW)
+            }, secondsUntilRefresh * 1000)
+        } else {
+            throw new Error(
+                `Freezeman auth loop error: expected authTokens to be defined in REFRESH.`,
+            )
+        }
+    }
 
-	/**
-	 * Try to refresh the current access token.
-	 *
-	 * If successful, schedule the next refresh.
-	 *
-	 * If it fails, do a fresh login.
-	 */
-	#refreshToken() {
-		if (this.authTokens) {
-			refreshToken(this.authTokens.refresh)
-				.then((auth) => {
-					// Ignore result if auth was aborted while waiting for response.
-					if (this.state !== AuthLoopState.ABORT) {
-						logger.debug(debugMsg(AuthLoopState.REFRESH_NOW, 'Received refreshed token'))
-						this.authTokens = auth
-						this.#changeState(AuthLoopState.SCHEDULE_REFRESH)
-					}
-				})
-				.catch((error) => {
-					// Ignore error if auth was aborted while waiting for response.
-					if (this.state !== AuthLoopState.ABORT) {
-						logger.error(`Freezeman auth token refresh failed. Will try to fetch new token.`)
-						logger.error({ message: error.message, method: error.config.method, url: error.config.url })
-						this.authTokens = undefined
-						this.#changeState(AuthLoopState.START_FETCH)
-					}
-				})
-		} else {
-			throw new Error(`Freezeman auth failure - expected authTokens to be defined in REFRESH_NOW..`)
-		}
-	}
+    /**
+     * Try to refresh the current access token.
+     *
+     * If successful, schedule the next refresh.
+     *
+     * If it fails, do a fresh login.
+     */
+    #refreshToken() {
+        if (this.authTokens) {
+            refreshToken(this.authTokens.refresh)
+                .then((auth) => {
+                    // Ignore result if auth was aborted while waiting for response.
+                    if (this.state !== AuthLoopState.ABORT) {
+                        logger.debug(
+                            debugMsg(
+                                AuthLoopState.REFRESH_NOW,
+                                "Received refreshed token",
+                            ),
+                        )
+                        this.authTokens = auth
+                        this.#changeState(AuthLoopState.SCHEDULE_REFRESH)
+                    }
+                })
+                .catch((error) => {
+                    // Ignore error if auth was aborted while waiting for response.
+                    if (this.state !== AuthLoopState.ABORT) {
+                        logger.error(
+                            `Freezeman auth token refresh failed. Will try to fetch new token.`,
+                        )
+                        logger.error({
+                            message: error.message,
+                            method: error.config.method,
+                            url: error.config.url,
+                        })
+                        this.authTokens = undefined
+                        this.#changeState(AuthLoopState.START_FETCH)
+                    }
+                })
+        } else {
+            throw new Error(
+                `Freezeman auth failure - expected authTokens to be defined in REFRESH_NOW..`,
+            )
+        }
+    }
 
-	/**
-	 * The auth has been trashed. Stop any pending timers.
-	 * Any outstanding promises will complete, but will be ignored due to the ABORT state.
-	 */
-	#abort() {
-		// Abort the authorization. Stop any pending timers.
-		if (this.retryFetchTimer) {
-			clearTimeout(this.retryFetchTimer)
-			this.retryFetchTimer = undefined
-		}
-		if (this.refreshTimer) {
-			clearTimeout(this.refreshTimer)
-			this.refreshTimer = undefined
-		}
-	}
+    /**
+     * The auth has been trashed. Stop any pending timers.
+     * Any outstanding promises will complete, but will be ignored due to the ABORT state.
+     */
+    #abort() {
+        // Abort the authorization. Stop any pending timers.
+        if (this.retryFetchTimer) {
+            clearTimeout(this.retryFetchTimer)
+            this.retryFetchTimer = undefined
+        }
+        if (this.refreshTimer) {
+            clearTimeout(this.refreshTimer)
+            this.refreshTimer = undefined
+        }
+    }
 }
 
 /**
@@ -347,17 +383,22 @@ class FreezemanAPIAuthorization {
  * @param password
  * @returns FreezemanAuthTokens
  */
-export async function fetchToken(username: string | undefined = LIMS_USERNAME, password: string | undefined = LIMS_PASSWORD): Promise<FreezemanAuthTokens> {
-	const response = await Axios.post(`${LIMS_API_URL}/token/`, {
-		username,
-		password,
-	})
-	if (response.status === 200) {
-		// TODO check the actual return code
-		return response.data
-	} else {
-		throw new Error(`Unable to fetch freezeman auth token. ${response.status}: ${response.statusText}`)
-	}
+export async function fetchToken(
+    username: string | undefined = LIMS_USERNAME,
+    password: string | undefined = LIMS_PASSWORD,
+): Promise<FreezemanAuthTokens> {
+    const response = await Axios.post(`${LIMS_API_URL}/token/`, {
+        username,
+        password,
+    })
+    if (response.status === 200) {
+        // TODO check the actual return code
+        return response.data
+    } else {
+        throw new Error(
+            `Unable to fetch freezeman auth token. ${response.status}: ${response.statusText}`,
+        )
+    }
 }
 
 /**
@@ -365,11 +406,17 @@ export async function fetchToken(username: string | undefined = LIMS_USERNAME, p
  * @param refreshToken
  * @returns FreezemanAuthTokens
  */
-async function refreshToken(refreshToken: string): Promise<FreezemanAuthTokens> {
-	const response = await Axios.post(`${LIMS_API_URL}/token/refresh/`, { refresh: refreshToken })
-	if (response.status === 200) {
-		return response.data
-	} else {
-		throw new Error(`Unable to refresh freezeman auth token. ${response.status}: ${response.statusText}`)
-	}
+async function refreshToken(
+    refreshToken: string,
+): Promise<FreezemanAuthTokens> {
+    const response = await Axios.post(`${LIMS_API_URL}/token/refresh/`, {
+        refresh: refreshToken,
+    })
+    if (response.status === 200) {
+        return response.data
+    } else {
+        throw new Error(
+            `Unable to refresh freezeman auth token. ${response.status}: ${response.statusText}`,
+        )
+    }
 }
