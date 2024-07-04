@@ -34,7 +34,7 @@ export function start() {
             contacts
                 .filter((contact) => contact.depth)
                 .map(async (contact) => {
-                    if (contact.depth !== "") {
+                    if (contact.depth !== null) {
                         await broadcastEmailsOfProject(
                             contact.project_id,
                             async (send) => {
