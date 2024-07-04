@@ -34,7 +34,9 @@ export function start() {
             contacts
                 .filter((contact) => contact.depth)
                 .map(async (contact) => {
-                    if (contact.password_reset === 0) {
+                    if (
+                        !(contact.password_reset === 1 && contact.depth === "")
+                    ) {
                         await broadcastEmailsOfProject(
                             contact.project_id,
                             async (send) => {
