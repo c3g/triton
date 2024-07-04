@@ -65,7 +65,7 @@ export type DownloadDatasetID = DownloadRequest["dataset_id"]
 interface ContactRecord {
     readonly id: Generated<number>
     readonly project_id: string
-    readonly depth: string
+    readonly depth: string | null
     readonly status: "NEW" | "MODIFIED"
     readonly type: "SFTP" | "GLOBUS"
 }
