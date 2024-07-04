@@ -147,10 +147,13 @@ export async function resetPassword(
     projectID: ExternalProjectID,
     type: DownloadRequestType,
 ) {
-    return await tritonPost<ApiReply<undefined>>(`download/reset-password/`, {
-        body: JSON.stringify({ projectID, type }),
-        headers: { "Content-Type": "application/json" },
-    })
+    return await tritonPost<ApiReply<Record<string, never>>>(
+        `download/reset-password/`,
+        {
+            body: JSON.stringify({ projectID, type }),
+            headers: { "Content-Type": "application/json" },
+        },
+    )
 }
 
 export default {
