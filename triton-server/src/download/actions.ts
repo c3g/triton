@@ -167,11 +167,11 @@ export async function createActions(db: Kysely<Database>) {
                 project_id: projectID,
                 type: type,
                 status: "MODIFIED",
-                depth: "",
+                depth: null,
             })
             .onConflict((oc) =>
                 oc.columns(["project_id", "type"]).doUpdateSet({
-                    depth: "",
+                    depth: null,
                 }),
             )
             .returningAll()

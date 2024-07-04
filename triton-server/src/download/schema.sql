@@ -64,7 +64,7 @@ CREATE TABLE historical_files (
 create table contacts (
     id INTEGER PRIMARY KEY ASC,
     project_id text not null,
-    depth      text not null,
+    depth      text, -- if depth is null, reset password
     status     text check(status IN ('NEW', 'MODIFIED')) not null,
     type       text check(type IN ('SFTP', 'GLOBUS')) not null,
 
