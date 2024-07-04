@@ -104,9 +104,13 @@ router.post(
     "/reset-password/",
     asyncHandler(async (req: Request, res: Response) => {
         const { projectID, type } = req.body
-        const { resetContactPassword } = await defaultDatabaseActions()
-        await resetContactPassword(projectID, type)
-        dataHandler(res)(undefined)
+        try {
+            const { resetContactPassword } = await defaultDatabaseActions()
+            await resetContactPassword(projectID, type)
+            dataHandler(res)({})
+        } catch (error) {
+            errorHandler(res)(error)
+        }
     }),
 )
 

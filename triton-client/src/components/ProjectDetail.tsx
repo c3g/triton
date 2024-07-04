@@ -70,19 +70,19 @@ function ProjectDetail() {
                 <>
                     <Button
                         onClick={() => {
-                            resetPassword(projectExternalId, "SFTP")
-                                .then(() =>
+                            resetPassword(projectExternalId, "SFTP").then(
+                                () =>
                                     notification.success({
                                         message: "Password Reset",
-                                        description: `The SFTP password is being reset for the project ${project.external_name}.`,
+                                        description: `The SFTP password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                )
-                                .catch(() =>
+                                (reason) => {
                                     notification.error({
                                         message: "Error",
-                                        description: `The SFTP password could not be reset for the project ${project.external_name}.`,
-                                    }),
-                                )
+                                        description: `The SFTP password could not be reset for the project ${project.external_name}. ${reason}`,
+                                    })
+                                },
+                            )
                         }}
                         style={{ float: "right" }}
                     >
@@ -90,19 +90,18 @@ function ProjectDetail() {
                     </Button>
                     <Button
                         onClick={() => {
-                            resetPassword(projectExternalId, "GLOBUS")
-                                .then(() =>
+                            resetPassword(projectExternalId, "GLOBUS").then(
+                                () =>
                                     notification.success({
                                         message: "Password Reset",
-                                        description: `The Globus password is being reset for the project ${project.external_name}.`,
+                                        description: `The Globus password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                )
-                                .catch(() =>
+                                (reason) =>
                                     notification.error({
                                         message: "Error",
-                                        description: `The Globus password could not be reset for the project ${project.external_name}.`,
+                                        description: `The Globus password could not be reset for the project ${project.external_name}. ${reason}.`,
                                     }),
-                                )
+                            )
                         }}
                         style={{ float: "right" }}
                     >
