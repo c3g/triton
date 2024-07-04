@@ -67,7 +67,7 @@ export async function tritonPost<T>(
             return reply.data
         } catch (err) {
             // JSON data could not be parsed from response body
-            throw new Error(`Invalid reply from ${route}`)
+            throw new Error(`Invalid reply from ${route}. ${err}.`)
         }
     } else {
         // HTTP response contains a status code. Throw the response so the caller
