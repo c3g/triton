@@ -67,7 +67,6 @@ create table contacts (
     depth      text not null,
     status     text check(status IN ('NEW', 'MODIFIED')) not null,
     type       text check(type IN ('SFTP', 'GLOBUS')) not null,
-    password_reset     tinyint not null default 0,
 
    unique(project_id, type)
 );

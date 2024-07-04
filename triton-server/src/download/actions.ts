@@ -168,7 +168,6 @@ export async function createActions(db: Kysely<Database>) {
                 type: type,
                 status: "MODIFIED",
                 depth: "",
-                password_reset: 1, // don't send email for this contact
             })
             .onConflict((oc) =>
                 oc.columns(["project_id", "type"]).doUpdateSet({

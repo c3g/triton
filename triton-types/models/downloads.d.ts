@@ -68,7 +68,6 @@ interface ContactRecord {
     readonly depth: string
     readonly status: "NEW" | "MODIFIED"
     readonly type: "SFTP" | "GLOBUS"
-    readonly password_reset: 0 | 1
 }
 export type Contact = Selectable<ContactRecord>
 
