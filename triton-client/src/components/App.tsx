@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { selectProjects, selectProjectsLoading } from "../store/projects"
 
 import LandingPage from "./Landing"
-import ProjectCardList from "./ProjectCardList"
+import { ProjectCardList, MGCHeader } from "./"
 import ProjectDetail from "./ProjectDetail"
 
 import "./App.scss"
@@ -17,17 +17,6 @@ import { fetchLoginStatus, fetchProjects } from "../store/thunks"
 
 const { Sider, Content } = Layout
 
-function MGCHeader() {
-    return (
-        <div className="mgc-header">
-            <img
-                alt="McGill Genome Center"
-                height="40px"
-                src={require("../static/genome-logo.jpg")}
-            />
-        </div>
-    )
-}
 
 function App() {
     const dispatch = useAppDispatch()
@@ -53,7 +42,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <div>
+            <>
                 <Layout style={{ minHeight: "100vh" }}>
                     <Sider
                         collapsedWidth="0"
@@ -104,7 +93,7 @@ function App() {
                         </Content>
                     </Layout>
                 </Layout>
-            </div>
+            </>
         </BrowserRouter>
     )
 }

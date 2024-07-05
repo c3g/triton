@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom"
+import { TritonDataset, TritonRun } from "@api/api-types"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { useEffect, useMemo } from "react"
 import { selectConstants } from "../store/constants"
@@ -12,7 +13,6 @@ import {
 
 import { dataSize } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { TritonDataset, TritonRun } from "../api/api-types"
 import {
     Button,
     Col,
