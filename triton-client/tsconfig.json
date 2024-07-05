@@ -1,7 +1,18 @@
 {
     "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@components/*": [ "./components/*" ],
+            "@api/*": [ "./api/*" ],
+            "@store/*": [ "./store/*" ],
+            "@static/*": [ "./static/*" ]
+        },
         "target": "es5",
-        "lib": ["dom", "dom.iterable", "esnext"],
+        "lib": [
+            "dom", 
+            "dom.iterable", 
+            "esnext"
+        ],
         "allowJs": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -15,7 +26,6 @@
         "noEmit": true,
         "jsx": "react-jsx"
     },
-    "include": ["src"],
     "references": [
         {
             "path": "../triton-types"

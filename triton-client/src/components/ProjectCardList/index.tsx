@@ -1,25 +1,22 @@
+import "../Common.scss"
 import { useNavigate } from "react-router-dom"
-import { TritonProject } from "../api/api-types"
-import "./Common.scss"
 import { Button, Typography } from "antd"
+import { IProjectCard, IProjectCardListProps } from "./interfaces"
 
-const { Title } = Typography
 
-interface ProjectCardListProps {
-    projects: TritonProject[]
-}
 
-function ProjectCardList({ projects }: ProjectCardListProps) {
+export default function ProjectCardList ({projects}: IProjectCardListProps) {
     const navigate = useNavigate()
+    const { Title } = Typography
     return (
         <>
             <Title level={2}>Projects</Title>
-            {projects.map((project) => (
-                <Button
+            {projects.map((project: IProjectCard) => (
+                <Button 
                     key={project.external_id}
                     block
-                    style={{ width: "90%", margin: "0 1rem" }}
                     onClick={() => navigate(`/project/${project.external_id}/`)}
+                    style={{ width: "90%", margin: "0 1rem" }}
                 >
                     <Typography.Text strong>
                         {project.external_name}
@@ -29,5 +26,3 @@ function ProjectCardList({ projects }: ProjectCardListProps) {
         </>
     )
 }
-
-export default ProjectCardList
