@@ -1,35 +1,18 @@
-import { useParams } from "react-router-dom"
-import { TritonDataset, TritonRun } from "@api/api-types"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { useEffect, useMemo } from "react"
+import { useParams } from "react-router-dom"
+import { Button, Col, Collapse, CollapseProps, Progress, Row, Space, Typography, notification } from "antd"
+import { TritonDataset, TritonRun } from "../api/api-types"
+import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { selectConstants } from "../store/constants"
-import {
-    fetchConstants,
-    fetchDatasets,
-    fetchReadsets,
-    fetchRequests,
-    fetchRuns,
-} from "../store/thunks"
-
+import { fetchConstants, fetchDatasets, fetchReadsets, fetchRequests, fetchRuns } from "../store/thunks"
+import { resetPassword } from "../api/api-triton"
 import { dataSize } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import {
-    Button,
-    Col,
-    Collapse,
-    CollapseProps,
-    Progress,
-    Row,
-    Space,
-    Typography,
-    notification,
-} from "antd"
-import DatasetList from "./DatasetList"
+import { DatasetList } from "./"
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
 } from "../selectors"
-import { resetPassword } from "../api/api-triton"
 
 const { Text, Title } = Typography
 
@@ -37,7 +20,7 @@ function ProjectDetail() {
     const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
     const project = useAppSelector(
-        (state) => state.projectsState.projectsById[projectExternalId],
+        (state: any) => state.projectsState.projectsById[projectExternalId],
     )
 
     useEffect(() => {
@@ -54,7 +37,7 @@ function ProjectDetail() {
         })()
     }, [dispatch, projectExternalId])
 
-    const runsByName = useAppSelector((state) => state.runsState.runsByName)
+    const runsByName = useAppSelector((state: any) => state.runsState.runsByName)
     const runs = useMemo(() => {
         return Object.values(runsByName).reduce<TritonRun[]>((runs, run) => {
             if (run && run.external_project_id === projectExternalId) {
@@ -76,7 +59,7 @@ function ProjectDetail() {
                                         message: "Password Reset",
                                         description: `The SFTP password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                (reason) => {
+                                (reason: any) => {
                                     notification.error({
                                         message: "Error",
                                         description: `The SFTP password could not be reset for the project ${project.external_name}. ${reason}`,
@@ -96,7 +79,7 @@ function ProjectDetail() {
                                         message: "Password Reset",
                                         description: `The Globus password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                (reason) =>
+                                (reason: any) =>
                                     notification.error({
                                         message: "Error",
                                         description: `The Globus password could not be reset for the project ${project.external_name}. ${reason}.`,
@@ -120,10 +103,10 @@ function ProjectDetail() {
 
 function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
     function Extra({ run }: { run: TritonRun }) {
-        const requests = useAppSelector((state) =>
+        const requests = useAppSelector((state: any) =>
             selectRequestsByRunName(state, run.name),
         )
-        const diskUsage = useAppSelector((state) =>
+        const diskUsage = useAppSelector((state: any) =>
             selectDisksUsageByRunName(state, run.name),
         )
         const constants = useAppSelector(selectConstants)
@@ -133,7 +116,7 @@ function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
                 {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
                 <Text
                     strong
-                >{`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}</Text>
+                >{`${requests.filter((r:any) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}</Text>
             </Space>
         )
     }
@@ -159,7 +142,7 @@ function ProjectDiskUsage({
     }, [dispatch])
 
     const diskUsage = useAppSelector(
-        (state) =>
+        (state: any) =>
             state.projectsState.projectsById[projectExternalId]?.diskUsage,
     )
 
