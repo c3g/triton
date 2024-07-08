@@ -1,5 +1,6 @@
 import { Button, Col, Modal, Row, Space, Spin } from "antd"
 import { ReactNode, useCallback, useMemo, useState } from "react"
+import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { DownloadRequest, DownloadRequestType } from "../api/api-types"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { ReadsetState } from "../store/readsets"
@@ -9,10 +10,10 @@ import {
     extendStagingRequest,
 } from "../store/thunks"
 import { selectConstants } from "../store/constants"
-import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { ActionDropdown, ActionDropdownProps } from "./ActionDropdown"
+import { ActionDropdownProps } from "./ActionDropdown/interfaces"
+import { ActionDropdown } from "./"
 import { selectRequestOfDatasetId } from "../selectors"
+import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import { DataSize } from "./shared"
 
 interface DatasetCardProps {

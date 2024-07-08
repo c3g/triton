@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom"
 import { Button, Typography } from "antd"
 import { IProjectCard, IProjectCardListProps } from "./interfaces"
 
-
-
 export default function ProjectCardList ({projects}: IProjectCardListProps) {
     const navigate = useNavigate()
     const { Title } = Typography
