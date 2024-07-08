@@ -1,15 +1,12 @@
 import { Divider, Empty, Spin } from "antd"
 import { useMemo } from "react"
-import { useAppSelector } from "../store/hooks"
-import DatasetCard from "./DatasetCard"
+import { useAppSelector } from "../../store/hooks"
+import DatasetCard from "../DatasetCard" 
+import { DataSetListProps } from "./interfaces"
 
-interface DatasetListProps {
-    runName: string
-}
-
-function DatasetList({ runName }: DatasetListProps) {
+export default function DatasetList({ runName }: DataSetListProps) {
     const datasetIDs = useAppSelector(
-        (state) => state.runsState.runsByName[runName]?.datasets,
+        (state: any) => state.runsState.runsByName[runName]?.datasets,
     )
 
     const renderDatasets = useMemo(() => {
@@ -48,5 +45,3 @@ function DatasetList({ runName }: DatasetListProps) {
         </div>
     )
 }
-
-export default DatasetList
