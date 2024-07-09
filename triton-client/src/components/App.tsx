@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import { selectIsLoggedIn, selectLoggedInUser } from "../store/auth"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
-import { selectProjects, selectProjectsLoading } from "../store/projects"
+import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { selectProjects, selectProjectsLoading } from "@store/projects"
 
 import LandingPage from "./Landing"
 import { ProjectCardList, MGCHeader } from "./"
@@ -12,8 +12,8 @@ import "./App.scss"
 import "./Common.scss"
 
 import { Alert, Layout, Spin } from "antd"
-import { TritonProject } from "../api/api-types"
-import { fetchLoginStatus, fetchProjects } from "../store/thunks"
+import { TritonProject } from "@api/api-types"
+import { fetchLoginStatus, fetchProjects } from "@store/thunks"
 
 const { Sider, Content } = Layout
 
