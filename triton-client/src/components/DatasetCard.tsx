@@ -1,15 +1,15 @@
 import { Button, Col, Modal, Row, Space, Spin } from "antd"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { DownloadRequest, DownloadRequestType } from "../api/api-types"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
-import { ReadsetState } from "../store/readsets"
+import { DownloadRequest, DownloadRequestType } from "@api/api-types"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { ReadsetState } from "@store/readsets"
 import {
     deleteDownloadRequest,
     createDownloadRequest,
     extendStagingRequest,
-} from "../store/thunks"
-import { selectConstants } from "../store/constants"
+} from "@store/thunks"
+import { selectConstants } from "@store/constants"
 import { ActionDropdownProps } from "./ActionDropdown/interfaces"
 import { ActionDropdown } from "./"
 import { selectRequestOfDatasetId } from "../selectors"
