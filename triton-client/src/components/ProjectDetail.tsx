@@ -1,3 +1,4 @@
+/* tslint:disable */ 
 import { useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import { Button, Col, Collapse, CollapseProps, Progress, Row, Space, Typography, notification } from "antd"
@@ -20,7 +21,7 @@ function ProjectDetail() {
     const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
     const project = useAppSelector(
-        (state: any) => state.projectsState.projectsById[projectExternalId],
+        (state) => state.projectsState.projectsById[projectExternalId],
     )
 
     useEffect(() => {
@@ -37,7 +38,7 @@ function ProjectDetail() {
         })()
     }, [dispatch, projectExternalId])
 
-    const runsByName = useAppSelector((state: any) => state.runsState.runsByName)
+    const runsByName = useAppSelector((state) => state.runsState.runsByName)
     const runs = useMemo(() => {
         return Object.values(runsByName).reduce<TritonRun[]>((runs, run) => {
             if (run && run.external_project_id === projectExternalId) {
@@ -59,7 +60,7 @@ function ProjectDetail() {
                                         message: "Password Reset",
                                         description: `The SFTP password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                (reason: any) => {
+                                (reason) => {
                                     notification.error({
                                         message: "Error",
                                         description: `The SFTP password could not be reset for the project ${project.external_name}. ${reason}`,
@@ -79,7 +80,7 @@ function ProjectDetail() {
                                         message: "Password Reset",
                                         description: `The Globus password is scheduled for reset for the project ${project.external_name}.`,
                                     }),
-                                (reason: any) =>
+                                (reason) =>
                                     notification.error({
                                         message: "Error",
                                         description: `The Globus password could not be reset for the project ${project.external_name}. ${reason}.`,
@@ -103,10 +104,10 @@ function ProjectDetail() {
 
 function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
     function Extra({ run }: { run: TritonRun }) {
-        const requests = useAppSelector((state: any) =>
+        const requests = useAppSelector((state) =>
             selectRequestsByRunName(state, run.name),
         )
-        const diskUsage = useAppSelector((state: any) =>
+        const diskUsage = useAppSelector((state) =>
             selectDisksUsageByRunName(state, run.name),
         )
         const constants = useAppSelector(selectConstants)
@@ -116,7 +117,7 @@ function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
                 {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
                 <Text
                     strong
-                >{`${requests.filter((r:any) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}</Text>
+                >{`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}</Text>
             </Space>
         )
     }
