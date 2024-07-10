@@ -4,11 +4,7 @@ import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { DownloadRequest, DownloadRequestType } from "@api/api-types"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { ReadsetState } from "@store/readsets"
-import {
-    deleteDownloadRequest,
-    createDownloadRequest,
-    extendStagingRequest,
-} from "@store/thunks"
+import { deleteDownloadRequest, createDownloadRequest, extendStagingRequest } from "@store/thunks"
 import { selectConstants } from "@store/constants"
 import { DataSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"

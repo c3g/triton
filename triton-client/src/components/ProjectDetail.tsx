@@ -143,7 +143,7 @@ function ProjectDiskUsage({
     }, [dispatch])
 
     const diskUsage = useAppSelector(
-        (state) =>
+        (state: any) =>
             state.projectsState.projectsById[projectExternalId]?.diskUsage,
     )
 
