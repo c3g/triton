@@ -10,11 +10,11 @@ import {
     extendStagingRequest,
 } from "@store/thunks"
 import { selectConstants } from "@store/constants"
-import { ActionDropdownProps } from "./ActionDropdown/interfaces"
-import { ActionDropdown } from "./"
+import { DataSize } from "@components/shared"
+import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
+import { ActionDropdown } from "@components/."
 import { selectRequestOfDatasetId } from "../selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { DataSize } from "./shared"
 
 interface DatasetCardProps {
     datasetID: number

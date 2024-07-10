@@ -7,9 +7,9 @@ import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectConstants } from "@store/constants"
 import { fetchConstants, fetchDatasets, fetchReadsets, fetchRequests, fetchRuns } from "@store/thunks"
 import { resetPassword } from "@api/api-triton"
+import { DatasetList } from "@components/."
 import { dataSize } from "../functions"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { DatasetList } from "./"
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
@@ -143,7 +143,7 @@ function ProjectDiskUsage({
     }, [dispatch])
 
     const diskUsage = useAppSelector(
-        (state: any) =>
+        (state) =>
             state.projectsState.projectsById[projectExternalId]?.diskUsage,
     )
 

@@ -4,9 +4,7 @@ import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectProjects, selectProjectsLoading } from "@store/projects"
 
-import LandingPage from "./Landing"
-import { ProjectCardList, MGCHeader } from "./"
-import ProjectDetail from "./ProjectDetail"
+import { ProjectCardList, MGCHeader, ProjectDetail, LandingPage } from "@components/."
 
 import "./App.scss"
 import "./Common.scss"

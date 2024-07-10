@@ -1,6 +1,6 @@
 import { Typography } from "antd"
-import "./Common.scss"
-import "./Landing.scss"
+import "@components/Common.scss"
+import "@components/Landing.scss"
 const { Title, Text } = Typography
 
 interface UserInformationProps {
