@@ -1,7 +1,7 @@
 import { TritonProject } from "../../api/api-types"
 
-export interface IProjectCardListProps {
-    projects: IProjectCard[]
+export interface ProjectCardListProps {
+    projects: ProjectCard[]
 }
 
-export interface IProjectCard extends TritonProject {}
+export interface ProjectCard extends TritonProject {}
