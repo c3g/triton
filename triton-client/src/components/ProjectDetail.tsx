@@ -1,11 +1,26 @@
-/* tslint:disable */ 
 import { useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
-import { Button, Col, Collapse, CollapseProps, Progress, Row, Space, Typography, notification } from "antd"
+import {
+    Button,
+    Col,
+    Collapse,
+    CollapseProps,
+    Progress,
+    Row,
+    Space,
+    Typography,
+    notification,
+} from "antd"
 import { TritonDataset, TritonRun } from "@api/api-types"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectConstants } from "@store/constants"
-import { fetchConstants, fetchDatasets, fetchReadsets, fetchRequests, fetchRuns } from "@store/thunks"
+import {
+    fetchConstants,
+    fetchDatasets,
+    fetchReadsets,
+    fetchRequests,
+    fetchRuns,
+} from "@store/thunks"
 import { resetPassword } from "@api/api-triton"
 import { DatasetList } from "@components/."
 import { dataSize } from "../functions"

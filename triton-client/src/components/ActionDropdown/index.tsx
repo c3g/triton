@@ -3,8 +3,10 @@ import type { MenuProps } from "antd"
 import { Dropdown } from "antd"
 import { ActionDropdownProps } from "./interfaces"
 
-export default function ActionDropdown({ button, actions }: ActionDropdownProps): ReactElement {
-
+export default function ActionDropdown({
+    button,
+    actions,
+}: ActionDropdownProps): ReactElement {
     const items: MenuProps["items"] = actions.map((a) => {
         return {
             key: a.action.name,
@@ -13,7 +15,7 @@ export default function ActionDropdown({ button, actions }: ActionDropdownProps)
             onClick: a.action.actionCall,
         }
     })
-    
+
     return (
         <Dropdown
             menu={{ items }}

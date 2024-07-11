@@ -4,7 +4,12 @@ import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectProjects, selectProjectsLoading } from "@store/projects"
 
-import { ProjectCardList, MGCHeader, ProjectDetail, LandingPage } from "@components/."
+import {
+    ProjectCardList,
+    MGCHeader,
+    ProjectDetail,
+    LandingPage,
+} from "@components/."
 
 import "./App.scss"
 import "./Common.scss"
@@ -14,7 +19,6 @@ import { TritonProject } from "@api/api-types"
 import { fetchLoginStatus, fetchProjects } from "@store/thunks"
 
 const { Sider, Content } = Layout
-
 
 function App() {
     const dispatch = useAppDispatch()
