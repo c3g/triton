@@ -1,33 +1,24 @@
 import { useEffect } from "react"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import { selectIsLoggedIn, selectLoggedInUser } from "../store/auth"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
-import { selectProjects, selectProjectsLoading } from "../store/projects"
+import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { selectProjects, selectProjectsLoading } from "@store/projects"
 
-import LandingPage from "./Landing"
-import ProjectCardList from "./ProjectCardList"
-import ProjectDetail from "./ProjectDetail"
+import {
+    ProjectCardList,
+    MGCHeader,
+    ProjectDetail,
+    LandingPage,
+} from "@components/."
 
 import "./App.scss"
 import "./Common.scss"
 
 import { Alert, Layout, Spin } from "antd"
-import { TritonProject } from "../api/api-types"
-import { fetchLoginStatus, fetchProjects } from "../store/thunks"
+import { TritonProject } from "@api/api-types"
+import { fetchLoginStatus, fetchProjects } from "@store/thunks"
 
 const { Sider, Content } = Layout
-
-function MGCHeader() {
-    return (
-        <div className="mgc-header">
-            <img
-                alt="McGill Genome Center"
-                height="40px"
-                src={require("../static/genome-logo.jpg")}
-            />
-        </div>
-    )
-}
 
 function App() {
     const dispatch = useAppDispatch()
@@ -53,7 +44,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <div>
+            <>
                 <Layout style={{ minHeight: "100vh" }}>
                     <Sider
                         collapsedWidth="0"
@@ -104,7 +95,7 @@ function App() {
                         </Content>
                     </Layout>
                 </Layout>
-            </div>
+            </>
         </BrowserRouter>
     )
 }

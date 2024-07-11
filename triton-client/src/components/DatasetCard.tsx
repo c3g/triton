@@ -1,19 +1,20 @@
 import { Button, Col, Modal, Row, Space, Spin } from "antd"
 import { ReactNode, useCallback, useMemo, useState } from "react"
-import { DownloadRequest, DownloadRequestType } from "../api/api-types"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
-import { ReadsetState } from "../store/readsets"
+import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
+import { DownloadRequest, DownloadRequestType } from "@api/api-types"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { ReadsetState } from "@store/readsets"
 import {
     deleteDownloadRequest,
     createDownloadRequest,
     extendStagingRequest,
-} from "../store/thunks"
-import { selectConstants } from "../store/constants"
-import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { ActionDropdown, ActionDropdownProps } from "./ActionDropdown"
+} from "@store/thunks"
+import { selectConstants } from "@store/constants"
+import { DataSize } from "@components/shared"
+import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
+import { ActionDropdown } from "@components/."
 import { selectRequestOfDatasetId } from "../selectors"
-import { DataSize } from "./shared"
+import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 
 interface DatasetCardProps {
     datasetID: number

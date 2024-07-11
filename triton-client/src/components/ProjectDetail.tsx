@@ -1,18 +1,5 @@
-import { useParams } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { useEffect, useMemo } from "react"
-import { selectConstants } from "../store/constants"
-import {
-    fetchConstants,
-    fetchDatasets,
-    fetchReadsets,
-    fetchRequests,
-    fetchRuns,
-} from "../store/thunks"
-
-import { dataSize } from "../functions"
-import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
-import { TritonDataset, TritonRun } from "../api/api-types"
+import { useParams } from "react-router-dom"
 import {
     Button,
     Col,
@@ -24,12 +11,24 @@ import {
     Typography,
     notification,
 } from "antd"
-import DatasetList from "./DatasetList"
+import { TritonDataset, TritonRun } from "@api/api-types"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { selectConstants } from "@store/constants"
+import {
+    fetchConstants,
+    fetchDatasets,
+    fetchReadsets,
+    fetchRequests,
+    fetchRuns,
+} from "@store/thunks"
+import { resetPassword } from "@api/api-triton"
+import { DatasetList } from "@components/."
+import { dataSize } from "../functions"
+import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
 } from "../selectors"
-import { resetPassword } from "../api/api-triton"
 
 const { Text, Title } = Typography
 
@@ -159,7 +158,7 @@ function ProjectDiskUsage({
     }, [dispatch])
 
     const diskUsage = useAppSelector(
-        (state) =>
+        (state: any) =>
             state.projectsState.projectsById[projectExternalId]?.diskUsage,
     )
 
