@@ -1,6 +1,6 @@
-import { Typography } from "antd"
-import "@components/Common.scss"
-import "@components/Landing.scss"
+import { Typography, Image } from "antd"
+import { Content } from "antd/es/layout/layout"
+
 const { Title, Text } = Typography
 
 interface UserInformationProps {
@@ -10,22 +10,23 @@ interface UserInformationProps {
 
 function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
     return (
-        <>
-            <div className="Common-padding">
-                <img
+        <div className="Common-padding">
+            <Content style={{ display:"flex", alignItems:"baseline", justifyContent: "flex-start" }}>
+                <Image
+                    preview={false}
                     alt="triton"
                     className="Landing-trident"
                     width={80}
-                    src={require("../static/triton.png")}
+                    src={require("@static/triton.png")}
                 />
                 <Title className="Common-title Landing-welcome">
                     Welcome to Triton
                 </Title>
-                <Text className="Common-subtitle Landing-user" type="secondary">
-                    {isLoggedIn ? `Logged in as ${userName}` : "Logging In.."}
-                </Text>
-            </div>
-        </>
+            </Content>
+            <Text className="Common-subtitle Landing-user" type="secondary">
+                {isLoggedIn ? `Logged in as ${userName}` : "Logging In.."}
+            </Text>
+        </div>
     )
 }
 
