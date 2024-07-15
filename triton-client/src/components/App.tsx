@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@store/hooks"
 import {
     ProjectDetail,
     LandingPage,
+    SiderMenu,
 } from "@components/."
 
 import "@components/App.scss"
@@ -14,7 +15,7 @@ import "@components/Common.scss"
 import { Button, Layout } from "antd"
 import { fetchLoginStatus, fetchProjects } from "@store/thunks"
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons"
-import SiderMenu from "./SiderMenu"
+
 const { Content } = Layout
 
 function App() {

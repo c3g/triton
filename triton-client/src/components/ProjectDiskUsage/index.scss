@@ -1,0 +1,9 @@
+main .disk-type-usage-container {
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 10% auto 1fr;
+    align-items: baseline;
+    .ant-progress-outer {
+        margin-left: 20px;
+    }
+}

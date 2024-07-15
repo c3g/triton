@@ -1,0 +1,14 @@
+.project-title-container {
+    h2 {
+        text-wrap: nowrap;
+    }
+    display: flex;
+    grid-template-columns: auto;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    div {
+        justify-content: flex-end;
+    }
+}

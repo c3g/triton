@@ -6,6 +6,8 @@ import ProjectDetail from "./ProjectDetail"
 import LandingPage from "./Landing"
 import MGCHeader from "./MGCHeader"
 import SiderMenu from "./SiderMenu"
+import ProjectActionsDropdown from "./ProjectActionsDropdown"
+import ProjectDiskUsage from "./ProjectDiskUsage"
 
 export {
     ProjectCardList,
@@ -16,4 +18,6 @@ export {
     LandingPage,
     DatasetCard,
     SiderMenu,
+    ProjectActionsDropdown,
+    ProjectDiskUsage,
 }
