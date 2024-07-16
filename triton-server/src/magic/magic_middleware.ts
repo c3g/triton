@@ -72,6 +72,13 @@ const magicAuthMiddleware = asyncHandler(
                 // User token is no longer valid. Flush the session info and force a new login.
                 req.session.credentials = undefined
                 req.session.userDetails = undefined
+
+                if (userDetails.accountType === "Internal") {
+                    res.status(403).send(
+                        "Internal users are not allowed to use Triton.",
+                    )
+                    next(Error("Internal users are not allowed to use Triton."))
+                }
             }
         }
 
