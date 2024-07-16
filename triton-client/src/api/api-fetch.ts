@@ -145,9 +145,9 @@ export async function tritonDelete<T>(
             throw new Error(`Invalid reply from ${route}`)
         }
     } else {
-        // HTTP response contains a status code. Throw the response so the caller
-        // can handle the code.
-        // Convert this to a typed error?
+        if (response.status === 401) {
+            await fetchLoginStatus()
+        }
         throw new Error(`${response.status}: ${response.statusText}`)
     }
 }
