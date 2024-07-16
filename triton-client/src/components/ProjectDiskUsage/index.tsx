@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect } from "react"
 import { selectConstants } from "@store/constants"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { fetchConstants } from "@store/thunks"
-import { Col, Flex, Layout, Progress, Row } from "antd"
+import { Flex, Layout, Progress } from "antd"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../../constants"
 import { dataSize } from "../../functions"
 import { ProjectDiskUsageProps } from "./interfaces"
@@ -27,7 +27,7 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
     )
     return (
         <>
-            {SUPPORTED_DOWNLOAD_TYPES.map((type) => {
+            {SUPPORTED_DOWNLOAD_TYPES.map((type,index) => {
                 const usage = diskUsage ? diskUsage[type] : 0
                 const capacity = constants.diskCapacity[type]
                 const [scaledUsage, usageUnit] = diskUsage
@@ -37,7 +37,7 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
                     constants.diskCapacity[type],
                 )
                 return (
-                    <Layout>
+                    <Layout key={index}>
                         <Content className="disk-type-usage-container">
                             <Title level={5}>{type}</Title>
                             <Text>
@@ -51,7 +51,9 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
                                         type: "inner",
                                     }}
                                     size={["100%", 20]}
-                                    percent={(usage / capacity) * 100}
+                                    percent={
+                                        Number(((usage / capacity) * 100).toFixed(2))
+                                    }
                                     strokeColor={
                                         usage < capacity ? "#1890ff" : "#f5222d"
                                     }

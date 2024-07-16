@@ -26,7 +26,7 @@ const { Text, Title } = Typography
 function ProjectDetail() {
     const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
-    let project: TritonProject | undefined = useAppSelector(
+    const project: TritonProject | undefined = useAppSelector(
         (state) => state.projectsState.projectsById[projectExternalId],
     )
 

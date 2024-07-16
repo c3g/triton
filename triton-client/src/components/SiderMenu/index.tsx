@@ -2,7 +2,7 @@ import { TritonProject } from "@api/api-types"
 import { MGCHeader, ProjectCardList } from "@components/."
 import { useAppSelector } from "@store/hooks"
 import { selectProjects, selectProjectsLoading } from "@store/projects"
-import { Alert, Layout, Spin } from "antd"
+import { Layout, Spin } from "antd"
 import { FunctionComponent, useEffect, useState } from "react"
 import { SiderMenuProps } from "./interfaces"
 import "./index.scss"
@@ -23,9 +23,9 @@ const SiderMenu: FunctionComponent<SiderMenuProps> = ({ isOpened }) => {
             collapsedWidth="0"
             theme="light"
             trigger={null}
+            width={300}
             collapsible
-            collapsed={isCollapsed}
-        >
+            collapsed={isCollapsed}>
             <MGCHeader />
             <Content>
                 {/* below code should be refactored to look cleaner */}
@@ -37,7 +37,9 @@ const SiderMenu: FunctionComponent<SiderMenuProps> = ({ isOpened }) => {
                     ></Spin>
                 )}
                 {projects && !areProjectsLoading && (
-                    <ProjectCardList projects={projects} />
+                    <div style={{ display: (!isOpened ? "block" : "none") , textWrap:"nowrap", transition:'0.1s'}}>
+                        <ProjectCardList projects={projects}/>
+                    </div>
                 )}
             </Content>
         </Sider>

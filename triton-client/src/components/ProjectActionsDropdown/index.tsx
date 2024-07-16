@@ -32,7 +32,7 @@ const ProjectActionsDropdown: FunctionComponent<
         )
     }
 
-    let items = [
+    const items = [
         {
             label: "For Globus",
             key: "GLOBUS",
