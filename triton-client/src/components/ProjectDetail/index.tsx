@@ -10,8 +10,15 @@ import {
     fetchRequests,
     fetchRuns,
 } from "@store/thunks"
-import { DatasetList, ProjectActionsDropdown, ProjectDiskUsage } from "@components/."
-import { selectDisksUsageByRunName, selectRequestsByRunName } from "../../selectors"
+import {
+    DatasetList,
+    ProjectActionsDropdown,
+    ProjectDiskUsage,
+} from "@components/."
+import {
+    selectDisksUsageByRunName,
+    selectRequestsByRunName,
+} from "../../selectors"
 import "./index.scss"
 
 const { Text, Title } = Typography
@@ -19,10 +26,12 @@ const { Text, Title } = Typography
 function ProjectDetail() {
     const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
-    let project: TritonProject | undefined = useAppSelector((state) => state.projectsState.projectsById[projectExternalId])
+    let project: TritonProject | undefined = useAppSelector(
+        (state) => state.projectsState.projectsById[projectExternalId],
+    )
 
     useEffect(() => {
-        (async () => {
+        ;(async () => {
             const runs = await dispatch(fetchRuns(projectExternalId))
             const datasets: TritonDataset[] = []
             for (const run of runs) {
@@ -45,7 +54,9 @@ function ProjectDetail() {
         }, [])
     }, [projectExternalId, runsByName])
 
-    function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
+    function runItem(
+        run: TritonRun,
+    ): NonNullable<CollapseProps["items"]>[number] {
         function Extra({ run }: { run: TritonRun }) {
             const requests = useAppSelector((state) =>
                 selectRequestsByRunName(state, run.name),
@@ -74,7 +85,6 @@ function ProjectDetail() {
         }
     }
 
-
     return (
         <div style={{ margin: "0rem 0.5rem" }}>
             {project && (
@@ -83,7 +93,10 @@ function ProjectDetail() {
                         <Title level={2} style={{ marginTop: "0.5rem" }}>
                             {project.external_name}
                         </Title>
-                        <ProjectActionsDropdown projectExternalId={projectExternalId} project={project} />
+                        <ProjectActionsDropdown
+                            projectExternalId={projectExternalId}
+                            project={project}
+                        />
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <Collapse items={runs.map((run) => runItem(run))} />

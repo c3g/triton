@@ -1,6 +1,6 @@
-import { TritonProject } from "@api/api-types";
+import { TritonProject } from "@api/api-types"
 
 export interface ProjectActionsDropdownProps {
-    projectExternalId:string;
-    project:TritonProject
+    projectExternalId: string
+    project: TritonProject
 }

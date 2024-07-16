@@ -11,7 +11,13 @@ interface UserInformationProps {
 function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
     return (
         <div className="Common-padding">
-            <Content style={{ display:"flex", alignItems:"center", justifyContent: "flex-start" }}>
+            <Content
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                }}
+            >
                 <Image
                     preview={false}
                     alt="triton"

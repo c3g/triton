@@ -1,3 +1,3 @@
 export interface SiderMenuProps {
-    isOpened: boolean;
+    isOpened: boolean
 }

@@ -3,11 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 
-import {
-    ProjectDetail,
-    LandingPage,
-    SiderMenu,
-} from "@components/."
+import { ProjectDetail, LandingPage, SiderMenu } from "@components/."
 
 import "@components/App.scss"
 import "@components/Common.scss"
@@ -22,7 +18,8 @@ function App() {
     const dispatch = useAppDispatch()
     const isLoggedIn = useAppSelector(selectIsLoggedIn)
     const user = useAppSelector(selectLoggedInUser)
-    const userName:string = (user != undefined) ? `${user.firstName} ${user.lastName}`:  "UNKNOWN"
+    const userName: string =
+        user != undefined ? `${user.firstName} ${user.lastName}` : "UNKNOWN"
     const [collapsed, setCollapsed] = useState(false)
 
     useEffect(() => {
@@ -33,23 +30,28 @@ function App() {
         if (isLoggedIn) dispatch(fetchProjects())
     }, [dispatch, isLoggedIn])
 
-
     return (
         <BrowserRouter>
             <Layout style={{ minHeight: "100vh" }}>
-                <SiderMenu isOpened={collapsed}/>
+                <SiderMenu isOpened={collapsed} />
                 <Layout>
                     <Content>
-                    <Button
-                      type="text"
-                      icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                      onClick={() => setCollapsed(!collapsed)}
-                      style={{
-                        fontSize: '16px',
-                        width: 64,
-                        height: 64,
-                      }}
-                    />
+                        <Button
+                            type="text"
+                            icon={
+                                collapsed ? (
+                                    <MenuUnfoldOutlined />
+                                ) : (
+                                    <MenuFoldOutlined />
+                                )
+                            }
+                            onClick={() => setCollapsed(!collapsed)}
+                            style={{
+                                fontSize: "16px",
+                                width: 64,
+                                height: 64,
+                            }}
+                        />
                         <Routes>
                             <Route
                                 path="/"

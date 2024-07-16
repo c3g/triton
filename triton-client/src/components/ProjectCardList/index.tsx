@@ -14,15 +14,16 @@ export default function ProjectCardList({ projects }: ProjectCardListProps) {
             header={<Title level={3}>Projects</Title>}
             bordered
             dataSource={items}
-            renderItem={(item: ProjectCard) =>
+            renderItem={(item: ProjectCard) => (
                 <List.Item
-                    onClick={() => navigate(`/project/${item.external_id}/`)}>
+                    onClick={() => navigate(`/project/${item.external_id}/`)}
+                >
                     <List.Item.Meta
                         avatar={<Avatar src={projectIcon} />}
                         title={<Text>{item.external_name}</Text>}
-                        />
+                    />
                 </List.Item>
-            }
+            )}
         />
     )
 }

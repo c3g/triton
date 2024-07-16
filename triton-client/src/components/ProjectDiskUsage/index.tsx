@@ -1,17 +1,19 @@
-import { FunctionComponent, useEffect } from "react";
-import { selectConstants } from "@store/constants";
-import { useAppDispatch, useAppSelector } from "@store/hooks";
-import { fetchConstants } from "@store/thunks";
+import { FunctionComponent, useEffect } from "react"
+import { selectConstants } from "@store/constants"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { fetchConstants } from "@store/thunks"
 import { Col, Flex, Layout, Progress, Row } from "antd"
 import { SUPPORTED_DOWNLOAD_TYPES } from "../../constants"
 import { dataSize } from "../../functions"
-import { ProjectDiskUsageProps } from "./interfaces";
-import { Content } from "antd/es/layout/layout";
+import { ProjectDiskUsageProps } from "./interfaces"
+import { Content } from "antd/es/layout/layout"
 import { Typography } from "antd"
 import "./index.scss"
 const { Text, Title } = Typography
 
-const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({ projectExternalId }) => {
+const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
+    projectExternalId,
+}) => {
     const dispatch = useAppDispatch()
     const constants = useAppSelector(selectConstants)
 
@@ -37,16 +39,17 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({ projectExt
                 return (
                     <Layout>
                         <Content className="disk-type-usage-container">
-                            <Title level={5}>
-                                {type}
-                            </Title>
+                            <Title level={5}>{type}</Title>
                             <Text>
                                 {`${scaledUsage} ${usageUnit} / ${scaledCapacity} ${capacityUnit}`}
                             </Text>
 
                             <Flex gap="small" vertical>
                                 <Progress
-                                    percentPosition={{ align: 'center', type: 'inner' }}
+                                    percentPosition={{
+                                        align: "center",
+                                        type: "inner",
+                                    }}
                                     size={["100%", 20]}
                                     percent={(usage / capacity) * 100}
                                     strokeColor={
@@ -54,13 +57,13 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({ projectExt
                                     }
                                     showInfo={true}
                                 />
-                                </Flex>
+                            </Flex>
                         </Content>
                     </Layout>
                 )
             })}
         </>
-     );
+    )
 }
 
-export default ProjectDiskUsage;
+export default ProjectDiskUsage
