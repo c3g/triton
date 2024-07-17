@@ -1,3 +1,15 @@
-div aside.sider-project-list {
-    transition: 2s;
+.sider-projects {
+    transition:
+        visibility 0.1s linear,
+        opacity 0.1s linear;
+    text-wrap: nowrap;
+}
+.__isOpened {
+    visibility: "visible";
+    opacity: 1;
+}
+
+.__isClosed {
+    visibility: "hidden";
+    opacity: 0;
 }

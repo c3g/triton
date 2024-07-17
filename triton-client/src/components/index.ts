@@ -8,6 +8,7 @@ import MGCHeader from "./MGCHeader"
 import SiderMenu from "./SiderMenu"
 import ProjectActionsDropdown from "./ProjectActionsDropdown"
 import ProjectDiskUsage from "./ProjectDiskUsage"
+import Landing from "./Landing"
 
 export {
     ProjectCardList,
@@ -20,4 +21,5 @@ export {
     SiderMenu,
     ProjectActionsDropdown,
     ProjectDiskUsage,
+    Landing,
 }

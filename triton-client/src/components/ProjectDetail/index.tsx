@@ -18,7 +18,7 @@ import {
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
-} from "../../selectors"
+} from "../../store/selectors"
 import "./index.scss"
 
 const { Text, Title } = Typography
@@ -90,7 +90,7 @@ function ProjectDetail() {
             {project && (
                 <>
                     <div className="project-title-container">
-                        <Title level={2} style={{ marginTop: "0.5rem" }}>
+                        <Title level={2} style={{ margin: "1rem 1rem" }}>
                             {project.external_name}
                         </Title>
                         <ProjectActionsDropdown
@@ -98,6 +98,9 @@ function ProjectDetail() {
                             project={project}
                         />
                     </div>
+                    <Title level={4} style={{ margin: "1rem 0 0 1rem" }} italic>
+                        Disk Usage
+                    </Title>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <Collapse items={runs.map((run) => runItem(run))} />
                 </>

@@ -13,8 +13,8 @@ import { selectConstants } from "@store/constants"
 import { DataSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ActionDropdown } from "@components/."
-import { selectRequestOfDatasetId } from "../selectors"
-import { SUPPORTED_DOWNLOAD_TYPES } from "../constants"
+import { selectRequestOfDatasetId } from "@store/selectors"
+import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 
 interface DatasetCardProps {
     datasetID: number

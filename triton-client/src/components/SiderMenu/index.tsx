@@ -14,18 +14,19 @@ const SiderMenu: FunctionComponent<SiderMenuProps> = ({ isOpened }) => {
     const [isCollapsed, setIsCollapsed] = useState(isOpened)
 
     useEffect(() => {
-        setIsCollapsed(isOpened)
+        setIsCollapsed(!isOpened)
     }, [isOpened])
 
     return (
         <Sider
             className="sider-project-list"
-            collapsedWidth="0"
+            collapsedWidth="90"
             theme="light"
             trigger={null}
             width={300}
             collapsible
-            collapsed={isCollapsed}>
+            collapsed={!isCollapsed}
+        >
             <MGCHeader />
             <Content>
                 {/* below code should be refactored to look cleaner */}
@@ -37,8 +38,13 @@ const SiderMenu: FunctionComponent<SiderMenuProps> = ({ isOpened }) => {
                     ></Spin>
                 )}
                 {projects && !areProjectsLoading && (
-                    <div style={{ display: (!isOpened ? "block" : "none") , textWrap:"nowrap", transition:'0.1s'}}>
-                        <ProjectCardList projects={projects}/>
+                    <div
+                        className={
+                            "sider-projects " +
+                            (isCollapsed ? "__isOpened" : "__isClosed")
+                        }
+                    >
+                        <ProjectCardList projects={projects} />
                     </div>
                 )}
             </Content>
