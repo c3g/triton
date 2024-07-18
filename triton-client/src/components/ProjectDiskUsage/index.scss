@@ -1,5 +1,22 @@
+.disk-usage-card {
+    background-color: white;
+    padding: 0;
+
+    .ant-card-body {
+        padding: 1rem;
+    }
+}
+
+.disk-usage-title {
+    margin: 0;
+}
+
+.disk-type-usage-layout {
+    background-color: inherit;
+}
+
 main .disk-type-usage-container {
-    padding: 0 48px;
+    padding: 0 2rem;
     display: grid;
     grid-template-columns: 10% auto 1fr;
     align-items: baseline;

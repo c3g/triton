@@ -17,6 +17,7 @@ export default function ProjectCardList({ projects }: ProjectCardListProps) {
             renderItem={(item: ProjectCard) => (
                 <List.Item
                     onClick={() => navigate(`/project/${item.external_id}/`)}
+                    style={{ cursor: "pointer" }}
                 >
                     <List.Item.Meta
                         avatar={<Avatar src={projectIcon} />}

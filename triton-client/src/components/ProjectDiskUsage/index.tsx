@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect } from "react"
 import { selectConstants } from "@store/constants"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { fetchConstants } from "@store/thunks"
-import { Flex, Layout, Progress } from "antd"
+import { Card, Flex, Layout, Progress } from "antd"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 import { dataSize } from "@common/functions"
 import { ProjectDiskUsageProps } from "./interfaces"
@@ -26,7 +26,15 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
             state.projectsState.projectsById[projectExternalId]?.diskUsage,
     )
     return (
-        <>
+        <Card className="disk-usage-card">
+            <Title
+                level={4}
+                className="disk-usage-title"
+                style={{ margin: "1rem 0 0 1rem" }}
+                italic
+            >
+                Disk Usage
+            </Title>
             {SUPPORTED_DOWNLOAD_TYPES.map((type, index) => {
                 const usage = diskUsage ? diskUsage[type] : 0
                 const capacity = constants.diskCapacity[type]
@@ -37,7 +45,7 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
                     constants.diskCapacity[type],
                 )
                 return (
-                    <Layout key={index}>
+                    <Layout key={index} className="disk-type-usage-layout">
                         <Content className="disk-type-usage-container">
                             <Title level={5}>{type}</Title>
                             <Text>
@@ -64,7 +72,7 @@ const ProjectDiskUsage: FunctionComponent<ProjectDiskUsageProps> = ({
                     </Layout>
                 )
             })}
-        </>
+        </Card>
     )
 }
 

@@ -98,10 +98,8 @@ function ProjectDetail() {
                             project={project}
                         />
                     </div>
-                    <Title level={4} style={{ margin: "1rem 0 0 1rem" }} italic>
-                        Disk Usage
-                    </Title>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
+                    <div style={{ padding: "0.5rem" }} />
                     <Collapse items={runs.map((run) => runItem(run))} />
                 </>
             )}
