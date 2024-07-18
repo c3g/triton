@@ -4,8 +4,6 @@ import { UserInformationProps } from "./interfaces"
 
 const { Title, Text } = Typography
 
-
-
 function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
     return (
         <div className="Common-padding">
