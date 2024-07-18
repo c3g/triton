@@ -1,5 +1,5 @@
 import { ApiReply } from "./api-types"
-import CONFIG from "../config"
+import CONFIG from "@common/config"
 
 export const TRITON_API_BASE_URL = CONFIG.apiBaseUrl
 

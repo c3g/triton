@@ -1,4 +1,4 @@
-import { dataSize } from "../functions"
+import { dataSize } from "@common/functions"
 
 export interface SizeProps {
     size: number

@@ -1,31 +1,26 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import { selectIsLoggedIn, selectLoggedInUser } from "@store/auth"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
-import { selectProjects, selectProjectsLoading } from "@store/projects"
 
-import {
-    ProjectCardList,
-    MGCHeader,
-    ProjectDetail,
-    LandingPage,
-} from "@components/."
+import { ProjectDetail, LandingPage, SiderMenu } from "@components/."
 
-import "./App.scss"
-import "./Common.scss"
+import "@components/App.scss"
+import "@components/Common.scss"
 
-import { Alert, Layout, Spin } from "antd"
-import { TritonProject } from "@api/api-types"
+import { Button, Layout } from "antd"
 import { fetchLoginStatus, fetchProjects } from "@store/thunks"
+import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons"
 
-const { Sider, Content } = Layout
+const { Content } = Layout
 
 function App() {
     const dispatch = useAppDispatch()
     const isLoggedIn = useAppSelector(selectIsLoggedIn)
     const user = useAppSelector(selectLoggedInUser)
-    const projects = useAppSelector<TritonProject[]>(selectProjects)
-    const areProjectsLoading = useAppSelector(selectProjectsLoading)
+    const userName: string =
+        user != undefined ? `${user.firstName} ${user.lastName}` : "UNKNOWN"
+    const [collapsed, setCollapsed] = useState(false)
 
     useEffect(() => {
         if (!isLoggedIn) dispatch(fetchLoginStatus())
@@ -35,67 +30,50 @@ function App() {
         if (isLoggedIn) dispatch(fetchProjects())
     }, [dispatch, isLoggedIn])
 
-    let userName
-    if (user) {
-        userName = `${user.firstName} ${user.lastName}`
-    } else {
-        userName = "UNKNOWN"
-    }
-
     return (
         <BrowserRouter>
-            <>
-                <Layout style={{ minHeight: "100vh" }}>
-                    <Sider
-                        collapsedWidth="0"
-                        breakpoint="lg"
-                        width="24rem"
-                        className="app-sidebar"
-                        theme="light"
-                    >
-                        <MGCHeader />
-                        {areProjectsLoading && (
-                            <Spin
-                                size="large"
-                                className="App-spinner"
-                                tip="Loading..."
-                            ></Spin>
-                        )}
-                        {projects && !areProjectsLoading && (
-                            <ProjectCardList projects={projects} />
-                        )}
-                        {projects.length === 0 && !areProjectsLoading && (
-                            <Alert
-                                message="No projects associated with this user."
-                                type="info"
+            <Layout style={{ minHeight: "100vh" }}>
+                <SiderMenu isOpened={collapsed} />
+                <Layout>
+                    <Content>
+                        <Button
+                            type="text"
+                            icon={
+                                collapsed ? (
+                                    <MenuUnfoldOutlined />
+                                ) : (
+                                    <MenuFoldOutlined />
+                                )
+                            }
+                            onClick={() => setCollapsed(!collapsed)}
+                            style={{
+                                fontSize: "16px",
+                                width: 64,
+                                height: 64,
+                            }}
+                        />
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={
+                                    <LandingPage
+                                        isLoggedIn={isLoggedIn}
+                                        userName={userName}
+                                    />
+                                }
                             />
-                        )}
-                    </Sider>
-                    <Layout>
-                        <Content>
-                            <Routes>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <LandingPage
-                                            isLoggedIn={isLoggedIn}
-                                            userName={userName}
-                                        />
-                                    }
-                                />
-                                <Route
-                                    path="/project/:projectExternalId/"
-                                    element={<ProjectDetail />}
-                                />
-                                <Route
-                                    path="*"
-                                    element={<Navigate to="/" replace />}
-                                />
-                            </Routes>
-                        </Content>
-                    </Layout>
+                            <Route
+                                path="/project/:projectExternalId/"
+                                element={<ProjectDetail />}
+                            />
+                            <Route
+                                path="*"
+                                element={<Navigate to="/" replace />}
+                            />
+                        </Routes>
+                    </Content>
                 </Layout>
-            </>
+            </Layout>
         </BrowserRouter>
     )
 }

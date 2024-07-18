@@ -1,9 +1,20 @@
+import { Link } from "react-router-dom"
 import genomeLogo from "@static/genome-logo.jpg"
+import { Image } from "antd"
 
 export const MGCHeader = () => {
     return (
         <div className="mgc-header">
-            <img alt="McGill Genome Center" height="40px" src={genomeLogo} />
+            <Link to="/">
+                <Image
+                    alt="McGill Genome Center"
+                    preview={false}
+                    width={80}
+                    src={genomeLogo}
+                />
+            </Link>
         </div>
     )
 }
+
+export default MGCHeader

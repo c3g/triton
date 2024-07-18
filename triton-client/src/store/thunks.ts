@@ -15,7 +15,7 @@ import { RunsStateActions } from "./runs"
 import { ConstantsStateActions } from "./constants"
 import { AppDispatch, RootState, convertToSerializedError } from "./store"
 import { RequestsStateActions } from "./requests"
-import { selectRequestOfDatasetId } from "../selectors"
+import { selectRequestOfDatasetId } from "./selectors"
 
 export const fetchLoginStatus =
     () => async (dispatch: AppDispatch, getState: () => RootState) => {

@@ -1,9 +1,9 @@
 import { createSelector } from "@reduxjs/toolkit"
-import { RootState } from "./store/store"
-import { DownloadRequestType } from "./api/api-types"
-import { RequestState } from "./store/requests"
-import { ReadsetState } from "./store/readsets"
-import { DatasetState } from "./store/datasets"
+import { RootState } from "@store/store"
+import { DownloadRequestType } from "@api/api-types"
+import { RequestState } from "@store/requests"
+import { ReadsetState } from "@store/readsets"
+import { DatasetState } from "@store/datasets"
 
 export const selectRequestById = (state: RootState) =>
     state.requestsState.requestById

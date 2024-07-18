@@ -1,26 +1,30 @@
 import "@components/Common.scss"
 import { useNavigate } from "react-router-dom"
-import { Button, Typography } from "antd"
+import { List, Typography, Avatar } from "antd"
 import { ProjectCard, ProjectCardListProps } from "./interfaces"
+import projectIcon from "@static/project-icon.png"
 
 export default function ProjectCardList({ projects }: ProjectCardListProps) {
     const navigate = useNavigate()
-    const { Title } = Typography
+    const { Title, Text } = Typography
+    const items = projects
     return (
-        <>
-            <Title level={2}>Projects</Title>
-            {projects.map((project: ProjectCard) => (
-                <Button
-                    key={project.external_id}
-                    block
-                    onClick={() => navigate(`/project/${project.external_id}/`)}
-                    style={{ width: "90%", margin: "0 1rem" }}
+        <List
+            size="large"
+            header={<Title level={3}>Projects</Title>}
+            bordered
+            dataSource={items}
+            renderItem={(item: ProjectCard) => (
+                <List.Item
+                    onClick={() => navigate(`/project/${item.external_id}/`)}
+                    style={{ cursor: "pointer" }}
                 >
-                    <Typography.Text strong>
-                        {project.external_name}
-                    </Typography.Text>
-                </Button>
-            ))}
-        </>
+                    <List.Item.Meta
+                        avatar={<Avatar src={projectIcon} />}
+                        title={<Text>{item.external_name}</Text>}
+                    />
+                </List.Item>
+            )}
+        />
     )
 }
