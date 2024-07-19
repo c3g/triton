@@ -9,6 +9,7 @@ import SiderMenu from "./SiderMenu"
 import ProjectActionsDropdown from "./ProjectActionsDropdown"
 import ProjectDiskUsage from "./ProjectDiskUsage"
 import Landing from "./Landing"
+import GuidedOnboarding from "./GuidedOnboarding"
 
 export {
     ProjectCardList,
@@ -22,4 +23,5 @@ export {
     ProjectActionsDropdown,
     ProjectDiskUsage,
     Landing,
+    GuidedOnboarding,
 }

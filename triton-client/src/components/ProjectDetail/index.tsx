@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react"
+import { Step } from "react-joyride"
 import { useParams } from "react-router-dom"
 import { Collapse, CollapseProps, Space, Typography } from "antd"
 import { TritonDataset, TritonProject, TritonRun } from "@api/api-types"
@@ -12,13 +13,14 @@ import {
 } from "@store/thunks"
 import {
     DatasetList,
+    GuidedOnboarding,
     ProjectActionsDropdown,
     ProjectDiskUsage,
 } from "@components/."
 import {
     selectDisksUsageByRunName,
     selectRequestsByRunName,
-} from "../../store/selectors"
+} from "@store/selectors"
 import "./index.scss"
 
 const { Text, Title } = Typography
@@ -29,6 +31,23 @@ function ProjectDetail() {
     const project: TritonProject | undefined = useAppSelector(
         (state) => state.projectsState.projectsById[projectExternalId],
     )
+
+    const steps: Step[] = [
+        {
+            target: ".disk-usage-card",
+            content:
+                "This is the current status of available space for Globus and SFTP storage.",
+        },
+        {
+            target: ".project-actions-dropdown",
+            content: "You can reset SFTP or Globus password here.",
+        },
+        {
+            target: ".data-sets-container",
+            content:
+                "The datasets that have been released in Freezeman, relating to the project, will be displayed here.",
+        },
+    ]
 
     useEffect(() => {
         ;(async () => {
@@ -87,6 +106,7 @@ function ProjectDetail() {
 
     return (
         <div style={{ margin: "0rem 0.5rem" }}>
+            <GuidedOnboarding step={steps} />
             {project && (
                 <>
                     <div className="project-title-container">
@@ -100,7 +120,10 @@ function ProjectDetail() {
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <div style={{ padding: "0.5rem" }} />
-                    <Collapse items={runs.map((run) => runItem(run))} />
+                    <Collapse
+                        className="data-sets-container"
+                        items={runs.map((run) => runItem(run))}
+                    />
                 </>
             )}
         </div>

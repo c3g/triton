@@ -10,8 +10,13 @@ export default function ProjectCardList({ projects }: ProjectCardListProps) {
     const items = projects
     return (
         <List
+            className="mgc-projects-list"
             size="large"
-            header={<Title level={3}>Projects</Title>}
+            header={
+                <Title className="mgc-triton-user-projects" level={3}>
+                    Projects
+                </Title>
+            }
             bordered
             dataSource={items}
             renderItem={(item: ProjectCard) => (

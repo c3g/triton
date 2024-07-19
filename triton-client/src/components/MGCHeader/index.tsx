@@ -11,6 +11,7 @@ export const MGCHeader = () => {
                     preview={false}
                     width={80}
                     src={genomeLogo}
+                    className="mgc-header-logo"
                 />
             </Link>
         </div>

@@ -10,3 +10,14 @@
     float: left !important;
     margin-right: 20px !important;
 }
+
+div.logo-title-header {
+    display: grid;
+    grid-template-columns: 80px auto;
+    align-items: end;
+}
+main.logo-title-onboarding-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
