@@ -1,5 +1,12 @@
 import Axios, { AxiosInstance, AxiosResponse } from "axios"
-import type { Dataset, DatasetFile, FMSList, Project, Readset } from "./models"
+import type {
+    Dataset,
+    DatasetFile,
+    FMSList,
+    Metric,
+    Project,
+    Readset,
+} from "./models"
 import config from "../../config"
 import { logger } from "../logger"
 import { getAccessToken, handle401 } from "./authToken"
@@ -142,6 +149,15 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
+                )
+            },
+        },
+        Metrics: {
+            getReadsPerSampleForDataset: async (
+                ...datasetIds: Array<Dataset["id"]>
+            ): Promise<ListResponse<Metric>> => {
+                return await axios.get(
+                    `${LIMS_API_URL}/metrics/?readset__dataset__id__in=${datasetIds.join(",")}&limit=100000&name=nb_reads&metric_group=qc`,
                 )
             },
         },
