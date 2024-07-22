@@ -75,3 +75,17 @@ export interface Project {
     readonly created_by: number
     readonly updated_by: number
 }
+
+export interface Metric {
+    readonly id: number
+    readonly name: string // Metric name
+    readonly metric_group: string // Named group that metric belongs to
+    readonly readset_id: Readset["id"] // Readset ID
+    readonly sample_name: string // Name of sample metric applies to
+    readonly derived_sample_id?: number // Derived sample id, if metric is from a freezeman experiment run
+    readonly run_name: string // Name of run that generated metric
+    readonly experiment_run_id?: number // Freezeman experiment run (undefined for external experiment runs)
+    readonly lane: number // Lane number
+    readonly value_numeric?: string // Metric value if numeric. Note: decimals are exported as string because JSON only supports floats and serializing as a number could lose precision.
+    readonly value_string?: string // Metric value, if text
+}
