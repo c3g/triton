@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { TritonDataset, TritonReadsPerSample } from "../api/api-types"
+import { TritonDataset, TritonReadsPerSample } from "@api/api-types"
 
 export interface DatasetState extends Omit<TritonDataset, "requests"> {
     readsPerSample?: TritonReadsPerSample

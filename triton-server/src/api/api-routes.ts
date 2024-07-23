@@ -29,7 +29,7 @@ import {
     listRunsByExternalProjectId,
 } from "./datasets"
 import { listUserProjects } from "./project"
-import { getFreezeManAuthenticatedAPI } from "src/freezeman/api"
+import { getFreezeManAuthenticatedAPI } from "../freezeman/api"
 
 const router = express.Router()
 
