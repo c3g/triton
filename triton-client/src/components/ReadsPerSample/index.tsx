@@ -95,7 +95,7 @@ function ReadsPerSampleGraph(
             >
                 Scroll Down
             </Button>
-            <Bar {...config} />
+            <Bar key={scrollPercentage} {...config} />
         </>
     )
 }
