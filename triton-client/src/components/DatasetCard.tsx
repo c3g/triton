@@ -12,7 +12,7 @@ import {
 import { selectConstants } from "@store/constants"
 import { DataSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
-import { ActionDropdown } from "@components/."
+import { ActionDropdown, ReadsPerSampleButton } from "@components/."
 import { selectRequestOfDatasetId } from "@store/selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 
@@ -239,7 +239,10 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
     return dataset ? (
         <Row justify={"space-between"} gutter={32}>
-            <Col span={3}>Dataset #{dataset.id}</Col>
+            <Col span={3}>
+                <ReadsPerSampleButton datasetId={dataset.id} />
+                <>Dataset #{dataset.id}</>
+            </Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
                     <Col key={`requestDetails-${i}`} span={3}>
