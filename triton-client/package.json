@@ -30,6 +30,7 @@
         ]
     },
     "dependencies": {
+        "@ant-design/charts": "^2.1.1",
         "antd": "^5.18.0",
         "craco": "^0.0.3",
         "react": "^18.2.0",
