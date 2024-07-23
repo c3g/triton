@@ -53,6 +53,7 @@ function ReadsPerSampleGraph(
     )
 
     const [scrollPercentage, setScrollPercentage] = useState(0)
+    const scrollBy = 10 / data.length
 
     const config: CorrectedBarConfig = useMemo(() => {
         return {
@@ -66,7 +67,7 @@ function ReadsPerSampleGraph(
             // https://ant-design-charts.antgroup.com/en/options/plots/component/scrollbar
             scrollbar: {
                 x: {
-                    ratio: 0.005,
+                    ratio: scrollBy,
                     slidable: false,
                     scrollable: false,
                     value: scrollPercentage,
@@ -80,7 +81,7 @@ function ReadsPerSampleGraph(
             <Button
                 onClick={() => {
                     setScrollPercentage(
-                        Math.max(scrollPercentage - 1 / data.length, 0.0),
+                        Math.max(scrollPercentage - scrollBy / 2, 0.0),
                     )
                 }}
             >
@@ -89,7 +90,7 @@ function ReadsPerSampleGraph(
             <Button
                 onClick={() => {
                     setScrollPercentage(
-                        Math.min(scrollPercentage + 1 / data.length, 1.0),
+                        Math.min(scrollPercentage + scrollBy / 2, 1.0),
                     )
                 }}
             >
