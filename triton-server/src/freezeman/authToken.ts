@@ -240,7 +240,12 @@ class FreezemanAPIAuthorization {
                 if (this.state !== AuthLoopState.ABORT) {
                     logger.debug(debugMsg(this.state, "Failed to fetch token"))
                     logger.error({
-                        message: error.message,
+                        message: `${error.message}`,
+                        hints: [
+                            `Is LIMS running?`,
+                            `Does user '${LIMS_USERNAME}' exist in LIMS?`,
+                            `Does it have the correct password?`,
+                        ],
                         method: error.config.method,
                         url: error.config.url,
                     })
