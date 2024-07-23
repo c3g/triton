@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { TritonDataset } from "../api/api-types"
+import { TritonDataset, TritonReadsPerSample } from "../api/api-types"
 
-export interface DatasetState extends Omit<TritonDataset, "requests"> {}
+export interface DatasetState extends Omit<TritonDataset, "requests"> {
+    readsPerSample?: TritonReadsPerSample
+}
 
 export interface DatasetsState {
     readonly datasetsById: Record<DatasetState["id"], DatasetState | undefined>
@@ -18,6 +20,18 @@ export const datasetsSlice = createSlice({
         setDatasets: (state, action: PayloadAction<TritonDataset[]>) => {
             const datasets = action.payload
             datasets.forEach((d) => (state.datasetsById[d.id] = d))
+        },
+        setReadsPerSample: (
+            state,
+            action: PayloadAction<{
+                datasetId: DatasetState["id"]
+                readsPerSample: TritonReadsPerSample
+            }>,
+        ) => {
+            const dataset = state.datasetsById[action.payload.datasetId]
+            if (dataset) {
+                dataset.readsPerSample = action.payload.readsPerSample
+            }
         },
     },
 })
