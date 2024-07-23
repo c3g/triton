@@ -104,6 +104,8 @@ function ProjectDetail() {
         }
     }
 
+    const items = useMemo(() => runs.map((run) => runItem(run)), [runs])
+
     return (
         <div style={{ margin: "0rem 0.5rem" }}>
             <GuidedOnboarding step={steps} />
@@ -120,10 +122,7 @@ function ProjectDetail() {
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <div style={{ padding: "0.5rem" }} />
-                    <Collapse
-                        className="data-sets-container"
-                        items={runs.map((run) => runItem(run))}
-                    />
+                    <Collapse className="data-sets-container" items={items} />
                 </>
             )}
         </div>
