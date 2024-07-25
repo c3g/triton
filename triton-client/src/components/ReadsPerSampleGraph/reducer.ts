@@ -57,6 +57,17 @@ export function selectAntDesignBarChartConfig(
                 },
             },
         },
+        axis: {
+            x: {
+                labelAutoHide: true,
+                title: "Sample Name",
+            },
+            y: {
+                labelAlign: "horizontal", // failed attempt at rotating the labels
+                title: "Number of Reads",
+                tickLineWidth: 5,
+            },
+        },
     }
 }
 
