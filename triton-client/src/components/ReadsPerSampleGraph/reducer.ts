@@ -1,11 +1,7 @@
 import { BarConfig } from "@ant-design/charts"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-const PAGE_SIZE = 10
-
 export interface ReadsPerSampleGraphState {
-    mode: "full" | "zoom"
-    pageSize: number
     sort: "reads" | "sample"
     order: "ascending" | "descending"
     readsPerSample: {
@@ -18,8 +14,6 @@ export function createInitialState(
     readsPerSample: ReadsPerSampleGraphState["readsPerSample"],
 ): ReadsPerSampleGraphState {
     return {
-        mode: "full",
-        pageSize: PAGE_SIZE,
         sort: "reads",
         order: "descending",
         readsPerSample,
@@ -55,16 +49,17 @@ export function selectAntDesignBarChartConfig(
         },
         xField: "sample",
         yField: "reads",
-        scrollbar: {
+        slider: {
             x: {
-                ratio: selectRatio(state),
+                label: false,
+                formatter() {
+                    return ""
+                },
             },
         },
     }
 }
-function selectRatio(state: ReadsPerSampleGraphState) {
-    return state.pageSize / state.readsPerSample.length
-}
+
 interface CorrectedBarConfig extends Omit<BarConfig, "sort"> {
     sort?: {
         by?: "x" | "y"
