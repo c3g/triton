@@ -7,7 +7,6 @@ import { store } from "@store/store"
 import { Button, Modal, Spin, Typography } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { Provider } from "react-redux"
-import "./index.scss"
 import ReadsPerSampleGraph from "@components/ReadsPerSampleGraph"
 
 export default function ReadsPerSample({
