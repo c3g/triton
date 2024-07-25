@@ -15,7 +15,7 @@ const ProjectActionsDropdown: FunctionComponent<
     async function resetTypePassword(
         projectExternalId: ExternalProjectID,
         type: DownloadRequestType,
-        project: TritonProject
+        project: TritonProject,
     ) {
         await resetPassword(projectExternalId, type).then(
             () =>
@@ -28,7 +28,7 @@ const ProjectActionsDropdown: FunctionComponent<
                     message: "Error",
                     description: `The ${type} password could not be reset for the project ${project.external_name}. ${reason}`,
                 })
-            }
+            },
         )
     }
 

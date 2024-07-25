@@ -45,7 +45,7 @@ async function startServer() {
  */
 async function createServer(
     handler: Express,
-    port: string
+    port: string,
 ): Promise<http.Server> {
     return await new Promise((resolve, reject) => {
         // set port for Express

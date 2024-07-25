@@ -49,7 +49,7 @@ export const start = () => {
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: TritonDataset[] = [mockDataset]
+    datasets: TritonDataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -82,7 +82,7 @@ export const sendNotificationEmailTest = async (
                             dataset.metric_report_url
                         }
                         -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date()
+                            dataset.latest_release_update ?? new Date(),
                         )}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
@@ -102,7 +102,7 @@ export const sendNotificationEmailTest = async (
 }
 
 export const sendNotificationEmail = async (
-    releasedDatasets: TritonDataset[] = [mockDataset]
+    releasedDatasets: TritonDataset[] = [mockDataset],
 ) => {
     releasedDatasets.map(async (dataset: TritonDataset) => {
         const subject = `The following dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
@@ -133,15 +133,15 @@ export const sendNotificationEmail = async (
                             dataset.metric_report_url
                         }<br/>
                         -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date()
+                            dataset.latest_release_update ?? new Date(),
                         )}<br/>
                     You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
                     Thank you<br/>
                     From the Triton Tech team<br/>
-                    This is an automated email, do not reply back.,`
+                    This is an automated email, do not reply back.,`,
                 )
-            }
+            },
         )
     })
 }

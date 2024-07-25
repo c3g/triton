@@ -9,13 +9,13 @@ import {
 } from "./api-types"
 
 export async function listRunsByExternalProjectId(
-    externalProjectIds: string[]
+    externalProjectIds: string[],
 ): Promise<TritonRun[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse =
         await freezemanApi.Dataset.listByExternalProjectIds(externalProjectIds)
     const datasets = datasetsResponse.data.results.filter(
-        (dataset) => dataset.released_status_count > 0
+        (dataset) => dataset.released_status_count > 0,
     )
     const datasetsByRunIDAndProjectID = datasets.reduce<{
         [projectID: string]: { [runName: string]: typeof datasets }
@@ -41,11 +41,11 @@ export async function listRunsByExternalProjectId(
                 datasets: datasets.map((d) => d.id),
                 readsetCount: datasets.reduce(
                     (total, d) => total + d.readset_count,
-                    0
+                    0,
                 ),
                 availableReadsetsCount: datasets.reduce(
                     (total, d) => total + d.released_status_count,
-                    0
+                    0,
                 ),
             })
         }
@@ -55,7 +55,7 @@ export async function listRunsByExternalProjectId(
 }
 
 export async function listDatasetsByIds(
-    datasetIds: string[]
+    datasetIds: string[],
 ): Promise<TritonDataset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
@@ -64,15 +64,15 @@ export async function listDatasetsByIds(
 }
 
 export async function listRequests(
-    datasetIds: Array<TritonDataset["id"]>
+    datasetIds: Array<TritonDataset["id"]>,
 ): Promise<TritonRequest[]> {
     const { listRequestByDatasetId } = await defaultDatabaseActions()
     return (
         await Promise.all(
             datasetIds.map(
                 async (datasetId) =>
-                    await listRequestByDatasetId(datasetId.toString())
-            )
+                    await listRequestByDatasetId(datasetId.toString()),
+            ),
         )
     ).reduce<TritonRequest[]>((requests, request) => {
         if (request) {
@@ -83,18 +83,17 @@ export async function listRequests(
 }
 
 export async function listReadsetsByDataset(
-    datasetId: TritonDataset["id"]
+    datasetId: TritonDataset["id"],
 ): Promise<TritonReadset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
-    const readsetsResponse = await freezemanApi.Readset.listByDatasetId(
-        datasetId
-    )
+    const readsetsResponse =
+        await freezemanApi.Readset.listByDatasetId(datasetId)
     const readsets = [...readsetsResponse.data.results] // it's a readonly array
     return readsets
 }
 
 export async function listDatasetFilesByDataset(
-    datasetId: TritonDataset["id"]
+    datasetId: TritonDataset["id"],
 ): Promise<TritonDatasetFile[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const readsets = (
@@ -135,6 +134,6 @@ export async function listDatasetFilesByDataset(
             }
             return tritonDatasetFiles
         },
-        []
+        [],
     )
 }
