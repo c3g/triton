@@ -10,6 +10,7 @@ import { Express } from "express"
 import server from "../src/server"
 import { initializeFreezemanAPIAuthorization } from "./freezeman/authToken"
 import { defaultDatabaseActions } from "./download/actions"
+import * as notification from "./notification"
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production"
 
@@ -31,6 +32,7 @@ function startup() {
 async function startServer() {
     // Create express server
     try {
+        notification.start()
         const { getConstants } = await defaultDatabaseActions()
         await getConstants() // throws if constants are not available
         initializeFreezemanAPIAuthorization()
@@ -47,7 +49,7 @@ async function startServer() {
  */
 async function createServer(
     handler: Express,
-    port: string,
+    port: string
 ): Promise<http.Server> {
     return await new Promise((resolve, reject) => {
         // set port for Express
