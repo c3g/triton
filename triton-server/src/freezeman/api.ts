@@ -157,7 +157,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 datasetId: Dataset["id"],
             ): Promise<ListResponse<Metric>> => {
                 return await axios.get(
-                    `${LIMS_API_URL}/metrics/?readset__dataset__id=${datasetId}&limit=100000&name=nb_reads&metric_group=qc`,
+                    `${LIMS_API_URL}/metrics/?readset__dataset__id__in=${datasetId}&limit=100000&name=nb_reads&metric_group=qc`,
                 )
             },
         },
