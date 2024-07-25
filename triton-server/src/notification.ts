@@ -40,7 +40,7 @@ export const start = () => {
                 latest_release_update: dataset.latest_release_update,
                 blocked_status_count: dataset.blocked_status_count,
                 project_name: dataset.project_name,
-                metric_report_url: dataset.metric_report_url,
+                // metric_report_url: dataset.metric_report_url,
             }
         })
 
