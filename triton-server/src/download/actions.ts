@@ -191,7 +191,9 @@ export async function createActions(db: Kysely<Database>) {
         return await db
             .selectFrom("constants")
             .selectAll()
-            .executeTakeFirstOrThrow()
+            .executeTakeFirstOrThrow(
+                () => new Error("Could not find entries in constants table"),
+            )
     }
 
     return {

@@ -12,11 +12,7 @@ function makeMagicReply<T>(data: T): MagicReply<T> {
 
 const app = express()
 
-app.use("/login", (req, res) => {
-    res.redirect(
-        "http://localhost:3001/api/auth/magic-callback?userID=userID&token=token",
-    )
-})
+app.use("/login", express.static("public"))
 
 app.use("/oauth/token", (req, res) => {
     res.json({ access_token: "access_token", expires_in: 24 * 60 * 60 })

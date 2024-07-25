@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 
 /**
  * Module dependencies.
@@ -11,6 +10,7 @@ import server from "../src/server"
 import { initializeFreezemanAPIAuthorization } from "./freezeman/authToken"
 import { defaultDatabaseActions } from "./download/actions"
 import * as notification from "./notification"
+import { logger } from "./logger"
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production"
 
@@ -24,24 +24,20 @@ startup()
 
 function startup() {
     startServer().catch((err) => {
-        console.error("Server startup failed", err)
+        logger.error(err, "Server startup failed")
         throw err
     })
 }
 
 async function startServer() {
     // Create express server
-    try {
-        notification.start()
-        const { getConstants } = await defaultDatabaseActions()
-        await getConstants() // throws if constants are not available
-        initializeFreezemanAPIAuthorization()
-        await createServer(server, centralPort)
-        console.log(`Server running on port ${centralPort}`)
-    } catch (e) {
-        console.error("Failed to create server", e)
-        throw e
-    }
+    notification.start()
+    const { getConstants } = await defaultDatabaseActions()
+    // throws if constants are not available
+    await getConstants()
+    initializeFreezemanAPIAuthorization()
+    await createServer(server, centralPort)
+    logger.info(`Server running on port ${centralPort}`)
 }
 
 /**
