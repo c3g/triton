@@ -12,11 +12,15 @@ export type ProjectID = number
 export interface Dataset {
     readonly id: DatasetID
     readonly external_project_id: string
+    readonly project_name: string
     readonly run_name: string
     readonly lane: number
     readonly files: ReadonlyArray<DatasetFile["id"]>
     readonly readset_count: number
     readonly released_status_count: number
+    readonly blocked_status_count: number
+    // below variable is commented due to the eaze of data breach that it provides
+    // readonly metric_report_url?: string
     readonly latest_release_update?: Date
 }
 
