@@ -1,25 +1,52 @@
-import { Bar } from "@ant-design/charts"
-import { useMemo, useReducer } from "react"
-import reducer, {
-    createInitialState,
-    selectAntDesignBarChartConfig,
-} from "./reducer"
+import { Bar, BarConfig } from "@ant-design/charts"
 import { ReadsPerSampleGraphProps } from "./interfaces"
 
 export default function ReadsPerSampleGraph({
-    datasetId,
     readsPerSample,
 }: ReadsPerSampleGraphProps) {
     const data = readsPerSample.sampleReads.map((numberOfReads) => ({
         sample: numberOfReads.sampleName,
         reads: numberOfReads.nbReads,
     }))
-    const [state] = useReducer(reducer, createInitialState(data))
-    const config = useMemo(() => selectAntDesignBarChartConfig(state), [state])
+    const config: CorrectedBarConfig = {
+        data: data,
+        sort: {
+            by: "y",
+            reverse: true,
+        },
+        xField: "sample",
+        yField: "reads",
+        slider: {
+            x: {
+                label: false,
+                formatter() {
+                    return ""
+                },
+            },
+        },
+        axis: {
+            x: {
+                label: false,
+                title: "Samples",
+            },
+            y: {
+                labelAlign: "horizontal", // failed attempt at rotating the labels
+                title: "Number of Reads",
+                tickLineWidth: 5,
+            },
+        },
+    }
 
     return (
         <>
-            <Bar key={`${datasetId}`} {...config} />
+            <Bar {...config} />
         </>
     )
+}
+
+interface CorrectedBarConfig extends Omit<BarConfig, "sort"> {
+    sort?: {
+        by?: "x" | "y"
+        reverse?: boolean
+    }
 }

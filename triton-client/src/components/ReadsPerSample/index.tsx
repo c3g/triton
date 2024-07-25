@@ -33,10 +33,7 @@ export default function ReadsPerSample({
                 </ul>
             </Typography.Paragraph>
             {readsPerSample ? (
-                <ReadsPerSampleGraph
-                    datasetId={datasetId}
-                    readsPerSample={readsPerSample}
-                />
+                <ReadsPerSampleGraph readsPerSample={readsPerSample} />
             ) : (
                 <Spin />
             )}
