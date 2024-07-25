@@ -21,6 +21,8 @@ import * as sqlite3 from "sqlite3"
 import sqliteStoreFactory from "express-session-sqlite"
 import cors from "cors"
 import contactService from "./contact-service"
+import notification from "./notification"
+
 const SQLiteStore = sqliteStoreFactory(session)
 
 interface Credentials {
@@ -47,6 +49,7 @@ const CLIENT_PORTAL_ORIGIN = new URL(config.client_portal.loginUrl).origin
  */
 
 const stopContactService = contactService.start()
+const stopNotificationService = notification.start()
 
 const app = express()
 

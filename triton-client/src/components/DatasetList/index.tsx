@@ -6,7 +6,7 @@ import { DatasetListProps } from "./interfaces"
 
 export default function DatasetList({ runName }: DatasetListProps) {
     const datasetIDs = useAppSelector(
-        (state: any) => state.runsState.runsByName[runName]?.datasets,
+        (state) => state.runsState.runsByName[runName]?.datasets,
     )
 
     const renderDatasets = useMemo(() => {
