@@ -19,7 +19,8 @@ export interface Dataset {
     readonly readset_count: number
     readonly released_status_count: number
     readonly blocked_status_count: number
-    readonly metric_report_url?: string
+    // below variable is commented due to the eaze of data breach that it provides
+    // readonly metric_report_url?: string
     readonly latest_release_update?: Date
 }
 
