@@ -9,6 +9,7 @@ import { Express } from "express"
 import server from "../src/server"
 import { initializeFreezemanAPIAuthorization } from "./freezeman/authToken"
 import { defaultDatabaseActions } from "./download/actions"
+import * as notification from "./notification"
 import { logger } from "./logger"
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production"
@@ -30,12 +31,17 @@ function startup() {
 
 async function startServer() {
     // Create express server
-    const { getConstants } = await defaultDatabaseActions()
-    // throws if constants are not available
-    await getConstants()
-    initializeFreezemanAPIAuthorization()
-    await createServer(server, centralPort)
-    logger.info(`Server running on port ${centralPort}`)
+    try {
+        notification.start()
+        const { getConstants } = await defaultDatabaseActions()
+        await getConstants() // throws if constants are not available
+        initializeFreezemanAPIAuthorization()
+        await createServer(server, centralPort)
+        console.log(`Server running on port ${centralPort}`)
+    } catch (e) {
+        console.error("Failed to create server", e)
+        throw e
+    }
 }
 
 /**
@@ -43,7 +49,7 @@ async function startServer() {
  */
 async function createServer(
     handler: Express,
-    port: string,
+    port: string
 ): Promise<http.Server> {
     return await new Promise((resolve, reject) => {
         // set port for Express
