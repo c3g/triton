@@ -40,6 +40,9 @@ export default function ReadsPerSample({
             ) : (
                 <Spin />
             )}
+            <Typography.Text strong>
+                Number of Samples: {readsPerSample?.sampleReads.length}
+            </Typography.Text>
         </>
     )
 }
