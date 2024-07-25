@@ -59,8 +59,8 @@ export function selectAntDesignBarChartConfig(
         },
         axis: {
             x: {
-                labelAutoHide: true,
-                title: "Sample Name",
+                label: false,
+                title: "Samples",
             },
             y: {
                 labelAlign: "horizontal", // failed attempt at rotating the labels

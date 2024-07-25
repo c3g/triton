@@ -4,7 +4,7 @@ import { useAppSelector } from "@store/hooks"
 import { selectReadsPerSample } from "@store/selectors"
 import { fetchReadsPerSample } from "@store/thunks"
 import { store } from "@store/store"
-import { Button, Modal, Spin } from "antd"
+import { Button, Modal, Spin, Typography } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { Provider } from "react-redux"
 import "./index.scss"
@@ -23,6 +23,15 @@ export default function ReadsPerSample({
 
     return (
         <>
+            <Typography.Paragraph>
+                <ul>
+                    <li>
+                        Move the top and bottom slider to pan view and zoom
+                        in/out.
+                    </li>
+                    <li>Hover over bar to see more details</li>
+                </ul>
+            </Typography.Paragraph>
             {readsPerSample ? (
                 <ReadsPerSampleGraph
                     datasetId={datasetId}
