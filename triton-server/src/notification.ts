@@ -19,7 +19,7 @@ const mockDataset: TritonDataset = {
 
 export const start = () => {
     console.info("Notification service started to run.")
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("0 * * * *", async () => {
         console.info("Notification service is running at an hourly pace.")
 
         let releasedDatasets: TritonDataset[] = []
