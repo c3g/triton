@@ -1,4 +1,5 @@
 import cron from "node-cron"
+import nodemailer from "nodemailer"
 import * as email from "./contact-service"
 import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
@@ -76,6 +77,68 @@ export const sendNotificationEmail = async (
             },
         )
     })
+}
+
+export const sendNotificationEmailTest = async (
+    datasets: TritonDataset[] = [mockDataset]
+) => {
+    const transporter = nodemailer.createTransport({
+        service: "gmail", // other mailer can be used but right now default is gmail
+        auth: {
+            user: "yourGmailForTesting",
+            pass: "app password",
+        },
+    })
+    datasets.map((dataset) => {
+        const mailOptions = {
+            from: "yourGmail if gmail is being used",
+            to: "theRecipient",
+            subject: "Sending Email using Node.js",
+            text: `The dataset can be downloaded using the Triton platform
+                    Here are the information pertaining to the released dataset:
+                        -   Dataset ID: ${dataset.id}
+                        -   Dataset project id: ${dataset.external_project_id}
+                        -   Dataset project name: ${dataset.project_name}
+                        -   Dataset Lane: ${dataset.lane}
+                        -   Readset count within the Dataset: ${
+                            dataset.readset_count
+                        }
+                        -   Readset released status count: ${
+                            dataset.released_status_count
+                        }
+                        -   Readset blocked status count: ${
+                            dataset.blocked_status_count
+                        }
+                        -   Dataset latest released update date: ${formatDateAndTime(
+                            dataset.latest_release_update ?? new Date()
+                        )}
+                    You can now stage for download (Via Globus or SFTP) in Triton.
+
+                    Thank you
+                    From the Triton Tech team
+                    This is an automated email, do not reply back.`,
+        }
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log("Email sent: " + info.response)
+            }
+        })
+    })
+}
+
+const mockDataset: TritonDataset = {
+    id: 987654,
+    lane: 123546,
+    external_project_id: "project-id-testing",
+    project_name: "project name",
+    run_name: "test name",
+    readset_count: 19,
+    released_status_count: 99,
+    blocked_status_count: 64,
+    latest_release_update: new Date(),
 }
 
 const formatDateAndTime = (date: Date): string => {
