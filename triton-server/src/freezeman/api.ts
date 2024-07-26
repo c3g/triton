@@ -83,7 +83,9 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 external: boolean = true,
             ): Promise<ListResponse<Project>> =>
                 await axios.get(
-                    `${LIMS_API_URL}/projects/?${external ? "external_id__in" : "id__in"}=${ids.join(",")}`,
+                    `${LIMS_API_URL}/projects/?${
+                        external ? "external_id__in" : "id__in"
+                    }=${ids.join(",")}`,
                 ),
         },
         Dataset: {
@@ -96,7 +98,9 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(",")}`,
+                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(
+                        ",",
+                    )}`,
                 )
             },
             list: async (ids: string[]): Promise<ListResponse<Dataset>> => {
@@ -109,6 +113,11 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
                 )
             },
+            listByReleasedUpdates: async (): Promise<ListResponse<Dataset>> => {
+                return await axios.get(
+                    `${LIMS_API_URL}/datasets/?latest_release_update=latest`,
+                )
+            },
         },
         DatasetFile: {
             list: async (
@@ -118,7 +127,9 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     throw new Error("Must provide at least one id")
 
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?id__in=${ids.join(",")}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?id__in=${ids.join(
+                        ",",
+                    )}&limit=100000`,
                 )
             },
             listByReadsetIds: async (
@@ -128,7 +139,9 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     throw new Error("Must provide at least one readset id")
 
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(",")}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(
+                        ",",
+                    )}&limit=100000`,
                 )
             },
         },

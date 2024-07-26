@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /*
  * contact-service.ts
  */
@@ -112,7 +110,7 @@ export function start() {
     return stop
 }
 
-async function broadcastEmailsOfProject(
+export async function broadcastEmailsOfProject(
     projectID: string,
     fn: (
         sendEmail: (subject: string, message: string) => Promise<void>,
@@ -143,7 +141,9 @@ function getCredentialMessageFor(contact: Contact) {
         return `
       Hello,<br/>
       <br/>
-      A new Globus account has been created for the project ${contact.project_id}.<br/>
+      A new Globus account has been created for the project ${
+          contact.project_id
+      }.<br/>
       <br/>
       Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
       Username: <b>${contact.project_id}</b><br/>
@@ -157,7 +157,9 @@ function getCredentialMessageFor(contact: Contact) {
         return `
         Hello,<br/>
         <br/>
-        The Globus password has been reset for the project ${contact.project_id}.<br/>
+        The Globus password has been reset for the project ${
+            contact.project_id
+        }.<br/>
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
@@ -171,7 +173,9 @@ function getCredentialMessageFor(contact: Contact) {
         return `
         Hello,<br/>
         <br/>
-        A new SFTP account has been created for the project ${contact.project_id}.<br/>
+        A new SFTP account has been created for the project ${
+            contact.project_id
+        }.<br/>
         <br/>
         Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
@@ -185,7 +189,9 @@ function getCredentialMessageFor(contact: Contact) {
         return `
       Hello,<br/>
       <br/>
-      The SFTP password has been reset for the project ${contact.project_id}.<br/>
+      The SFTP password has been reset for the project ${
+          contact.project_id
+      }.<br/>
       <br/>
       Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
       Username: <b>${contact.project_id}</b><br/>
