@@ -4,7 +4,7 @@ import * as email from "./contact-service"
 import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 
-const start = () => {
+export const start = () => {
     console.info("Notification service started to run.")
     const task = cron.schedule("0 * * * *", async () => {
         console.info("Notification service is running at an hourly pace.")
@@ -14,7 +14,9 @@ const start = () => {
         const freezemanApi = await getFreezeManAuthenticatedAPI()
 
         const datasetsResponse =
-            await freezemanApi.Dataset.listByReleasedUpdates()
+            await freezemanApi.Dataset.listByReleasedUpdates(
+                formatDateAndTime(),
+            )
 
         releasedDatasets = datasetsResponse.data.results.map((dataset) => {
             return {
@@ -67,9 +69,7 @@ export const sendNotificationEmail = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date(),
-                        )}<br/>
+                        -   Dataset latest released update date: ${formatDateAndTime()}<br/>
                     You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
                     This is an automated email, do not reply back.`,
@@ -80,7 +80,7 @@ export const sendNotificationEmail = async (
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: TritonDataset[] = [mockDataset]
+    datasets: TritonDataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -109,9 +109,7 @@ export const sendNotificationEmailTest = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }
-                        -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date()
-                        )}
+                        -   Dataset latest released update date: ${formatDateAndTime()}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
                     Thank you
@@ -141,15 +139,13 @@ const mockDataset: TritonDataset = {
     latest_release_update: new Date(),
 }
 
-const formatDateAndTime = (date: Date): string => {
-    const cleanedDate = new Date(date)
+const formatDateAndTime = (): string => {
+    const cleanedDate = new Date()
+    const hours = new Date().getHours() - 1
+    cleanedDate.setHours(hours)
     return (
         cleanedDate.toLocaleDateString() +
-        " " +
-        cleanedDate.toLocaleTimeString()
+        "T" +
+        cleanedDate.toLocaleTimeString().split(" ")[0]
     )
-}
-
-export default {
-    start,
 }
