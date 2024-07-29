@@ -72,6 +72,13 @@ const magicAuthMiddleware = asyncHandler(
                 // User token is no longer valid. Flush the session info and force a new login.
                 req.session.credentials = undefined
                 req.session.userDetails = undefined
+
+                if (userDetails.accountType === "Internal") {
+                    res.status(403).send(
+                        "Internal users are not allowed to use Triton.",
+                    )
+                    next(Error("Internal users are not allowed to use Triton."))
+                }
             }
         }
 
@@ -106,11 +113,18 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
     // Verify that the user is still logged in with the token.
     const isAuthenticated = await isUserAuthenticated(userId, token)
     if (!isAuthenticated) {
-        throw Error("Not authenticated")
+        res.status(401).send("Not Authorized")
+        next(Error("Not Authorized"))
     }
 
     // Ask Magic for the user's details.
     const userDetails = await getUserDetails(userId, token)
+
+    // Do not allow internal users
+    if (userDetails.accountType === "Internal") {
+        res.status(403).send("Internal users are not allowed to use Triton.")
+        next(Error("Internal users are not allowed to use Triton."))
+    }
 
     // Store the user details and their login credentials in the session.
     // We need the user id and token because triton has to check if the user is
