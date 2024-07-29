@@ -4,7 +4,7 @@ import * as email from "./contact-service"
 import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 
-const start = () => {
+export const start = () => {
     console.info("Notification service started to run.")
     const task = cron.schedule("0 * * * *", async () => {
         console.info("Notification service is running at an hourly pace.")
@@ -80,7 +80,7 @@ export const sendNotificationEmail = async (
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: TritonDataset[] = [mockDataset]
+    datasets: TritonDataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -110,7 +110,7 @@ export const sendNotificationEmailTest = async (
                             dataset.blocked_status_count
                         }
                         -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date()
+                            dataset.latest_release_update ?? new Date(),
                         )}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
@@ -148,8 +148,4 @@ const formatDateAndTime = (date: Date): string => {
         " " +
         cleanedDate.toLocaleTimeString()
     )
-}
-
-export default {
-    start,
 }
