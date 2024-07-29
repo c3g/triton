@@ -5,9 +5,15 @@ import type {
     FMSList,
     Project,
     Readset,
+<<<<<<< HEAD
 } from "../../types/freezeman"
 import config from "../../../config"
 import { logger } from "@core/logger"
+=======
+} from "../../../../triton-types/models/freezeman"
+import config from "../../../config"
+import { logger } from "../../logger"
+>>>>>>> 41e57fd (reverted some changes)
 import { getAccessToken, handle401 } from "./authToken"
 
 const LIMS_API_URL = config.lims.url
@@ -119,11 +125,17 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
                 )
             },
+<<<<<<< HEAD
             listByReleasedUpdates: async (
                 dates: string,
             ): Promise<ListResponse<Dataset>> => {
                 return await axios.get(
                     `${LIMS_API_URL}/datasets/?latest_release_update=${dates}`,
+=======
+            listByReleasedUpdates: async (): Promise<ListResponse<Dataset>> => {
+                return await axios.get(
+                    `${LIMS_API_URL}/datasets/?latest_release_update=latest`,
+>>>>>>> 41e57fd (reverted some changes)
                 )
             },
         },
@@ -166,6 +178,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 )
             },
         },
+<<<<<<< HEAD
         Metrics: {
             getReadsPerSampleForDataset: async (
                 datasetId: Dataset["id"],
@@ -175,6 +188,8 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 )
             },
         },
+=======
+>>>>>>> 41e57fd (reverted some changes)
     } as const
 }
 
