@@ -73,36 +73,7 @@ function ProjectDetail() {
         }, [])
     }, [projectExternalId, runsByName])
 
-    function runItem(
-        run: TritonRun,
-    ): NonNullable<CollapseProps["items"]>[number] {
-        function Extra({ run }: { run: TritonRun }) {
-            const requests = useAppSelector((state) =>
-                selectRequestsByRunName(state, run.name),
-            )
-            const diskUsage = useAppSelector((state) =>
-                selectDisksUsageByRunName(state, run.name),
-            )
-            const constants = useAppSelector(selectConstants)
-            return (
-                <Space size={"middle"}>
-                    {`SFTP: ${((diskUsage.SFTP / constants.diskCapacity.SFTP) * 100).toFixed(2)}%`}
-                    {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
-                    <Text strong>
-                        {`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}
-                    </Text>
-                </Space>
-            )
-        }
-
-        return {
-            extra: <Extra run={run} />,
-            label: <b>{run.name}</b>,
-            key: run.name,
-            showArrow: true,
-            children: <DatasetList runName={run.name} />,
-        }
-    }
+    const items = useMemo(() => runs.map((run) => runItem(run)), [runs])
 
     return (
         <div style={{ margin: "0rem 0.5rem" }}>
@@ -120,14 +91,40 @@ function ProjectDetail() {
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <div style={{ padding: "0.5rem" }} />
-                    <Collapse
-                        className="data-sets-container"
-                        items={runs.map((run) => runItem(run))}
-                    />
+                    <Collapse className="data-sets-container" items={items} />
                 </>
             )}
         </div>
     )
+}
+
+function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
+    function Extra({ run }: { run: TritonRun }) {
+        const requests = useAppSelector((state) =>
+            selectRequestsByRunName(state, run.name),
+        )
+        const diskUsage = useAppSelector((state) =>
+            selectDisksUsageByRunName(state, run.name),
+        )
+        const constants = useAppSelector(selectConstants)
+        return (
+            <Space size={"middle"}>
+                {`SFTP: ${((diskUsage.SFTP / constants.diskCapacity.SFTP) * 100).toFixed(2)}%`}
+                {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
+                <Text strong>
+                    {`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}
+                </Text>
+            </Space>
+        )
+    }
+
+    return {
+        extra: <Extra run={run} />,
+        label: <b>{run.name}</b>,
+        key: run.name,
+        showArrow: true,
+        children: <DatasetList runName={run.name} />,
+    }
 }
 
 export default ProjectDetail
