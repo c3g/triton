@@ -5,7 +5,7 @@ import { selectReadsPerSample } from "@store/selectors"
 import { fetchReadsPerSample } from "@store/thunks"
 import { store } from "@store/store"
 import { Spin, Typography } from "antd"
-import ReadsPerSampleGraph from "@components/ReadsPerSampleGraph"
+import { ReadsPerSampleGraph } from "@components/."
 
 export default function ReadsPerSample({
     datasetId,
