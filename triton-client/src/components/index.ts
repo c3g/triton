@@ -10,7 +10,7 @@ import ProjectActionsDropdown from "./ProjectActionsDropdown"
 import ProjectDiskUsage from "./ProjectDiskUsage"
 import Landing from "./Landing"
 import GuidedOnboarding from "./GuidedOnboarding"
-import ReadsPerSample, { ReadsPerSampleButton } from "./ReadsPerSample"
+import ReadsPerSample from "./ReadsPerSample"
 
 export {
     ProjectCardList,
@@ -26,5 +26,4 @@ export {
     Landing,
     GuidedOnboarding,
     ReadsPerSample,
-    ReadsPerSampleButton,
 }

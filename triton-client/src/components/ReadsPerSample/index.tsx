@@ -1,12 +1,10 @@
-import { ReactElement, useCallback, useEffect } from "react"
-import ReadsPerSampleProps, { ReadsPerSampleButtonProps } from "./interfaces"
+import { ReactElement, useEffect } from "react"
+import ReadsPerSampleProps from "./interfaces"
 import { useAppSelector } from "@store/hooks"
 import { selectReadsPerSample } from "@store/selectors"
 import { fetchReadsPerSample } from "@store/thunks"
 import { store } from "@store/store"
-import { Button, Modal, Spin, Typography } from "antd"
-import { InfoCircleOutlined } from "@ant-design/icons"
-import { Provider } from "react-redux"
+import { Spin, Typography } from "antd"
 import ReadsPerSampleGraph from "@components/ReadsPerSampleGraph"
 
 export default function ReadsPerSample({
@@ -40,28 +38,5 @@ export default function ReadsPerSample({
                 Number of Samples: {readsPerSample?.sampleReads.length}
             </Typography.Text>
         </>
-    )
-}
-
-export function ReadsPerSampleButton({
-    datasetId,
-}: ReadsPerSampleButtonProps): ReactElement {
-    const showModal = useCallback(() => {
-        Modal.info({
-            title: `Reads Per Sample of dataset #${datasetId}`,
-            content: (
-                <Provider store={store}>
-                    <ReadsPerSample datasetId={datasetId} />
-                </Provider>
-            ),
-            width: "80%",
-        })
-    }, [datasetId])
-    return (
-        <Button
-            type={"text"}
-            icon={<InfoCircleOutlined />}
-            onClick={showModal}
-        />
     )
 }
