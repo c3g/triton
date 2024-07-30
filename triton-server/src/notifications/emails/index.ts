@@ -76,9 +76,7 @@ export const sendNotificationEmail = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date(),
-                        )}<br/>
+                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
                     You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
                     This is an automated email, do not reply back.`,
@@ -118,9 +116,7 @@ export const sendNotificationEmailTest = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }
-                        -   Dataset latest released update date: ${formatDateAndTime(
-                            dataset.latest_release_update ?? new Date(),
-                        )}
+                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
                     Thank you
