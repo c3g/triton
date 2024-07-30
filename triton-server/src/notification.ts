@@ -69,7 +69,7 @@ export const sendNotificationEmail = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${formatDateAndTime()}<br/>
+                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
                     You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
                     This is an automated email, do not reply back.`,
@@ -109,7 +109,7 @@ export const sendNotificationEmailTest = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }
-                        -   Dataset latest released update date: ${formatDateAndTime()}
+                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
                     Thank you
@@ -139,10 +139,12 @@ const mockDataset: TritonDataset = {
     latest_release_update: new Date(),
 }
 
-const formatDateAndTime = (): string => {
-    const cleanedDate = new Date()
-    const hours = new Date().getHours() - 1
-    cleanedDate.setHours(hours)
+const formatDateAndTime = (date?: Date): string => {
+    const cleanedDate = date ?? new Date()
+    if (!date) {
+        const hours = new Date().getHours() - 1
+        cleanedDate.setHours(hours)
+    }
     return (
         cleanedDate.toLocaleDateString() +
         "T" +
