@@ -98,3 +98,14 @@ export interface TritonRequestResponse {
 export interface TritonCreateRequestResponse extends TritonRequestResponse {
     files: DownloadFile[]
 }
+
+export interface TritonNumberOfReads {
+    derivedSampleID?: number // Sample ID if this is from a freezeman experiment run and the sample is in the DB
+    readsetID: TritonReadset["id"] // the readset to which are attached those reads
+    sampleName: string // Name of the sample
+    nbReads: number // Number of reads for the sample
+}
+
+export interface TritonReadsPerSample {
+    sampleReads: TritonNumberOfReads[]
+}

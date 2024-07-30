@@ -20,13 +20,16 @@ import {
     IsLoggedInData,
     TritonDataset,
     TritonDatasetFile,
+    TritonNumberOfReads,
     TritonProject,
     TritonReadset,
+    TritonReadsPerSample,
     TritonRequest,
     TritonRun,
     User,
 } from "../types/api"
 import { listUserProjects } from "./project"
+import { getFreezeManAuthenticatedAPI } from "../freezeman/api"
 
 const router = express.Router()
 
@@ -155,6 +158,28 @@ router.get(
         const idParam = Number(req.query.dataset_id)
         const datasetFiles = await listDatasetFilesByDataset(idParam)
         res.json(okReply<TritonDatasetFile[]>(datasetFiles))
+    }),
+)
+
+router.get(
+    "/reads-per-sample/",
+    asyncHandler(async (req, res) => {
+        const datasetId = Number(req.query.dataset_id)
+        const freezemanApi = await getFreezeManAuthenticatedAPI()
+        const metrics = (
+            await freezemanApi.Metrics.getReadsPerSampleForDataset(datasetId)
+        ).data.results
+        const sampleReads: TritonNumberOfReads[] = metrics.map((metric) => {
+            return {
+                derivedSampleID: metric.derived_sample_id ?? undefined,
+                readsetID: metric.readset_id,
+                sampleName: metric.sample_name,
+                nbReads: metric.value_numeric
+                    ? Number(metric.value_numeric)
+                    : 0, // The numeric value should always be defined for this type of metric
+            }
+        })
+        res.json(okReply<TritonReadsPerSample>({ sampleReads }))
     }),
 )
 
