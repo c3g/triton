@@ -16,8 +16,8 @@
  * containing the proper authorization headers.
  */
 import axios, { AxiosInstance } from "axios"
-import config from "../../config"
-import { logger } from "../logger"
+import config from "../../../config"
+import { logger } from "../../logger"
 import { HttpsProxyAgent } from "https-proxy-agent"
 
 /** Typing for the auth response */
