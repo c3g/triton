@@ -21,7 +21,7 @@ import * as sqlite3 from "sqlite3"
 import sqliteStoreFactory from "express-session-sqlite"
 import cors from "cors"
 import contactService from "./contact-service"
-import notification from "./notification"
+import * as notification from "./notification"
 
 const SQLiteStore = sqliteStoreFactory(session)
 
