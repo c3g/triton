@@ -117,7 +117,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 dates: string,
             ): Promise<ListResponse<Dataset>> => {
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?latest_release_update__current=${dates}`,
+                    `${LIMS_API_URL}/datasets/?latest_release_update=${dates}`,
                 )
             },
         },
