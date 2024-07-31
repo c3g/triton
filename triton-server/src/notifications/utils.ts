@@ -12,11 +12,15 @@ export const mockDataset: TritonDataset = {
     latest_release_update: new Date(),
 }
 
-export const formatDateAndTime = (date: Date): string => {
-    const cleanedDate = new Date(date)
+export const formatDateAndTime = (date?: Date): string => {
+    const cleanedDate = date ?? new Date()
+    if (!date) {
+        const hours = new Date().getHours() - 1
+        cleanedDate.setHours(hours)
+    }
     return (
         cleanedDate.toLocaleDateString() +
-        " " +
-        cleanedDate.toLocaleTimeString()
+        "T" +
+        cleanedDate.toLocaleTimeString().split(" ")[0]
     )
 }
