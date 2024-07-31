@@ -203,3 +203,24 @@ export const extendStagingRequest =
         const response = await apiTriton.extendStagingRequest(datasetID)
         dispatch(RequestsStateActions.setRequests([response]))
     }
+
+export const fetchReadsPerSample =
+    (datasetId: TritonDataset["id"]) =>
+    async (dispatch: AppDispatch, getState: () => RootState) => {
+        const dataset = getState().datasetsState.datasetsById[datasetId]
+        if (dataset?.readsPerSample) {
+            return dataset?.readsPerSample
+        }
+
+        const readsPerSample =
+            await apiTriton.getReadsPerSampleForDataset(datasetId)
+        // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
+        dispatch(
+            DatasetsStateActions.setReadsPerSample({
+                datasetId,
+                readsPerSample,
+            }),
+        )
+
+        return readsPerSample
+    }

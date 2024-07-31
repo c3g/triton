@@ -119,9 +119,11 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
                 )
             },
-            listByReleasedUpdates: async (): Promise<ListResponse<Dataset>> => {
+            listByReleasedUpdates: async (
+                dates: string,
+            ): Promise<ListResponse<Dataset>> => {
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?latest_release_update=latest`,
+                    `${LIMS_API_URL}/datasets/?latest_release_update=${dates}`,
                 )
             },
         },
@@ -161,6 +163,15 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
+                )
+            },
+        },
+        Metrics: {
+            getReadsPerSampleForDataset: async (
+                datasetId: Dataset["id"],
+            ): Promise<ListResponse<Metric>> => {
+                return await axios.get(
+                    `${LIMS_API_URL}/metrics/?readset__dataset__id__in=${datasetId}&limit=100000&name=nb_reads&metric_group=qc`,
                 )
             },
         },

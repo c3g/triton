@@ -1,4 +1,5 @@
 import { Button, Col, Modal, Row, Space, Spin } from "antd"
+import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { DownloadRequest, DownloadRequestType } from "@api/api-types"
@@ -12,9 +13,11 @@ import {
 import { selectConstants } from "@store/constants"
 import { DataSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
-import { ActionDropdown } from "@components/."
+import { ActionDropdown, ReadsPerSample } from "@components/."
 import { selectRequestOfDatasetId } from "@store/selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
+import { Provider } from "react-redux"
+import { store } from "@store/store"
 
 interface DatasetCardProps {
     datasetID: number
@@ -237,9 +240,28 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         return `Expires: ${expiry_date ? new Date(expiry_date).toLocaleDateString() : "-"}`
     }, [])
 
+    const showModal = useCallback(() => {
+        Modal.info({
+            title: `Reads Per Sample of dataset #${datasetID}`,
+            content: (
+                <Provider store={store}>
+                    <ReadsPerSample datasetId={datasetID} />
+                </Provider>
+            ),
+            width: "80%",
+        })
+    }, [datasetID])
+
     return dataset ? (
         <Row justify={"space-between"} gutter={32}>
-            <Col span={3}>Dataset #{dataset.id}</Col>
+            <Col span={3}>
+                <Button
+                    type={"text"}
+                    icon={<InfoCircleOutlined />}
+                    onClick={showModal}
+                />
+                <>Dataset #{dataset.id}</>
+            </Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
                     <Col key={`requestDetails-${i}`} span={3}>
