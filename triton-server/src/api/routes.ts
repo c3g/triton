@@ -7,7 +7,14 @@
 
 import express from "express"
 import asyncHandler from "express-async-handler"
-import { getUserDetails, isUserAuthenticated } from "../magic/magic_api"
+import { getUserDetails, isUserAuthenticated } from "@api/magic/magic_api"
+import {
+    listDatasetFilesByDataset,
+    listDatasetsByIds,
+    listReadsetsByDataset,
+    listRequests,
+    listRunsByExternalProjectId,
+} from "@api/freezeman/datasets"
 import {
     ApiReply,
     IsLoggedInData,
@@ -18,14 +25,7 @@ import {
     TritonRequest,
     TritonRun,
     User,
-} from "./api-types"
-import {
-    listDatasetFilesByDataset,
-    listDatasetsByIds,
-    listReadsetsByDataset,
-    listRequests,
-    listRunsByExternalProjectId,
-} from "./datasets"
+} from "../types/api"
 import { listUserProjects } from "./project"
 
 const router = express.Router()

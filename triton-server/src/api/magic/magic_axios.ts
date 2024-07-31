@@ -17,7 +17,7 @@
  */
 import axios, { AxiosInstance } from "axios"
 import config from "../../../config"
-import { logger } from "../../logger"
+import { logger } from "@core/logger"
 import { HttpsProxyAgent } from "https-proxy-agent"
 
 /** Typing for the auth response */

@@ -4,7 +4,7 @@ import {
     ProjectUsers,
     UserDetails,
     UserProjects,
-} from "./magic-types"
+} from "../../types/magic"
 import getAuthorizedAxios from "./magic_axios"
 
 /**

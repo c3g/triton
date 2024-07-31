@@ -5,7 +5,7 @@
  */
 
 // import util from 'util'
-import config from "../../config"
+import config from "../../../config"
 import { Kysely, Transaction } from "kysely"
 import {
     Database,
@@ -16,7 +16,7 @@ import {
     DownloadRequestID,
     DownloadDatasetID,
     Contact,
-} from "./download-types"
+} from "../../types/download"
 import { createSQLite } from "./sqlite-database"
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>

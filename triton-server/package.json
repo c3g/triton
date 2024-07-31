@@ -68,6 +68,7 @@
         "@types/nodemailer": "^6.4.15",
         "@types/serve-favicon": "^2.5.3",
         "@types/sqlite3": "^3.1.8",
+        "craco": "^0.0.3",
         "globals": "^15.6.0",
         "nodemon": "^3.0.1",
         "pino-pretty": "^10.0.1",

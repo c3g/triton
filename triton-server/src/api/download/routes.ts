@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
-import { dataHandler, errorHandler } from "./handlers"
-import { defaultDatabaseActions } from "./actions"
-import { getFreezeManAuthenticatedAPI } from "../freezeman/api"
-import { NewDownloadFile } from "./download-types"
+import { dataHandler, errorHandler } from "@notifications/emails/handlers"
+import { defaultDatabaseActions } from "@database/download/actions"
+import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
+import { NewDownloadFile } from "../../types/download"
 import {
     TritonCreateRequestBody,
     TritonCreateRequestResponse,
-} from "./api-types"
+} from "../../types/api/"
 import path from "path"
 
 const router = express.Router()

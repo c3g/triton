@@ -2,7 +2,7 @@
  * handlers.js
  */
 import { Response } from "express"
-import { logger } from "../logger"
+import { logger } from "@core/logger"
 
 export const errorHandler =
     (res: Response) =>

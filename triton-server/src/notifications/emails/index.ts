@@ -1,41 +1,50 @@
-import cron from "node-cron"
+/*
+ * email.ts
+ */
 import nodemailer from "nodemailer"
-import * as email from "./contact-service"
-import { TritonDataset } from "./api/api-types"
-import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
+import { spawn } from "child_process"
+import { logger } from "@core/logger"
+import { TritonDataset } from "../../types/api"
+import * as email from "../contact-service"
+import { formatDateAndTime, mockDataset } from "@notifications/utils"
 
-export const start = () => {
-    console.info("Notification service started to run.")
-    const task = cron.schedule("0 * * * *", async () => {
-        console.info("Notification service is running at an hourly pace.")
-
-        let releasedDatasets: TritonDataset[] = []
-
-        const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-        const datasetsResponse =
-            await freezemanApi.Dataset.listByReleasedUpdates()
-
-        releasedDatasets = datasetsResponse.data.results.map((dataset) => {
-            return {
-                external_project_id: dataset.external_project_id,
-                id: dataset.id,
-                lane: dataset.lane,
-                readset_count: dataset.readset_count,
-                released_status_count: dataset.released_status_count,
-                run_name: dataset.run_name,
-                latest_release_update: dataset.latest_release_update,
-                blocked_status_count: dataset.blocked_status_count,
-                project_name: dataset.project_name,
-            }
-        })
-
-        sendNotificationEmail(releasedDatasets)
+export async function sendEmail(
+    from: string,
+    to: string,
+    subject: string,
+    content: string,
+) {
+    const sendmail = spawn("sendmail", ["-t"], {
+        stdio: ["pipe", "ignore", "pipe"],
     })
-    task.start()
-
-    return () => {
-        task.stop()
+    try {
+        await new Promise<void>((resolve, reject) => {
+            sendmail.stderr.on("data", (data: string) => {
+                logger.error(data, "[sendmail]")
+                reject(data)
+            })
+            sendmail.on("exit", () => resolve())
+            sendmail.on("disconnect", () => resolve())
+            sendmail.on("close", () => resolve())
+            sendmail.on("error", (err) => {
+                logger.error(err, "[sendmail]")
+                reject(err)
+            })
+            sendmail.stdin.write(
+                `To: ${to}\nSubject: ${subject}\nMIME-Version: 1.0\nContent-Type: text/html\n${content}`,
+                (err) => {
+                    if (err) {
+                        logger.error(err, "[sendmail]")
+                        reject(err)
+                    } else {
+                        logger.debug(`Finished writing to ${to}`, "[sendmail]")
+                    }
+                },
+            )
+            sendmail.stdin.end()
+        })
+    } finally {
+        sendmail.kill()
     }
 }
 
@@ -127,25 +136,4 @@ export const sendNotificationEmailTest = async (
             }
         })
     })
-}
-
-const mockDataset: TritonDataset = {
-    id: 987654,
-    lane: 123546,
-    external_project_id: "project-id-testing",
-    project_name: "project name",
-    run_name: "test name",
-    readset_count: 19,
-    released_status_count: 99,
-    blocked_status_count: 64,
-    latest_release_update: new Date(),
-}
-
-const formatDateAndTime = (date: Date): string => {
-    const cleanedDate = new Date(date)
-    return (
-        cleanedDate.toLocaleDateString() +
-        " " +
-        cleanedDate.toLocaleTimeString()
-    )
 }

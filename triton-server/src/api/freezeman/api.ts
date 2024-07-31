@@ -5,9 +5,9 @@ import type {
     FMSList,
     Project,
     Readset,
-} from "../../../../triton-types/models/freezeman"
+} from "../../types/freezeman"
 import config from "../../../config"
-import { logger } from "../../logger"
+import { logger } from "@core/logger"
 import { getAccessToken, handle401 } from "./authToken"
 
 const LIMS_API_URL = config.lims.url

@@ -2,7 +2,7 @@ import Express from "express"
 import asyncHandler from "express-async-handler"
 import { getUserDetails, isUserAuthenticated } from "./magic_api"
 import config from "../../../config"
-import { logger } from "../../logger"
+import { logger } from "@core/logger"
 
 /**
  * This module handles the user login in Triton.
