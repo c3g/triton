@@ -4,7 +4,16 @@
         "module": "commonjs",
         "outDir": "dist",
         "strict": true,
-        "baseUrl": "./",
+        "baseUrl": "./src",
+        "noImplicitAny": false,
+        "paths": {
+            "@types/*": ["./types/*"],
+            "@api/*": ["./api/*"],
+            "@core/*": ["./core/*"],
+            "@notifications/*": ["./notifications/*"],
+            "@service/*": ["./service/*"],
+            "@database/*": ["./database/*"]
+        },
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "sourceMap": true,

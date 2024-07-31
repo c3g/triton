@@ -11,17 +11,18 @@ import helmet from "helmet"
 import { expressCspHeader, SELF } from "express-csp-header"
 import session from "express-session"
 import flash from "connect-flash"
-import config from "../config"
-import ApiRouter from "./api/api-routes"
-import { UserDetails } from "./magic/magic-types"
-import MagicAuthMiddleware from "./magic/magic_middleware"
+import config from "../../config"
+import ApiRouter from "@api/routes"
+import MagicAuthMiddleware from "@api/magic/magic_middleware"
+import { UserDetails } from "../types/magic"
+
 // File staging DB
-import DownloadRouter from "./download/routes"
+import DownloadRouter from "@api/download/routes"
 import * as sqlite3 from "sqlite3"
 import sqliteStoreFactory from "express-session-sqlite"
 import cors from "cors"
-import contactService from "./contact-service"
-import * as notification from "./notification"
+import contactService from "@notifications/contact-service"
+import * as notification from "@notifications/notification-service"
 
 const SQLiteStore = sqliteStoreFactory(session)
 

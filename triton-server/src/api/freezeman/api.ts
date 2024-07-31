@@ -3,12 +3,11 @@ import type {
     Dataset,
     DatasetFile,
     FMSList,
-    Metric,
     Project,
     Readset,
-} from "./models"
-import config from "../../config"
-import { logger } from "../logger"
+} from "../../types/freezeman"
+import config from "../../../config"
+import { logger } from "@core/logger"
 import { getAccessToken, handle401 } from "./authToken"
 
 const LIMS_API_URL = config.lims.url

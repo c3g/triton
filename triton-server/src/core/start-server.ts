@@ -6,10 +6,10 @@
 
 import * as http from "http"
 import { Express } from "express"
-import server from "../src/server"
-import { initializeFreezemanAPIAuthorization } from "./freezeman/authToken"
-import { defaultDatabaseActions } from "./download/actions"
-import * as notification from "./notification"
+import server from "./server"
+import { initializeFreezemanAPIAuthorization } from "@api/freezeman/authToken"
+import { defaultDatabaseActions } from "@database/download/actions"
+import * as notification from "@notifications/notification-service"
 import { logger } from "./logger"
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production"

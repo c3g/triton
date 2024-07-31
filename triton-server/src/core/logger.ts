@@ -3,7 +3,7 @@ import pino from "pino"
 import asyncHandler from "express-async-handler"
 import Express from "express"
 
-import config from "../config"
+import config from "../../config"
 
 export const logger = pino({
     transport: {

@@ -1,8 +1,8 @@
-import { Database } from "./download-types"
+import { Database } from "../../types/download"
 import SQLite from "better-sqlite3"
 import { readFileSync } from "fs"
 import { Kysely, SqliteDialect, sql } from "kysely"
-import { logger } from "../logger"
+import { logger } from "@core/logger"
 
 export async function createSQLite(
     path: string,
