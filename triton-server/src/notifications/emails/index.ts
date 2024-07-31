@@ -8,6 +8,40 @@ import { TritonDataset } from "../../types/api"
 import * as email from "../contact-service"
 import { formatDateAndTime, mockDataset } from "@notifications/utils"
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:triton-server/src/notification.ts
+export const start = () => {
+    console.info("Notification service started to run.")
+    const task = cron.schedule("0 * * * *", async () => {
+        console.info("Notification service is running at an hourly pace.")
+
+        let releasedDatasets: TritonDataset[] = []
+
+        const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+        const datasetsResponse =
+            await freezemanApi.Dataset.listByReleasedUpdates(
+                formatDateAndTime(),
+            )
+
+        releasedDatasets = datasetsResponse.data.results.map((dataset) => {
+            return {
+                external_project_id: dataset.external_project_id,
+                id: dataset.id,
+                lane: dataset.lane,
+                readset_count: dataset.readset_count,
+                released_status_count: dataset.released_status_count,
+                run_name: dataset.run_name,
+                latest_release_update: dataset.latest_release_update,
+                blocked_status_count: dataset.blocked_status_count,
+                project_name: dataset.project_name,
+            }
+        })
+
+        sendNotificationEmail(releasedDatasets)
+=======
+>>>>>>> bf30e21 (step 1 of 3 for code refactoring at the server level)
 export async function sendEmail(
     from: string,
     to: string,
@@ -16,6 +50,10 @@ export async function sendEmail(
 ) {
     const sendmail = spawn("sendmail", ["-t"], {
         stdio: ["pipe", "ignore", "pipe"],
+<<<<<<< HEAD
+=======
+>>>>>>> 09d35db (step 1 of 3 for code refactoring at the server level):triton-server/src/notifications/emails/index.ts
+>>>>>>> bf30e21 (step 1 of 3 for code refactoring at the server level)
     })
     try {
         await new Promise<void>((resolve, reject) => {
@@ -133,3 +171,34 @@ export const sendNotificationEmailTest = async (
         })
     })
 }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:triton-server/src/notification.ts
+
+const mockDataset: TritonDataset = {
+    id: 987654,
+    lane: 123546,
+    external_project_id: "project-id-testing",
+    project_name: "project name",
+    run_name: "test name",
+    readset_count: 19,
+    released_status_count: 99,
+    blocked_status_count: 64,
+    latest_release_update: new Date(),
+}
+
+const formatDateAndTime = (date?: Date): string => {
+    const cleanedDate = date ?? new Date()
+    if (!date) {
+        const hours = new Date().getHours() - 1
+        cleanedDate.setHours(hours)
+    }
+    return (
+        cleanedDate.toLocaleDateString() +
+        "T" +
+        cleanedDate.toLocaleTimeString().split(" ")[0]
+    )
+}
+=======
+>>>>>>> 09d35db (step 1 of 3 for code refactoring at the server level):triton-server/src/notifications/emails/index.ts
+>>>>>>> bf30e21 (step 1 of 3 for code refactoring at the server level)
