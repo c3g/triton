@@ -3,6 +3,7 @@ import type {
     Dataset,
     DatasetFile,
     FMSList,
+    Metric,
     Project,
     Readset,
 } from "../../types/freezeman"

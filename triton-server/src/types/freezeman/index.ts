@@ -5,6 +5,7 @@ export {
     DatasetID,
     DerivedSampleID,
     FMSList,
+    Metric,
     Project,
     ProjectID,
     Readset,

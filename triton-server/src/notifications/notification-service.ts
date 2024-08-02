@@ -2,6 +2,7 @@ import cron from "node-cron"
 import { TritonDataset } from "../types/api"
 import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
 import { sendNotificationEmail } from "./emails"
+import { formatDateAndTime } from "./utils"
 
 export const start = () => {
     console.info("Notification service started to run.")
@@ -13,7 +14,9 @@ export const start = () => {
         const freezemanApi = await getFreezeManAuthenticatedAPI()
 
         const datasetsResponse =
-            await freezemanApi.Dataset.listByReleasedUpdates()
+            await freezemanApi.Dataset.listByReleasedUpdates(
+                formatDateAndTime(),
+            )
 
         releasedDatasets = datasetsResponse.data.results.map((dataset) => {
             return {
