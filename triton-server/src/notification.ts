@@ -52,24 +52,19 @@ export const sendNotificationEmail = async (
                 await send(
                     `${subject}`,
                     `${subject}.<br/><br/>
-                    The dataset can be downloaded using the Triton platform<br/>
+                    The dataset can be downloaded using the data portal<br/>
                     Here are the information pertaining to the released dataset:<br/>
-                        -   Dataset ID: ${dataset.id}<br/>
-                        -   Dataset project id: ${
-                            dataset.external_project_id
-                        }<br/>
-                        -   Dataset project name: ${dataset.project_name}<br/>
-                        -   Dataset Lane: ${dataset.lane}<br/>
-                        -   Readset count within the Dataset: ${
-                            dataset.readset_count
-                        }<br/>
-                        -   Readset released status count: ${
+                        -   Project ID: ${dataset.external_project_id}<br/>
+                        -   Run Name: ${dataset.run_name}<br/>
+                        -   Lane: ${dataset.lane}<br/>
+                        -   Total Readset count: ${dataset.readset_count}<br/>
+                        -   Total Readsets released: ${
                             dataset.released_status_count
                         }<br/>
-                        -   Readset blocked status count: ${
+                        -   Total Readsets blocked: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
+                        -   Latest dataset release date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
                     You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
                     This is an automated email, do not reply back.`,
