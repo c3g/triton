@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Space, Spin } from "antd"
+import { Button, Col, Modal, notification, Row, Space, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -132,9 +132,21 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         action: {
                             name: "Unstage dataset",
                             actionCall: () =>
-                                dispatch(
-                                    deleteDownloadRequest(datasetID),
-                                ).catch((e) => console.error(e)),
+                                dispatch(deleteDownloadRequest(datasetID)).then(
+                                    () => {
+                                        notification.success({
+                                            message: "Dataset Unstaging",
+                                            description: `Dataset #${datasetID} will be unstaged shortly.`,
+                                        })
+                                    },
+                                    (e) => {
+                                        notification.error({
+                                            message: "Error Unstaging Dataset",
+                                            description: `Dataset #${datasetID} could not be unstaged.`,
+                                        })
+                                        console.error(e)
+                                    },
+                                ),
                         },
                         icon: (
                             <CloseCircleOutlined style={{ color: "#c9162b" }} />
