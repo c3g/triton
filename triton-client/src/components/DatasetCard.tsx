@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Space, Spin } from "antd"
+import { Button, Col, Modal, Row, Space, Spin, Typography } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -242,7 +242,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
     const showModal = useCallback(() => {
         Modal.info({
-            title: `Reads Per Sample of dataset #${datasetID}`,
+            title: `Reads Per Sample of dataset ${dataset?.identifier}`,
             content: (
                 <Provider store={store}>
                     <ReadsPerSample datasetId={datasetID} />
@@ -250,17 +250,27 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
             ),
             width: "80%",
         })
-    }, [datasetID])
+    }, [datasetID, dataset?.identifier])
 
     return dataset ? (
-        <Row justify={"space-between"} gutter={32}>
-            <Col span={3}>
+        <Row justify={"space-between"} gutter={32} align={"middle"}>
+            <Col span={1}>
                 <Button
                     type={"text"}
                     icon={<InfoCircleOutlined />}
                     onClick={showModal}
                 />
-                <>Dataset #{dataset.id}</>
+            </Col>
+            <Col span={3} pull={2}>
+                <Typography.Text
+                    ellipsis={{
+                        suffix: dataset.identifier.slice(
+                            dataset.identifier.search(/L[0-9]+$/),
+                        ),
+                    }}
+                >
+                    {dataset.identifier}
+                </Typography.Text>
             </Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(

@@ -62,7 +62,7 @@ export interface TritonProject {
 }
 
 export interface TritonDataset extends Omit<Dataset, "files"> {
-    identifier: `P${string}-R${string}-L${string}` // Project ID, Run Name, Lane number
+    identifier: `${TritonProject["external_id"]}-${TritonRun["name"]}-L${TritonDataset["lane"]}` // Project ID, Run Name, Lane number
 }
 
 export interface TritonRequest extends DownloadRequest {}
