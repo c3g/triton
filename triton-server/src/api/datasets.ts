@@ -60,7 +60,10 @@ export async function listDatasetsByIds(
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
     const datasets = datasetsResponse.data.results
-    return [...datasets]
+    return datasets.map((dataset) => ({
+        identifier: `P${dataset.external_project_id}-R${dataset.run_name}-L${dataset.lane}`,
+        ...dataset,
+    }))
 }
 
 export async function listRequests(
