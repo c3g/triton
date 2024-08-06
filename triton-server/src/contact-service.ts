@@ -83,7 +83,8 @@ export function start() {
                             await send(
                                 `${subject}`,
                                 `${subject}.<br/>
-                        The dataset can be downloaded using ${request.type} using the credential provided to you.`
+                        The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
+                        If you forgot your credential, you can reset your password in the data portal.`,
                             )
                         }
                     )

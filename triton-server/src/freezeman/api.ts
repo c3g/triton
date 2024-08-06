@@ -124,11 +124,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                 dates: string,
             ): Promise<ListResponse<Dataset>> => {
                 return await axios.get(
-<<<<<<< HEAD
                     `${LIMS_API_URL}/datasets/?latest_release_update=${dates}`,
-=======
-                    `${LIMS_API_URL}/datasets/?latest_release_update=latest`
->>>>>>> 9ceffab (added triton notification service, to test on qc)
                 )
             },
         },

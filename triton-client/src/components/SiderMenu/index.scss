@@ -13,3 +13,10 @@
     visibility: "hidden";
     opacity: 0;
 }
+
+.sider-project-list {
+    div {
+        display: grid;
+        align-content: space-between;
+    }
+}
