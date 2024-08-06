@@ -20,17 +20,29 @@ export default function DatasetList({ runName }: DatasetListProps) {
                 />
             )
         if (datasetIDs.length > 0) {
-            return datasetIDs.map((datasetID) => {
+            return datasetIDs.map((datasetID, index) => {
                 return (
-                    <DatasetCard key={datasetID} datasetID={datasetID} />
+                    <>
+                        <DatasetCard key={datasetID} datasetID={datasetID} />
+                        {index < datasetIDs.length - 1 ? (
+                            <Divider style={{ margin: "0.5rem 0" }} />
+                        ) : null}
+                    </>
                 )
             })
         }
     }, [datasetIDs])
 
     return (
-        <table style={{ width: '100%' }}>
+        <div
+            className="data-sets-container"
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.25rem",
+            }}
+        >
             {renderDatasets}
-        </table>
+        </div>
     )
 }
