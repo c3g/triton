@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Space, Spin, Typography } from "antd"
+import { Button, Col, Modal, Row, Space, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -261,16 +261,17 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     onClick={showModal}
                 />
             </Col>
-            <Col span={3} pull={2}>
-                <Typography.Text
-                    ellipsis={{
-                        suffix: dataset.identifier.slice(
-                            dataset.identifier.search(/L[0-9]+$/),
-                        ),
+            <Col span={3} pull={1}>
+                <div
+                    style={{
+                        overflow: "hidden",
+                        textWrap: "nowrap",
+                        textOverflow: "ellipsis",
+                        direction: "rtl",
                     }}
                 >
                     {dataset.identifier}
-                </Typography.Text>
+                </div>
             </Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
