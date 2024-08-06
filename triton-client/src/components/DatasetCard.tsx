@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Space, Spin } from "antd"
+import { Button, Modal, Space, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -253,15 +253,15 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     }, [datasetID, dataset?.identifier])
 
     return dataset ? (
-        <Row justify={"space-between"} gutter={32} align={"middle"}>
-            <Col span={1}>
+        <tr>
+            <td style={{ width: '1rem' }}>
                 <Button
                     type={"text"}
                     icon={<InfoCircleOutlined />}
                     onClick={showModal}
                 />
-            </Col>
-            <Col span={3} pull={1}>
+            </td>
+            <td style={{ width: '16rem', textAlign: 'left' }}>
                 <div
                     style={{
                         overflow: "hidden",
@@ -272,20 +272,20 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                 >
                     {dataset.identifier}
                 </div>
-            </Col>
+            </td>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
-                    <Col key={`requestDetails-${i}`} span={3}>
+                    <td key={i} style={{ width: '12rem' }}>
                         {r}
-                    </Col>,
+                    </td>,
                 )
                 return cols
             }, [])}
-            <Col span={3}>{activeRequest && expiration}</Col>
-            <Col span={3} style={{ textAlign: "right" }}>
+            <td style={{ width: '7rem' }}>{activeRequest ? expiration : ''}</td>
+            <td style={{ width: '5rem', textAlign: 'end' }}>
                 {totalSize ? <DataSize size={totalSize} /> : <Spin />}
-            </Col>
-        </Row>
+            </td>
+        </tr>
     ) : (
         <Spin />
     )
