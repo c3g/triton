@@ -40,13 +40,13 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
                 config.headers = { Authorization: `Bearer ${token}` }
             } else {
                 logger.warn(
-                    `token is currently undefined. Freezeman API might fail`
+                    `token is currently undefined. Freezeman API might fail`,
                 )
             }
             return config
         },
         undefined,
-        { synchronous: true }
+        { synchronous: true },
     )
 
     // This interceptor catches 401 UNAUTHORIZED errors from freezeman and
@@ -74,7 +74,7 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
         } = res
         logger.debug(
             { status, data, config: { baseURL, url, method, params } },
-            "Freezeman Response"
+            "Freezeman Response",
         )
         return res
     })
@@ -87,37 +87,37 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
         Project: {
             list: async (
                 ids: readonly string[],
-                external: boolean = true
+                external: boolean = true,
             ): Promise<ListResponse<Project>> =>
                 await axios.get(
                     `${LIMS_API_URL}/projects/?${
                         external ? "external_id__in" : "id__in"
-                    }=${ids.join(",")}`
+                    }=${ids.join(",")}`,
                 ),
         },
         Dataset: {
             listByExternalProjectIds: async (
-                externalProjectIds: readonly string[]
+                externalProjectIds: readonly string[],
             ): Promise<ListResponse<Dataset>> => {
                 if (externalProjectIds.length === 0) {
                     throw new Error(
-                        "Must provide at least one project id to list datasets"
+                        "Must provide at least one project id to list datasets",
                     )
                 }
                 return await axios.get(
                     `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(
-                        ","
-                    )}`
+                        ",",
+                    )}`,
                 )
             },
             list: async (ids: string[]): Promise<ListResponse<Dataset>> => {
                 if (ids.length === 0) {
                     throw new Error(
-                        "Must provide at least one project id to list datasets"
+                        "Must provide at least one project id to list datasets",
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`
+                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
                 )
             },
             listByReleasedUpdates: async (
@@ -130,40 +130,40 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
         },
         DatasetFile: {
             list: async (
-                ids: readonly number[]
+                ids: readonly number[],
             ): Promise<ListResponse<DatasetFile>> => {
                 if (ids.length === 0)
                     throw new Error("Must provide at least one id")
 
                 return await axios.get(
                     `${LIMS_API_URL}/dataset-files/?id__in=${ids.join(
-                        ","
-                    )}&limit=100000`
+                        ",",
+                    )}&limit=100000`,
                 )
             },
             listByReadsetIds: async (
-                readsetIds: readonly number[]
+                readsetIds: readonly number[],
             ): Promise<ListResponse<DatasetFile>> => {
                 if (readsetIds.length === 0)
                     throw new Error("Must provide at least one readset id")
 
                 return await axios.get(
                     `${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(
-                        ","
-                    )}&limit=100000`
+                        ",",
+                    )}&limit=100000`,
                 )
             },
         },
         Readset: {
             listByDatasetId: async (
-                datasetId: Dataset["id"]
+                datasetId: Dataset["id"],
             ): Promise<ListResponse<Readset>> => {
                 const params = [
                     `dataset__id__in=${datasetId}`,
                     "has_released_files=true",
                 ]
                 return await axios.get(
-                    `${LIMS_API_URL}/readsets/?${params.join("&")}`
+                    `${LIMS_API_URL}/readsets/?${params.join("&")}`,
                 )
             },
         },
@@ -182,7 +182,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
 export type AuthenticatedAPI = ReturnType<typeof getAuthenticatedAPI>
 
 export const getOrCreateAxiosInstance = async (
-    accessToken?: string
+    accessToken?: string,
 ): Promise<AxiosInstance> => {
     if (axiosInstance !== undefined) {
         return axiosInstance
@@ -193,7 +193,7 @@ export const getOrCreateAxiosInstance = async (
 }
 
 export async function getFreezeManAuthenticatedAPI(
-    accessToken?: string
+    accessToken?: string,
 ): Promise<AuthenticatedAPI> {
     try {
         const instance = await getOrCreateAxiosInstance(accessToken)

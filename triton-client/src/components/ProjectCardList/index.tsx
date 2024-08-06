@@ -16,14 +16,16 @@ export default function ProjectCardList({ projects }: ProjectCardListProps) {
                 height: "90vh",
                 overflow: "auto",
                 border: "1px solid rgba(140, 140, 140, 0.35)",
-            }}>
+            }}
+        >
             <InfiniteScroll
-                loader={(<Divider plain/>)}
+                loader={<Divider plain />}
                 dataLength={items.length}
                 hasMore={items.length < 100}
                 endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
                 scrollableTarget="scrollableDiv"
-                next={() => console.log("All the projects have been loaded.")}>
+                next={() => console.log("All the projects have been loaded.")}
+            >
                 <List
                     className="mgc-projects-list"
                     size="large"

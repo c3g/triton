@@ -16,11 +16,13 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
         },
         {
             target: ".mgc-header-logo",
-            content: "This is the App logo, you can return to the home page with it.",
+            content:
+                "This is the App logo, you can return to the home page with it.",
         },
         {
             target: ".mgc-projects-list",
-            content: "These are your projects, Close this dialog and click on a project from this list to continue.",
+            content:
+                "These are your projects, Close this dialog and click on a project from this list to continue.",
         },
     ]
     return (
@@ -54,19 +56,52 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                 <Typography.Title level={2}>Guide</Typography.Title>
                 <Content className="faq-container">
                     <div className="faq-section-container">
-                        <Typography.Title level={5}>1. The Triton app landing page is where you will always start.</Typography.Title>
-                        <Typography.Title level={5}>2. The App logo will help you return to this page when you click on it.</Typography.Title>
-                        <Typography.Title level={5}>3. These are your projects, Close this dialog and click on a project from this list to continue.</Typography.Title>
+                        <Typography.Title level={5}>
+                            1. The Triton app landing page is where you will
+                            always start.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            2. The App logo will help you return to this page
+                            when you click on it.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            3. These are your projects, Close this dialog and
+                            click on a project from this list to continue.
+                        </Typography.Title>
                     </div>
                     <div className="faq-section-container">
-                        <Typography.Title level={5}>4. The second page will have several status of available space for Globus and SFTP storage allocated to your project.</Typography.Title>
-                        <Typography.Title level={5}>5. You will be able to reset SFTP or Globus password in the next page. It will be on the top right corner of the next page.</Typography.Title>
-                        <Typography.Title level={5}>6. You will see the datasets that have been released in Freezeman, relating to the project, will be displayed in a collapsable container of the next page.</Typography.Title>
+                        <Typography.Title level={5}>
+                            4. The second page will have several status of
+                            available space for Globus and SFTP storage
+                            allocated to your project.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            5. You will be able to reset SFTP or Globus password
+                            in the next page. It will be on the top right corner
+                            of the next page.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            6. You will see the datasets that have been released
+                            in Freezeman, relating to the project, will be
+                            displayed in a collapsable container of the next
+                            page.
+                        </Typography.Title>
                     </div>
                     <div className="faq-section-container">
-                        <Typography.Title level={5}>7. You will be able to stage and/or unstage the files on either SFTP or GLOBUS.</Typography.Title>
-                        <Typography.Title level={5}>8. Once you stage the files, you will a fixed amount of time (7 days) to download the files before they get automatically unstaged from the server.</Typography.Title>
-                        <Typography.Title level={5}>9. There is an info icon associated to each dataset released. The graph can help you visualize, in more details, the amount of readsets/datasets released.</Typography.Title>
+                        <Typography.Title level={5}>
+                            7. You will be able to stage and/or unstage the
+                            files on either SFTP or GLOBUS.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            8. Once you stage the files, you will a fixed amount
+                            of time (7 days) to download the files before they
+                            get automatically unstaged from the server.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            9. There is an info icon associated to each dataset
+                            released. The graph can help you visualize, in more
+                            details, the amount of readsets/datasets released.
+                        </Typography.Title>
                     </div>
                 </Content>
             </Content>
