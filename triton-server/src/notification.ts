@@ -29,7 +29,6 @@ export const start = () => {
                 latest_release_update: dataset.latest_release_update,
                 blocked_status_count: dataset.blocked_status_count,
                 project_name: dataset.project_name,
-                identifier: `${dataset.external_project_id}-${dataset.run_name}-L${dataset.lane}`,
             }
         })
 
@@ -138,7 +137,6 @@ const mockDataset: TritonDataset = {
     released_status_count: 99,
     blocked_status_count: 64,
     latest_release_update: new Date(),
-    identifier: "P987654-test name-L123546",
 }
 
 const formatDateAndTime = (date?: Date): string => {

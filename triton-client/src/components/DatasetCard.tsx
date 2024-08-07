@@ -242,7 +242,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
     const showModal = useCallback(() => {
         Modal.info({
-            title: `Reads Per Sample of dataset ${dataset?.identifier}`,
+            title: `Reads Per Sample for run '${dataset?.run_name}' at lane ${dataset?.lane} for project '${project?.external_name}'`,
             content: (
                 <Provider store={store}>
                     <ReadsPerSample datasetId={datasetID} />
@@ -250,32 +250,22 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
             ),
             width: "80%",
         })
-    }, [datasetID, dataset?.identifier])
+    }, [datasetID, dataset?.run_name, dataset?.lane])
 
     return dataset ? (
         <Row justify={"space-between"} gutter={32} align={"middle"}>
-            <Col span={1}>
+            <Col span={4}>
                 <Button
                     type={"text"}
                     icon={<InfoCircleOutlined />}
                     onClick={showModal}
                 />
+                {`Dataset #${datasetID}`}
             </Col>
-            <Col span={3} pull={1}>
-                <div
-                    style={{
-                        overflow: "hidden",
-                        textWrap: "nowrap",
-                        textOverflow: "ellipsis",
-                        direction: "rtl",
-                    }}
-                >
-                    {dataset.identifier}
-                </div>
-            </Col>
+            <Col span={2} pull={1}>{`Lane ${dataset.lane}`}</Col>
             {requestDetails.reduce<ReactNode[]>((cols, r, i) => {
                 cols.push(
-                    <Col key={`requestDetails-${i}`} span={3}>
+                    <Col key={`requestDetails-${i}`} span={4}>
                         {r}
                     </Col>,
                 )
