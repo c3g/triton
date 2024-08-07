@@ -196,7 +196,7 @@ export async function createActions(db: Kysely<Database>) {
             )
     }
 
-    async function getReleaseNotificationDate() {
+    async function getLatestReleaseNotificationDate() {
         return await db
             .selectFrom("notification_dates")
             .select("last_released_notification_date")
@@ -216,7 +216,7 @@ export async function createActions(db: Kysely<Database>) {
         deleteRequest,
         extendRequest,
         getConstants,
-        getReleaseNotificationDate,
+        getLatestReleaseNotificationDate,
         getRequest,
         getRequestByID,
         insertFiles,

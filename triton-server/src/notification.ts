@@ -15,7 +15,7 @@ export const start = () => {
         console.info("Notification service is running at an hourly pace.")
 
         const db = await defaultDatabaseActions()
-        const lastReleaseDate = (await db.getReleaseNotificationDate())
+        const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
             .last_released_notification_date
 
         const freezemanApi = await getFreezeManAuthenticatedAPI()
