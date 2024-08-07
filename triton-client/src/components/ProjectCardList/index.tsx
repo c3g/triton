@@ -22,7 +22,7 @@ export default function ProjectCardList({ projects }: ProjectCardListProps) {
                 loader={<Divider plain />}
                 dataLength={items.length}
                 hasMore={items.length < 100}
-                endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+                endMessage={<Divider plain>No more projects</Divider>}
                 scrollableTarget="scrollableDiv"
                 next={() => console.log("All the projects have been loaded.")}
             >

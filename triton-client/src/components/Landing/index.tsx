@@ -1,6 +1,6 @@
-import { Typography, Image, FloatButton, Tooltip } from "antd"
+import { Typography, Image, FloatButton, Tooltip, Button } from "antd"
 import { Content } from "antd/es/layout/layout"
-import { FileTextOutlined } from "@ant-design/icons"
+import { FileTextOutlined, InfoCircleOutlined} from "@ant-design/icons"
 import { UserInformationProps } from "./interfaces"
 import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
@@ -57,48 +57,34 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                 <Content className="faq-container">
                     <div className="faq-section-container">
                         <Typography.Title level={5}>
-                            1. The Triton app landing page is where you will
-                            always start.
-                        </Typography.Title>
-                        <Typography.Title level={5}>
-                            2. The App logo will help you return to this page
-                            when you click on it.
-                        </Typography.Title>
-                        <Typography.Title level={5}>
-                            3. These are your projects, Close this dialog and
-                            click on a project from this list to continue.
-                        </Typography.Title>
-                    </div>
-                    <div className="faq-section-container">
-                        <Typography.Title level={5}>
-                            4. The second page will have several status of
+                            1. The released Dataset list page will have several status displayed of
                             available space for Globus and SFTP storage
                             allocated to your project.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            5. You will be able to reset SFTP or Globus password
-                            in the next page. It will be on the top right corner
-                            of the next page.
+                            2. You will be able to reset SFTP or Globus password
+                            in the released Dataset list page. It will be on the top right corner
+                            of the page.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            6. You will see the datasets that have been released
-                            in Freezeman, relating to the project, will be
+                            3. You will see the Dataset list that have been released for download,
+                            relating to the project, will be
                             displayed in a collapsable container of the next
                             page.
                         </Typography.Title>
                     </div>
                     <div className="faq-section-container">
                         <Typography.Title level={5}>
-                            7. You will be able to stage and/or unstage the
-                            files on either SFTP or GLOBUS.
+                            4. You will be able to stage and/or unstage the
+                            datasets on either SFTP or GLOBUS.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            8. Once you stage the files, you will a fixed amount
+                            5. Once the datasets are staged, you will a fixed amount
                             of time (7 days) to download the files before they
                             get automatically unstaged from the server.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            9. There is an info icon associated to each dataset
+                            6. There is an info icon <Button icon={<InfoCircleOutlined />} /> associated to each dataset
                             released. The graph can help you visualize, in more
                             details, the amount of readsets/datasets released.
                         </Typography.Title>
