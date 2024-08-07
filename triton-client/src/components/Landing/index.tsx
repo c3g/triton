@@ -79,9 +79,12 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             datasets on either SFTP or GLOBUS.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            5. Once the datasets are staged, you will a fixed amount
+                            5. You will be able to stage with one of the 2 methods available (via SFTP and/or GLOBUS) for each dataset.
+                            Once the datasets are staged, you will a fixed amount
                             of time (7 days) to download the files before they
                             get automatically unstaged from the server.
+                            It is necessary that you unstage manually (click on the same button again)
+                            the files once you have finished the download in order to continue staging and then download other files.
                         </Typography.Title>
                         <Typography.Title level={5}>
                             6. There is an info icon <Button icon={<InfoCircleOutlined />} /> associated to each dataset
