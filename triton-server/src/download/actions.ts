@@ -203,7 +203,7 @@ export async function createActions(db: Kysely<Database>) {
             .executeTakeFirstOrThrow()
     }
 
-    async function updateReleaseNotificationDate(date: string) {
+    async function updateLatestReleaseNotificationDate(date: string) {
         return await db
             .updateTable("notification_dates")
             .set({ last_released_notification_date: date })
@@ -227,7 +227,7 @@ export async function createActions(db: Kysely<Database>) {
         removeContact,
         resetContactPassword,
         updateNotificationDate,
-        updateReleaseNotificationDate,
+        updateLatestReleaseNotificationDate,
     }
 }
 
