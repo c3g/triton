@@ -5,6 +5,7 @@ import { UserInformationProps } from "./interfaces"
 import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
 import "./index.scss"
+import { Link } from "react-router-dom"
 
 const { Title, Text } = Typography
 
@@ -78,7 +79,8 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             datasets. Unstaging, Stage, Queued and Failed. If
                             you see Queued, it means that the dataset is waiting
                             to have enough space in the disc to start staging.
-                            If you see Failed, you can communicate with
+                            If you see Failed, you can communicate with{" "}
+                            <Link to={""}>{"it.genome@mail.mcgill.ca"}</Link>
                         </Typography.Title>
                         <Typography.Title level={5}>
                             4. There is an info icon {"  "}
