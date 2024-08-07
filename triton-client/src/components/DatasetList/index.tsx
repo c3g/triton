@@ -29,10 +29,8 @@ export default function DatasetList({ runName }: DatasetListProps) {
             return [...datasetIDs]
                 .sort(
                     (a, b) =>
-                        -(
-                            (datasetsByID[b]?.lane ?? 0) -
-                            (datasetsByID[a]?.lane ?? 0)
-                        ),
+                        (datasetsByID[a]?.lane ?? 0) -
+                        (datasetsByID[b]?.lane ?? 0),
                 )
                 .map((datasetID, index) => {
                     return (
