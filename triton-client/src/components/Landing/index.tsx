@@ -1,6 +1,6 @@
 import { Typography, Image, FloatButton, Tooltip, Button } from "antd"
 import { Content } from "antd/es/layout/layout"
-import { FileTextOutlined, InfoCircleOutlined} from "@ant-design/icons"
+import { FileTextOutlined, InfoCircleOutlined } from "@ant-design/icons"
 import { UserInformationProps } from "./interfaces"
 import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
@@ -53,43 +53,39 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                 <Text className="Common-subtitle Landing-user" type="secondary">
                     {isLoggedIn ? `Logged in as ${userName}` : "Logging In.."}
                 </Text>
-                <Typography.Title level={2}>Guide</Typography.Title>
+                <Typography.Title level={2}>How to stage</Typography.Title>
                 <Content className="faq-container">
                     <div className="faq-section-container">
                         <Typography.Title level={5}>
-                            1. The released Dataset list page will have several status displayed of
-                            available space for Globus and SFTP storage
-                            allocated to your project.
+                            1. You will be able to stage and/or unstage the
+                            datasets on either SFTP or GLOBUS. We strongly
+                            suggest to use GLOBUS as it is faster than SFTP.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            2. You will be able to reset SFTP or Globus password
-                            in the released Dataset list page. It will be on the top right corner
-                            of the page.
+                            2. You will be able to stage with either one or the
+                            other of the 2 methods available (via SFTP or
+                            GLOBUS) for each dataset. Once the datasets are
+                            staged, you will a fixed amount of time (7 days) to
+                            download the files before they get automatically
+                            unstaged from the server. It is necessary that you
+                            unstage manually (click on the same button again)
+                            the files once you have finished the download in
+                            order to continue staging and then download other
+                            files.
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            3. You will see the Dataset list that have been released for download,
-                            relating to the project, will be
-                            displayed in a collapsable container of the next
-                            page.
-                        </Typography.Title>
-                    </div>
-                    <div className="faq-section-container">
-                        <Typography.Title level={5}>
-                            4. You will be able to stage and/or unstage the
-                            datasets on either SFTP or GLOBUS.
+                            3. There are 4 request status when staging the
+                            datasets. Unstaging, Stage, Queued and Failed. If
+                            you see Queued, it means that the dataset is waiting
+                            to have enough space in the disc to start staging.
+                            If you see Failed, you can communicate with
                         </Typography.Title>
                         <Typography.Title level={5}>
-                            5. You will be able to stage with one of the 2 methods available (via SFTP and/or GLOBUS) for each dataset.
-                            Once the datasets are staged, you will a fixed amount
-                            of time (7 days) to download the files before they
-                            get automatically unstaged from the server.
-                            It is necessary that you unstage manually (click on the same button again)
-                            the files once you have finished the download in order to continue staging and then download other files.
-                        </Typography.Title>
-                        <Typography.Title level={5}>
-                            6. There is an info icon <Button icon={<InfoCircleOutlined />} /> associated to each dataset
-                            released. The graph can help you visualize, in more
-                            details, the amount of readsets/datasets released.
+                            4. There is an info icon {"  "}
+                            <Button icon={<InfoCircleOutlined />} /> {"  "}
+                            associated to each dataset released. The graph can
+                            help you visualize, in more details, the amount of
+                            readsets/datasets released.
                         </Typography.Title>
                     </div>
                 </Content>
