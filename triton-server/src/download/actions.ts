@@ -196,21 +196,38 @@ export async function createActions(db: Kysely<Database>) {
             )
     }
 
+    async function getReleaseNotificationDate() {
+        return await db
+            .selectFrom("notification_dates")
+            .select("last_released_notification_date")
+            .executeTakeFirstOrThrow()
+    }
+
+    async function updateReleaseNotificationDate(date: string) {
+        return await db
+            .updateTable("notification_dates")
+            .set({ last_released_notification_date: date })
+            .returning("last_released_notification_date")
+            .executeTakeFirstOrThrow()
+    }
+
     return {
-        listRequestByDatasetId,
-        listRequests,
+        createRequest,
+        deleteRequest,
+        extendRequest,
+        getConstants,
+        getReleaseNotificationDate,
         getRequest,
         getRequestByID,
-        createRequest,
-        extendRequest,
-        deleteRequest,
         insertFiles,
         listFilesByDatasetId,
         listReadyContacts,
+        listRequestByDatasetId,
+        listRequests,
         removeContact,
         resetContactPassword,
         updateNotificationDate,
-        getConstants,
+        updateReleaseNotificationDate,
     }
 }
 
