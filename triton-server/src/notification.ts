@@ -97,7 +97,7 @@ export const sendNotificationEmail = async (
                 )
             },
         )
-        await db.updateReleaseNotificationDate(
+        await db.updateLatestReleaseNotificationDate(
             dataset.latest_release_update.toISOString(),
         )
     }
