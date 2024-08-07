@@ -242,7 +242,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
 
     const showModal = useCallback(() => {
         Modal.info({
-            title: `Reads Per Sample for run '${dataset?.run_name}' at lane ${dataset?.lane} for project '${project?.external_name}'`,
+            title: `Reads Per Sample for lane ${dataset?.lane} of run ${dataset?.run_name} for project ${project?.external_name}`,
             content: (
                 <Provider store={store}>
                     <ReadsPerSample datasetId={datasetID} />
@@ -250,7 +250,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
             ),
             width: "80%",
         })
-    }, [datasetID, dataset?.run_name, dataset?.lane])
+    }, [datasetID, dataset?.lane, dataset?.run_name, project?.external_name])
 
     return dataset ? (
         <Row justify={"space-between"} gutter={32} align={"middle"}>
