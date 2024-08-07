@@ -78,3 +78,9 @@ create table constants (
     sftp_project_size   INTEGER not null,
     expiry_days         INTEGER not null default 7
 );
+
+create table notification_dates {
+    id                              INTEGER PRIMARY KEY ASC check(id = 1),
+    last_released_notification_date text not null, -- ISO8601
+}
+insert into notification_dates values (1, datetime('now'));
