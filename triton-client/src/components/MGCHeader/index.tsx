@@ -9,7 +9,8 @@ export const MGCHeader = () => {
                 <Image
                     alt="McGill Genome Center"
                     preview={false}
-                    width={80}
+                    width={140}
+                    height={50}
                     src={genomeLogo}
                     className="mgc-header-logo"
                 />
