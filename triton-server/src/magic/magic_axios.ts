@@ -120,7 +120,7 @@ async function requestToken() {
                 currentToken = undefined
                 authorizedAxios = undefined
             },
-            (auth.expires_in - 1) * 1000,
+            timeout,
         )
         logger.debug(
             {
