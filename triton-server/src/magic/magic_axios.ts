@@ -48,14 +48,17 @@ async function getToken(): Promise<string> {
     // If we are already fetching the token then await for it to finish,
     // rather than kicking off a second token request.
     if (currentTokenPromise !== undefined) {
-        return await currentTokenPromise
+        return await currentTokenPromise.then((token) => {
+            currentTokenPromise = undefined
+            return token
+        })
     }
 
-    // Request the token
     currentTokenPromise = requestToken()
-
-    // Create a promise?
-    return await currentTokenPromise
+    return await currentTokenPromise.then((token) => {
+        currentTokenPromise = undefined
+        return token
+    })
 }
 
 async function requestToken() {
