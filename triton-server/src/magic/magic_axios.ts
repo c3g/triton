@@ -131,6 +131,9 @@ async function requestToken() {
 
 const getAuthorizedAxios = async () => {
     // If we already have an authorized axios instance, just return it.
+    logger.debug(authorizedAxios, "Axios auth~~~~~~~~~~~~~~~~~~~~~~~")
+    console.log(authorizedAxios)
+
     if (authorizedAxios !== undefined) {
         return authorizedAxios
     }
