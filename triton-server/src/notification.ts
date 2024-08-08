@@ -47,7 +47,9 @@ export const start = () => {
             return datasets
         }, [])
 
-        sendNotificationEmail(releasedDatasets)
+        if (releasedDatasets.length > 0) {
+            sendNotificationEmail(releasedDatasets)
+        }
     })
     task.start()
 
@@ -65,6 +67,7 @@ export const sendNotificationEmail = async (
             new Date(a.latest_release_update).getTime() -
             new Date(b.latest_release_update).getTime(),
     )
+    let lastDate: Date | undefined = undefined
     for (const dataset of releasedDatasets) {
         const subject = `The following dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
         await email.broadcastEmailsOfProject(
@@ -97,9 +100,18 @@ export const sendNotificationEmail = async (
                 )
             },
         )
-        await db.updateLatestReleaseNotificationDate(
-            dataset.latest_release_update.toISOString(),
-        )
+
+        if (
+            lastDate &&
+            lastDate.getTime() < dataset.latest_release_update.getTime()
+        ) {
+            await db.updateLatestReleaseNotificationDate(lastDate.toISOString())
+        }
+        lastDate = dataset.latest_release_update
+    }
+    if (lastDate !== undefined) {
+        // update the last notification date
+        await db.updateLatestReleaseNotificationDate(lastDate.toISOString())
     }
 }
 
