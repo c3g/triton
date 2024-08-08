@@ -28,6 +28,8 @@ export interface MagicAuthResponse {
 
 // We define a module variable to hold the latest auth token received from hercules
 let currentToken: string | undefined
+// prevents multiple token requests from being made simultaneously
+let currentTokenPromise: Promise<string> | undefined
 // Module variable to hold the latest axios instance created.
 let authorizedAxios: AxiosInstance | undefined
 
@@ -43,7 +45,12 @@ async function getToken(): Promise<string> {
         return currentToken
     }
     // Request the token
-    return await requestToken()
+    currentTokenPromise = requestToken()
+
+    return currentTokenPromise.then((token) => {
+        currentTokenPromise = undefined
+        return token
+    })
 }
 
 async function requestToken() {
