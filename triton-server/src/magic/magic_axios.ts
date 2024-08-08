@@ -110,12 +110,16 @@ async function requestToken() {
 
         // Set a timer to flush the token when it reaches its expiry time.
         // The next call to getToken() will request a new token from hercules.
-        setTimeout(
-            () => {
-                currentToken = undefined
-                authorizedAxios = undefined
+        const timeout = (auth.expires_in - 1) * 1000
+        setTimeout(() => {
+            currentToken = undefined
+            authorizedAxios = undefined
+        }, timeout)
+        logger.debug(
+            {
+                currentToken,
             },
-            (auth.expires_in - 1) * 1000,
+            `requestToken: Token will expire in ${timeout} milliseconds`,
         )
 
         return currentToken
