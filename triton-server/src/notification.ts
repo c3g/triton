@@ -3,38 +3,59 @@ import nodemailer from "nodemailer"
 import * as email from "./contact-service"
 import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
+import { defaultDatabaseActions } from "./download/actions"
+import { logger } from "./logger"
+
+type ReleasedTritonDataset = TritonDataset & {
+    latest_release_update: Date
+}
 
 export const start = () => {
-    console.info("Notification service started to run.")
-    const task = cron.schedule("0 * * * *", async () => {
-        console.info("Notification service is running at an hourly pace.")
+    const cronExpression = "*/5 * * * * *"
+    logger.info(`Notification service started to run. (${cronExpression})`)
+    const task = cron.schedule(cronExpression, async () => {
+        logger.info("Executing notification service.")
 
-        let releasedDatasets: TritonDataset[] = []
+        const db = await defaultDatabaseActions()
+        const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
+            .last_released_notification_date
 
         const freezemanApi = await getFreezeManAuthenticatedAPI()
 
-        const datasetsResponse =
+        const datasets = (
             await freezemanApi.Dataset.listByReleasedUpdates(
-                formatDateAndTime(),
+                // offset by 1 second to avoid duplicate notifications
+                new Date(lastReleaseDate).toISOString(),
             )
+        ).data.results.filter((dataset) => dataset.released_status_count > 0)
 
-        releasedDatasets = datasetsResponse.data.results.map((dataset) => {
-            return {
-                external_project_id: dataset.external_project_id,
-                id: dataset.id,
-                lane: dataset.lane,
-                readset_count: dataset.readset_count,
-                released_status_count: dataset.released_status_count,
-                run_name: dataset.run_name,
-                latest_release_update: dataset.latest_release_update,
-                blocked_status_count: dataset.blocked_status_count,
-                project_name: dataset.project_name,
-            }
-        })
+        const releasedDatasets = datasets.reduce<ReleasedTritonDataset[]>(
+            (datasets, dataset) => {
+                if (dataset.latest_release_update) {
+                    datasets.push({
+                        external_project_id: dataset.external_project_id,
+                        id: dataset.id,
+                        lane: dataset.lane,
+                        readset_count: dataset.readset_count,
+                        released_status_count: dataset.released_status_count,
+                        run_name: dataset.run_name,
+                        latest_release_update: dataset.latest_release_update,
+                        blocked_status_count: dataset.blocked_status_count,
+                        project_name: dataset.project_name,
+                    })
+                }
+                return datasets
+            },
+            [],
+        )
 
-        sendNotificationEmail(releasedDatasets)
+        logger.debug(
+            `Found ${releasedDatasets.length} released datasets to notify.`,
+        )
+        if (releasedDatasets.length > 0) {
+            sendNotificationEmail(releasedDatasets)
+        }
     })
-    task.start()
 
     return () => {
         task.stop()
@@ -42,9 +63,16 @@ export const start = () => {
 }
 
 export const sendNotificationEmail = async (
-    releasedDatasets: TritonDataset[],
+    releasedDatasets: ReleasedTritonDataset[],
 ) => {
-    releasedDatasets.map(async (dataset: TritonDataset) => {
+    const db = await defaultDatabaseActions()
+    releasedDatasets.sort(
+        (a, b) =>
+            new Date(a.latest_release_update).getTime() -
+            new Date(b.latest_release_update).getTime(),
+    )
+    let lastDate: Date | undefined = undefined
+    for (const dataset of releasedDatasets) {
         const subject = `The following dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
         await email.broadcastEmailsOfProject(
             dataset.external_project_id,
@@ -76,11 +104,23 @@ export const sendNotificationEmail = async (
                 )
             },
         )
-    })
+
+        if (
+            lastDate &&
+            lastDate.getTime() < dataset.latest_release_update.getTime()
+        ) {
+            await db.updateLatestReleaseNotificationDate(lastDate.toISOString())
+        }
+        lastDate = dataset.latest_release_update
+    }
+    if (lastDate !== undefined) {
+        // update the last notification date
+        await db.updateLatestReleaseNotificationDate(lastDate.toISOString())
+    }
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: TritonDataset[] = [mockDataset],
+    datasets: ReleasedTritonDataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -127,7 +167,7 @@ export const sendNotificationEmailTest = async (
     })
 }
 
-const mockDataset: TritonDataset = {
+const mockDataset: ReleasedTritonDataset = {
     id: 987654,
     lane: 123546,
     external_project_id: "project-id-testing",
@@ -139,15 +179,10 @@ const mockDataset: TritonDataset = {
     latest_release_update: new Date(),
 }
 
-const formatDateAndTime = (date?: Date): string => {
-    const cleanedDate = date ?? new Date()
-    if (!date) {
-        const hours = new Date().getHours() - 1
-        cleanedDate.setHours(hours)
-    }
+const formatDateAndTime = (date: Date): string => {
     return (
-        cleanedDate.toLocaleDateString() +
+        date.toLocaleDateString() +
         "T" +
-        cleanedDate.toLocaleTimeString().split(" ")[0]
+        date.toLocaleTimeString().split(" ")[0]
     )
 }

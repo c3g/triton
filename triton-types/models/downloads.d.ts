@@ -15,6 +15,7 @@ export interface Database {
     files: DownloadFileRecord
     contacts: ContactRecord
     constants: ConstantsRecord
+    notification_dates: NotificationDatesRecord
 }
 
 /**
@@ -78,3 +79,7 @@ interface ConstantsRecord {
     readonly expiry_days: number
 }
 export type Constants = Selectable<ConstantsRecord>
+
+interface NotificationDatesRecord {
+    readonly last_released_notification_date: string
+}
