@@ -32,7 +32,6 @@ function startup() {
 async function startServer() {
     // Create express server
     try {
-        notification.start()
         const { getConstants } = await defaultDatabaseActions()
         await getConstants() // throws if constants are not available
         initializeFreezemanAPIAuthorization()

@@ -4,15 +4,17 @@ import * as email from "./contact-service"
 import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
+import { logger } from "./logger"
 
 type ReleasedTritonDataset = TritonDataset & {
     latest_release_update: Date
 }
 
 export const start = () => {
-    console.info("Notification service started to run.")
-    const task = cron.schedule("0 * * * *", async () => {
-        console.info("Notification service is running at an hourly pace.")
+    const cronExpression = "*/5 * * * * *"
+    logger.info(`Notification service started to run. (${cronExpression})`)
+    const task = cron.schedule(cronExpression, async () => {
+        logger.info("Executing notification service.")
 
         const db = await defaultDatabaseActions()
         const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
@@ -20,38 +22,40 @@ export const start = () => {
 
         const freezemanApi = await getFreezeManAuthenticatedAPI()
 
-        const datasetsResponse =
+        const datasets = (
             await freezemanApi.Dataset.listByReleasedUpdates(
                 // offset by 1 second to avoid duplicate notifications
-                new Date(
-                    new Date(lastReleaseDate).getTime() + 1000,
-                ).toISOString(),
+                new Date(lastReleaseDate).toISOString(),
             )
+        ).data.results.filter((dataset) => dataset.released_status_count > 0)
 
-        const releasedDatasets = datasetsResponse.data.results.reduce<
-            ReleasedTritonDataset[]
-        >((datasets, dataset) => {
-            if (dataset.latest_release_update) {
-                datasets.push({
-                    external_project_id: dataset.external_project_id,
-                    id: dataset.id,
-                    lane: dataset.lane,
-                    readset_count: dataset.readset_count,
-                    released_status_count: dataset.released_status_count,
-                    run_name: dataset.run_name,
-                    latest_release_update: dataset.latest_release_update,
-                    blocked_status_count: dataset.blocked_status_count,
-                    project_name: dataset.project_name,
-                })
-            }
-            return datasets
-        }, [])
+        const releasedDatasets = datasets.reduce<ReleasedTritonDataset[]>(
+            (datasets, dataset) => {
+                if (dataset.latest_release_update) {
+                    datasets.push({
+                        external_project_id: dataset.external_project_id,
+                        id: dataset.id,
+                        lane: dataset.lane,
+                        readset_count: dataset.readset_count,
+                        released_status_count: dataset.released_status_count,
+                        run_name: dataset.run_name,
+                        latest_release_update: dataset.latest_release_update,
+                        blocked_status_count: dataset.blocked_status_count,
+                        project_name: dataset.project_name,
+                    })
+                }
+                return datasets
+            },
+            [],
+        )
 
+        logger.debug(
+            `Found ${releasedDatasets.length} released datasets to notify.`,
+        )
         if (releasedDatasets.length > 0) {
             sendNotificationEmail(releasedDatasets)
         }
     })
-    task.start()
 
     return () => {
         task.stop()
