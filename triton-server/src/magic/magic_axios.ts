@@ -28,8 +28,6 @@ export interface MagicAuthResponse {
 
 // We define a module variable to hold the latest auth token received from hercules
 let currentToken: string | undefined
-// This promise is defined whenever we are making a request for an auth token.
-let currentTokenPromise: Promise<string> | undefined
 // Module variable to hold the latest axios instance created.
 let authorizedAxios: AxiosInstance | undefined
 
@@ -44,18 +42,8 @@ async function getToken(): Promise<string> {
     if (currentToken !== undefined) {
         return currentToken
     }
-
-    // If we are already fetching the token then await for it to finish,
-    // rather than kicking off a second token request.
-    if (currentTokenPromise !== undefined) {
-        return await currentTokenPromise
-    }
-
     // Request the token
-    currentTokenPromise = requestToken()
-
-    // Create a promise?
-    return await currentTokenPromise
+    return await requestToken()
 }
 
 async function requestToken() {
@@ -110,7 +98,7 @@ async function requestToken() {
 
         // Set a timer to flush the token when it reaches its expiry time.
         // The next call to getToken() will request a new token from hercules.
-        const timeout = 10 * 1000
+        const timeout = 5 * 1000
         setTimeout(() => {
             logger.debug("requestToken: Flushing token in timeout")
             currentToken = undefined
