@@ -112,6 +112,7 @@ async function requestToken() {
         // The next call to getToken() will request a new token from hercules.
         const timeout = 10 * 1000
         setTimeout(() => {
+            logger.debug("requestToken: Flushing token in timeout")
             currentToken = undefined
             authorizedAxios = undefined
         }, timeout)

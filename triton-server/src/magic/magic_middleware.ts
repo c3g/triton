@@ -113,7 +113,7 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
     // Verify that the user is still logged in with the token.
     const isAuthenticated = await isUserAuthenticated(userId, token)
     if (!isAuthenticated) {
-        throw Error("Not authenticated")
+        next(Error("Not authenticated"))
     }
 
     // Ask Magic for the user's details.
