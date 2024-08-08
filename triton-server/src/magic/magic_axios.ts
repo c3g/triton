@@ -44,10 +44,17 @@ async function getToken(): Promise<string> {
     if (currentToken !== undefined) {
         return currentToken
     }
-    // Request the token
-    currentTokenPromise = requestToken()
 
-    return currentTokenPromise.then((token) => {
+    // Request the token
+    if (currentTokenPromise !== undefined) {
+        return await currentTokenPromise.then((token) => {
+            currentTokenPromise = undefined
+            return token
+        })
+    }
+
+    currentTokenPromise = requestToken()
+    return await currentTokenPromise.then((token) => {
         currentTokenPromise = undefined
         return token
     })
