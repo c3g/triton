@@ -54,8 +54,10 @@ const magicAuthMiddleware = asyncHandler(
     ) => {
         let isAuthenticated = false
 
-        // Verify that the user is logged in. If the user is logged in then their session
-        // contains credentials and userDetails.
+        logger.debug(
+            req.session,
+            `${magicAuthMiddleware.name}: Verify that the user is logged in. If the user is logged in then their session contains credentials and userDetails.`,
+        )
         const credentials = req.session?.credentials
         const userDetails = req.session?.userDetails
 
@@ -69,7 +71,9 @@ const magicAuthMiddleware = asyncHandler(
                 credentials.token,
             )
             if (!isAuthenticated) {
-                // User token is no longer valid. Flush the session info and force a new login.
+                logger.debug(
+                    `${magicAuthMiddleware.name}: User token is no longer valid. Flush the session info and force a new login.`,
+                )
                 req.session.credentials = undefined
                 req.session.userDetails = undefined
             }
@@ -99,7 +103,10 @@ const magicAuthMiddleware = asyncHandler(
  * button to navigate to triton.
  */
 const magicCallbackHandler = asyncHandler(async (req, res, next) => {
-    // userID and token are included as parameters in the magic-callback request.
+    logger.debug(
+        req.query,
+        `${magicCallbackHandler.name}: userID and token are included as parameters in the magic-callback request.`,
+    )
     const userId = req.query.userID as string
     const token = req.query.token as string
 
@@ -118,7 +125,15 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
     req.session.userDetails = userDetails
     req.session.credentials = { userId, token }
     req.session.save((err) => {
-        if (err !== undefined) logger.error(err)
+        if (err !== undefined)
+            logger.error(
+                {
+                    error: err,
+                    userDetails: req.session.userDetails,
+                    credentials: req.session.credentials,
+                },
+                `${magicCallbackHandler.name}: Error saving session`,
+            )
     })
 
     // Redirect the user to the triton client web app

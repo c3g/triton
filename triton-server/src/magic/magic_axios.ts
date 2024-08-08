@@ -146,8 +146,8 @@ const getAuthorizedAxios = async () => {
     // and clears the token or reauthorizes and attempts the request again?
 
     authorizedAxios.interceptors.request.use((req) => {
-        const { baseURL, url, method, params } = req
-        logger.debug({ baseURL, url, method, params }, "Magic Request")
+        const { baseURL, url, method, params, headers } = req
+        logger.debug({ baseURL, url, method, params, headers }, "Magic Request")
         return req
     })
     authorizedAxios.interceptors.response.use((res) => {
@@ -155,9 +155,10 @@ const getAuthorizedAxios = async () => {
             status,
             config: { baseURL, url, method, params },
             data,
+            headers,
         } = res
         logger.debug(
-            { status, data, config: { baseURL, url, method, params } },
+            { status, data, config: { baseURL, url, method, params }, headers },
             "Magic Response",
         )
         return res

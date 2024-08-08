@@ -21,26 +21,20 @@ export const httpLogger = asyncHandler(
         next: Express.NextFunction,
     ) => {
         res.on("finish", () => {
-            const {
-                method = "",
-                headers: { host = "", origin = "" },
-                url = "",
-            } = req
-            const { statusCode = 0, statusMessage = "" } = res
-
+            const { headers, session, body } = req
             const obj = {
-                request: {
-                    method,
-                    headers: { host, origin },
-                    url,
-                },
-                response: { statusCode, statusMessage },
+                headers,
+                body,
+                session,
             }
-            const message = `${method ?? "undefined"} ${url} ${statusCode} ${statusMessage}`
 
-            if (statusCode < 400) {
+            const message = `${req.method} ${req.url} ${res.statusCode} ${res.statusMessage}`
+
+            if (!req.statusCode) {
+                logger.debug(obj, message)
+            } else if (req.statusCode < 400) {
                 logger.info(obj, message)
-            } else if (statusCode === 500) {
+            } else if (req.statusCode === 500) {
                 logger.error(obj, message)
             } else {
                 logger.warn(obj, message)
