@@ -48,14 +48,17 @@ async function getToken(): Promise<string> {
     // If we are already fetching the token then await for it to finish,
     // rather than kicking off a second token request.
     if (currentTokenPromise !== undefined) {
-        return await currentTokenPromise
+        return await currentTokenPromise.then((token) => {
+            currentTokenPromise = undefined
+            return token
+        })
     }
 
-    // Request the token
     currentTokenPromise = requestToken()
-
-    // Create a promise?
-    return await currentTokenPromise
+    return await currentTokenPromise.then((token) => {
+        currentTokenPromise = undefined
+        return token
+    })
 }
 
 async function requestToken() {
@@ -110,12 +113,20 @@ async function requestToken() {
 
         // Set a timer to flush the token when it reaches its expiry time.
         // The next call to getToken() will request a new token from hercules.
+        const timeout = (auth.expires_in - 1) * 1000
         setTimeout(
             () => {
+                logger.debug("requestToken: Flushing token in timeout")
                 currentToken = undefined
                 authorizedAxios = undefined
             },
-            (auth.expires_in - 1) * 1000,
+            timeout,
+        )
+        logger.debug(
+            {
+                currentToken,
+            },
+            `requestToken: Token will expire in ${timeout} milliseconds`,
         )
 
         return currentToken
