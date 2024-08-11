@@ -27,7 +27,7 @@ export const start = () => {
 
         const datasets = (
             await freezemanApi.Dataset.listByReleasedUpdates(
-                dayjs(lastReleaseDate).format(),
+                formatDateAndTime(dayjs(lastReleaseDate)),
             )
         ).data.results
 
