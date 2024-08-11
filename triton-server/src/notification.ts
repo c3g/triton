@@ -13,7 +13,7 @@ interface UpdatedTritonDataset
 }
 
 export const start = () => {
-    const cronExpression = "*/5 * * * * *"
+    const cronExpression = "0 * * * *"
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, async () => {
         logger.info("Executing notification service.")
