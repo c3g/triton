@@ -6,6 +6,7 @@ import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
 import { logger } from "./logger"
 import dayjs, { Dayjs } from "dayjs"
+import config from "../config"
 
 interface UpdatedTritonDataset
     extends Omit<TritonDataset, "latest_release_update"> {
@@ -76,7 +77,7 @@ export const sendNotificationEmail = async (
     let lastDate: Dayjs | undefined = undefined
     for (const dataset of updatedDatasets) {
         if (dataset.released_status_count > 0) {
-            const subject = `The following dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
+            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
             await email.broadcastEmailsOfProject(
                 dataset.external_project_id,
                 async (send) => {
@@ -101,8 +102,8 @@ export const sendNotificationEmail = async (
                             dataset.blocked_status_count
                         }<br/>
                         -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
-                    You can now stage for download (Via Globus or SFTP) in Triton.<br/>
 
+                    You can now stage for download through our data portal: ${config.client.url}.<br/>
                     This is an automated email, do not reply back.`,
                     )
                 },
