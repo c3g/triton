@@ -103,7 +103,7 @@ export const sendNotificationEmail = async (
                         }<br/>
                         -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
 
-                    You can now stage for download through our data portal: ${config.client.url}.<br/>
+                    You can now stage for download through our data portal: <a href="${config.client.url}">${config.client.url}</a>.<br/>
                     This is an automated email, do not reply back.`,
                     )
                 },
