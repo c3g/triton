@@ -18,6 +18,7 @@ import {
     Contact,
 } from "./download-types"
 import { createSQLite } from "./sqlite-database"
+import dayjs from "dayjs"
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
 export async function createActions(db: Kysely<Database>) {
@@ -85,10 +86,7 @@ export async function createActions(db: Kysely<Database>) {
                 .select("expiry_days")
                 .executeTakeFirstOrThrow()
         ).expiry_days
-        const now = new Date()
-        const expiryDate = new Date(
-            now.setDate(now.getDate() + extensionSize),
-        ).toISOString()
+        const expiryDate = dayjs().add(extensionSize, "days").format()
 
         return await db
             .updateTable("requests")
@@ -280,5 +278,5 @@ export function setDatasetDownloading(datasetID: number, value: boolean) {
 // Helpers
 
 function currentDateToString() {
-    return new Date().toISOString()
+    return dayjs().format()
 }
