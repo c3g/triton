@@ -178,7 +178,8 @@ function getCredentialMessageFor(contact: Contact) {
             contact.project_id
         }.<br/>
         <br/>
-        Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
+        Server:   <b>${config.sftp.server}</b><br/>
+        Port:   <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
         Password: <b>${contact.depth ?? ""}</b><br/>
         <br/>
