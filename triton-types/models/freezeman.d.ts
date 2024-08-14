@@ -20,7 +20,7 @@ export interface Dataset {
     readonly released_status_count: number
     readonly blocked_status_count: number
     // readonly metric_report_url?: string // it might reveal details about other projects
-    readonly latest_release_update?: string
+    readonly latest_release_update: string // triton will only fetch datasets that contains released readsets
 }
 
 export type DatasetID = number

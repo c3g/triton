@@ -1,14 +1,10 @@
 import cron from "node-cron"
 import nodemailer from "nodemailer"
 import * as email from "./contact-service"
-import { TritonDataset } from "./api/api-types"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
 import { logger } from "./logger"
-
-interface ReleasedTritonDataset extends TritonDataset {
-    latest_release_update: string
-}
+import { Dataset } from "./freezeman/models"
 
 export const start = () => {
     const cronExpression = "0 * * * *"
@@ -25,12 +21,7 @@ export const start = () => {
 
         const releasedDatasets = (
             await freezemanApi.Dataset.listByReleasedUpdates(lastReleaseDate)
-        ).data.results.reduce<ReleasedTritonDataset[]>((datasets, dataset) => {
-            if (dataset.latest_release_update) {
-                datasets.push(dataset as ReleasedTritonDataset)
-            }
-            return datasets
-        }, [])
+        ).data.results.map((dataset) => ({ ...dataset }))
 
         logger.debug(
             `Found ${releasedDatasets.length} released datasets to potentially notify.`,
@@ -45,17 +36,15 @@ export const start = () => {
     }
 }
 
-export const sendNotificationEmail = async (
-    updatedDatasets: ReleasedTritonDataset[],
-) => {
+export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     const db = await defaultDatabaseActions()
-    updatedDatasets.sort(
+    releasedDatasets.sort(
         (a, b) =>
             new Date(a.latest_release_update).getTime() -
             new Date(b.latest_release_update).getTime(),
     )
     let lastDate: string | undefined = undefined
-    for (const dataset of updatedDatasets) {
+    for (const dataset of releasedDatasets) {
         if (dataset.released_status_count > 0) {
             const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
             await email.broadcastEmailsOfProject(
@@ -104,7 +93,7 @@ export const sendNotificationEmail = async (
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: ReleasedTritonDataset[] = [mockDataset],
+    datasets: Dataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -151,7 +140,7 @@ export const sendNotificationEmailTest = async (
     })
 }
 
-const mockDataset: ReleasedTritonDataset = {
+const mockDataset: Dataset = {
     id: 987654,
     lane: 123546,
     external_project_id: "project-id-testing",
@@ -161,4 +150,5 @@ const mockDataset: ReleasedTritonDataset = {
     released_status_count: 99,
     blocked_status_count: 64,
     latest_release_update: new Date().toISOString(),
+    files: [],
 }
