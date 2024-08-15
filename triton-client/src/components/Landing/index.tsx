@@ -1,10 +1,11 @@
-import { Typography, Image, FloatButton, Tooltip } from "antd"
+import { Typography, Image, FloatButton, Tooltip, Button } from "antd"
 import { Content } from "antd/es/layout/layout"
-import { FileTextOutlined } from "@ant-design/icons"
+import { FileTextOutlined, InfoCircleOutlined } from "@ant-design/icons"
 import { UserInformationProps } from "./interfaces"
 import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
 import "./index.scss"
+import { Link } from "react-router-dom"
 
 const { Title, Text } = Typography
 
@@ -49,9 +50,49 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                     />
                 </Tooltip>
             </Content>
-            <Text className="Common-subtitle Landing-user" type="secondary">
-                {isLoggedIn ? `Logged in as ${userName}` : "Logging In.."}
-            </Text>
+            <Content className="landing-page-content">
+                <Text className="Common-subtitle Landing-user" type="secondary">
+                    {isLoggedIn ? `Logged in as ${userName}` : "Logging In.."}
+                </Text>
+                <Typography.Title level={2}>
+                    How to stage Datasets
+                </Typography.Title>
+                <Content className="faq-container">
+                    <div className="faq-section-container">
+                        <Typography.Title level={5}>
+                            1. Datasets can be staged and/or unstaged using
+                            either SFTP or GLOBUS. GLOBUS is strongly
+                            recommended, as it is faster than SFTP.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            2. For each dataset, staging can be done using one
+                            of the two available methods: SFTP or GLOBUS. Once
+                            the datasets have been staged, a fixed period of 7
+                            days is provided to download the files before they
+                            are automatically unstaged from the server. After
+                            the download is completed, the files must be
+                            manually unstaged to allow further staging and
+                            downloading of other files.
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            3. There are five request statuses available when
+                            datasets are being staged: "Unstaging", "Staging",
+                            "Staged" (shown as "Download"), "Queued", and
+                            "Failed". If "Queued" is displayed, the dataset is
+                            waiting for sufficient disk space to begin staging.
+                            If "Failed" is displayed, please contact us at{" "}
+                            <Link to={""}>{"hercules@mcgill.ca"}</Link>
+                        </Typography.Title>
+                        <Typography.Title level={5}>
+                            4. An info icon {"  "}
+                            <Button icon={<InfoCircleOutlined />} /> {"  "} is
+                            associated with each dataset released. Clicking it
+                            will show a graph with reads per sample of that
+                            dataset, and the number of readsets.
+                        </Typography.Title>
+                    </div>
+                </Content>
+            </Content>
         </div>
     )
 }

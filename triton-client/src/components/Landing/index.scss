@@ -21,3 +21,12 @@ main.logo-title-onboarding-header-container {
     justify-content: space-between;
     align-items: center;
 }
+
+.faq-container {
+    display: flex;
+    justify-content: space-between;
+    .faq-section-container {
+        padding: 5px;
+        margin: 50px;
+    }
+}
