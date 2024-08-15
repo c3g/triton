@@ -46,14 +46,14 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     let lastDate: string | undefined = undefined
     for (const dataset of releasedDatasets) {
         if (dataset.released_status_count > 0) {
-            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
+            const subject = `Dataset #${dataset.id} for project '${dataset.project_name}' has been released.`
             const results = await email.broadcastEmailsOfProject(
                 dataset.external_project_id,
                 async (send) => {
                     await send(
                         `${subject}`,
-                        `${subject}.<br/><br/>
-                    The dataset can be downloaded using the Triton platform<br/>
+                        `${subject}.<br/>
+                    Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
                     Here are the information pertaining to the released dataset:<br/>
                         -   Dataset ID: ${dataset.id}<br/>
                         -   Dataset project id: ${
@@ -64,15 +64,13 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         -   Readset count within the Dataset: ${
                             dataset.readset_count
                         }<br/>
-                        -   Readset released status count: ${
+                        -   Readset released count: ${
                             dataset.released_status_count
                         }<br/>
-                        -   Readset blocked status count: ${
+                        -   Readset blocked count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${dataset.latest_release_update} (UTC)<br/>
-
-                    You can now stage it for download by signing in to Hercules and clicking on Data Portal.</a>.<br/>
+                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
                     )
                 },
