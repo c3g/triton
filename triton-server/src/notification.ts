@@ -61,8 +61,7 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         -   <b>Dataset project name: ${dataset.project_name}</b><br/>
                         -   Dataset Lane: ${dataset.lane}<br/>
                         -   Readset count within the Dataset: ${dataset.readset_count}<br/>
-                        -   <b>Readset released count: ${dataset.released_status_count}</b><br/>
-                        -   <b>Readset blocked count: ${dataset.blocked_status_count}</b><br/>
+                        -   <b>Readsets released count: ${dataset.released_status_count}</b><br/>
                         -   Dataset latest release update time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
                     )
