@@ -24,10 +24,10 @@ export const start = () => {
         ).data.results.map((dataset) => ({ ...dataset }))
 
         logger.debug(
-            `Found ${releasedDatasets.length} released datasets to potentially notify.`,
+            `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
         )
         if (releasedDatasets.length > 0) {
-            sendNotificationEmail(releasedDatasets)
+            await sendNotificationEmail(releasedDatasets)
         }
     })
 
@@ -47,7 +47,7 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     for (const dataset of releasedDatasets) {
         if (dataset.released_status_count > 0) {
             const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
-            await email.broadcastEmailsOfProject(
+            const results = await email.broadcastEmailsOfProject(
                 dataset.external_project_id,
                 async (send) => {
                     await send(
@@ -77,6 +77,11 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                     )
                 },
             )
+            if (results.some((result) => result.status === "rejected")) {
+                throw new Error(
+                    `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
+                )
+            }
         }
 
         // although datasets are sorted by date, we only want to
