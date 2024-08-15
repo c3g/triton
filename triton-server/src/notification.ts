@@ -55,22 +55,15 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         `${subject}.<br/>
                     Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
                     Here are the information pertaining to the released dataset:<br/>
-                        -   Dataset ID: ${dataset.id}<br/>
-                        -   Dataset project id: ${
-                            dataset.external_project_id
-                        }<br/>
-                        -   Dataset project name: ${dataset.project_name}<br/>
+                        -   <b>Run Name: ${dataset.run_name}</b><br/>
+                        -   <b>Dataset ID: ${dataset.id}</b><br/>
+                        -   Dataset project id: ${dataset.external_project_id}<br/>
+                        -   <b>Dataset project name: ${dataset.project_name}</b><br/>
                         -   Dataset Lane: ${dataset.lane}<br/>
-                        -   Readset count within the Dataset: ${
-                            dataset.readset_count
-                        }<br/>
-                        -   Readset released count: ${
-                            dataset.released_status_count
-                        }<br/>
-                        -   Readset blocked count: ${
-                            dataset.blocked_status_count
-                        }<br/>
-                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
+                        -   Readset count within the Dataset: ${dataset.readset_count}<br/>
+                        -   <b>Readset released count: ${dataset.released_status_count}</b><br/>
+                        -   <b>Readset blocked count: ${dataset.blocked_status_count}</b><br/>
+                        -   Dataset latest release update time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
                     )
                 },
