@@ -88,7 +88,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             <Button icon={<InfoCircleOutlined />} /> {"  "} is
                             associated with each dataset released. Clicking it
                             will show a graph with reads per sample of that
-                            dataset, and the number of readsets. (edited)
+                            dataset, and the number of readsets.
                         </Typography.Title>
                     </div>
                 </Content>
@@ -98,8 +98,3 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
 }
 
 export default LandingPage
-
-1
-2
-3
-4
