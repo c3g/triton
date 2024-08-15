@@ -32,7 +32,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
             <Content className="logo-title-onboarding-header-container">
                 <div className="logo-title-header">
                     <Title className="Common-title Landing-welcome">
-                        Welcome to MGC Data Portal
+                        MGC Data Portal
                     </Title>
                 </div>
                 <Tooltip title="Start Onboarding guide">
