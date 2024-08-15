@@ -53,7 +53,7 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                     await send(
                         `${subject}`,
                         `${subject}.<br/>
-                    You can download it from the MGC Data Portal which you can find by clicking on Data Portal at the Hercules website.<br/><br/>
+                    Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
                     Here are the information pertaining to the released dataset:<br/>
                         -   Dataset ID: ${dataset.id}<br/>
                         -   Dataset project id: ${
@@ -64,13 +64,13 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         -   Readset count within the Dataset: ${
                             dataset.readset_count
                         }<br/>
-                        -   Readset released status count: ${
+                        -   Readset released count: ${
                             dataset.released_status_count
                         }<br/>
-                        -   Readset blocked status count: ${
+                        -   Readset blocked count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${dataset.latest_release_update} (UTC)<br/><br/>
+                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
                     )
                 },

@@ -13,7 +13,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
     const steps: Step[] = [
         {
             target: ".onboarding-start-float-button",
-            content: "The Triton app guide will now start, Click on Next.",
+            content: "The Data Portal app guide will now start, Click on Next.",
         },
         {
             target: ".mgc-header-logo",
@@ -31,15 +31,8 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
             <GuidedOnboarding step={steps} />
             <Content className="logo-title-onboarding-header-container">
                 <div className="logo-title-header">
-                    <Image
-                        preview={false}
-                        alt="triton"
-                        className="Landing-trident"
-                        width={80}
-                        src={require("@static/triton.png")}
-                    />
                     <Title className="Common-title Landing-welcome">
-                        Welcome to Triton
+                        Welcome to MGC Data Portal
                     </Title>
                 </div>
                 <Tooltip title="Start Onboarding guide">
