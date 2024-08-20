@@ -25,7 +25,7 @@ export interface FreezeManAuthResponse {
     refresh: string
 }
 
-export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
+const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
     const instance = Axios.create()
 
     // Add a request interceptor to set the current access token in the request
@@ -82,7 +82,7 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
     return instance
 }
 
-export const getAuthenticatedAPI = (axios: AxiosInstance) => {
+const getAuthenticatedAPI = (axios: AxiosInstance) => {
     return {
         Project: {
             list: async (
@@ -181,7 +181,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
 
 export type AuthenticatedAPI = ReturnType<typeof getAuthenticatedAPI>
 
-export const getOrCreateAxiosInstance = async (
+const getOrCreateAxiosInstance = async (
     accessToken?: string,
 ): Promise<AxiosInstance> => {
     if (axiosInstance !== undefined) {
