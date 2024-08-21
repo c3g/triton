@@ -32,7 +32,6 @@ function startup() {
 async function startServer() {
     // Create express server
     try {
-        notification.start()
         const { getConstants } = await defaultDatabaseActions()
         await getConstants() // throws if constants are not available
         initializeFreezemanAPIAuthorization()
@@ -49,7 +48,7 @@ async function startServer() {
  */
 async function createServer(
     handler: Express,
-    port: string,
+    port: string
 ): Promise<http.Server> {
     return await new Promise((resolve, reject) => {
         // set port for Express

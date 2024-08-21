@@ -79,20 +79,19 @@ export async function createActions(db: Kysely<Database>) {
     }
 
     async function extendRequest(datasetID: DownloadDatasetID) {
-        const extensionSize: number = (
+        const daysToExpire: number = (
             await db
                 .selectFrom("constants")
                 .select("expiry_days")
                 .executeTakeFirstOrThrow()
         ).expiry_days
-        const now = new Date()
         const expiryDate = new Date(
-            now.setDate(now.getDate() + extensionSize),
-        ).toISOString()
+            Date.now() + daysToExpire * 24 * 60 * 60 * 1000,
+        )
 
         return await db
             .updateTable("requests")
-            .set({ expiry_date: expiryDate })
+            .set({ expiry_date: expiryDate.toISOString() })
             .where("dataset_id", "=", datasetID)
             .where("status", "=", "SUCCESS")
             .returningAll()
@@ -196,21 +195,38 @@ export async function createActions(db: Kysely<Database>) {
             )
     }
 
+    async function getLatestReleaseNotificationDate() {
+        return await db
+            .selectFrom("notification_dates")
+            .select("last_released_notification_date")
+            .executeTakeFirstOrThrow()
+    }
+
+    async function updateLatestReleaseNotificationDate(date: string) {
+        return await db
+            .updateTable("notification_dates")
+            .set({ last_released_notification_date: date })
+            .returning("last_released_notification_date")
+            .executeTakeFirstOrThrow()
+    }
+
     return {
-        listRequestByDatasetId,
-        listRequests,
+        createRequest,
+        deleteRequest,
+        extendRequest,
+        getConstants,
+        getLatestReleaseNotificationDate,
         getRequest,
         getRequestByID,
-        createRequest,
-        extendRequest,
-        deleteRequest,
         insertFiles,
         listFilesByDatasetId,
         listReadyContacts,
+        listRequestByDatasetId,
+        listRequests,
         removeContact,
         resetContactPassword,
         updateNotificationDate,
-        getConstants,
+        updateLatestReleaseNotificationDate,
     }
 }
 

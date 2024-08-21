@@ -37,14 +37,15 @@ export type AppAction =
     | RunsStateAction
     | ConstantsStateAction
 
-const loggerMiddleware: [Middleware<{}, RootState>] | [] =
-    process.env.NODE_ENV === "development"
-        ? [
-              createLogger({
-                  level: "info",
-              }),
-          ]
-        : []
+// below logger isnt being used
+// const loggerMiddleware: [Middleware<{}, RootState>] | [] =
+//     process.env.NODE_ENV === "development"
+//         ? [
+//               createLogger({
+//                   level: "info",
+//               }),
+//           ]
+//         : []
 
 export const store = configureStore({
     reducer: {

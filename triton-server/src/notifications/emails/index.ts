@@ -2,64 +2,62 @@
  * email.ts
  */
 import nodemailer from "nodemailer"
-import { spawn } from "child_process"
+import * as email from "./contact-service"
+import cron from "node-cron"
+import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
+import { defaultDatabaseActions } from "./download/actions"
+import { Dataset } from "./freezeman/models"
 import { logger } from "@core/logger"
-import { TritonDataset } from "../../types/api"
-import * as email from "../contact-service"
 import { formatDateAndTime, mockDataset } from "@notifications/utils"
 
-export async function sendEmail(
-    from: string,
-    to: string,
-    subject: string,
-    content: string,
-) {
-    const sendmail = spawn("sendmail", ["-t"], {
-        stdio: ["pipe", "ignore", "pipe"],
+export const start = () => {
+    const cronExpression = "0 * * * *"
+    logger.info(`Notification service started to run. (${cronExpression})`)
+    const task = cron.schedule(cronExpression, async () => {
+        logger.info("Executing notification service.")
+
+        const db = await defaultDatabaseActions()
+        // this db action fails silently if the table does not exist
+        const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
+            .last_released_notification_date
+
+        const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+        const releasedDatasets = (
+            await freezemanApi.Dataset.listByReleasedUpdates(lastReleaseDate)
+        ).data.results.map((dataset) => ({ ...dataset }))
+
+        logger.debug(
+            `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
+        )
+        if (releasedDatasets.length > 0) {
+            await sendNotificationEmail(releasedDatasets)
+        }
     })
-    try {
-        await new Promise<void>((resolve, reject) => {
-            sendmail.stderr.on("data", (data: string) => {
-                logger.error(data, "[sendmail]")
-                reject(data)
-            })
-            sendmail.on("exit", () => resolve())
-            sendmail.on("disconnect", () => resolve())
-            sendmail.on("close", () => resolve())
-            sendmail.on("error", (err) => {
-                logger.error(err, "[sendmail]")
-                reject(err)
-            })
-            sendmail.stdin.write(
-                `To: ${to}\nSubject: ${subject}\nMIME-Version: 1.0\nContent-Type: text/html\n${content}`,
-                (err) => {
-                    if (err) {
-                        logger.error(err, "[sendmail]")
-                        reject(err)
-                    } else {
-                        logger.debug(`Finished writing to ${to}`, "[sendmail]")
-                    }
-                },
-            )
-            sendmail.stdin.end()
-        })
-    } finally {
-        sendmail.kill()
+
+    return () => {
+        task.stop()
     }
 }
 
-export const sendNotificationEmail = async (
-    releasedDatasets: TritonDataset[],
-) => {
-    releasedDatasets.map(async (dataset: TritonDataset) => {
-        const subject = `The following dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
-        await email.broadcastEmailsOfProject(
-            dataset.external_project_id,
-            async (send) => {
-                await send(
-                    `${subject}`,
-                    `${subject}.<br/><br/>
-                    The dataset can be downloaded using the Triton platform<br/>
+export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
+    const db = await defaultDatabaseActions()
+    releasedDatasets.sort(
+        (a, b) =>
+            new Date(a.latest_release_update).getTime() -
+            new Date(b.latest_release_update).getTime(),
+    )
+    let lastDate: string | undefined = undefined
+    for (const dataset of releasedDatasets) {
+        if (dataset.released_status_count > 0) {
+            const subject = `Dataset #${dataset.id} for project '${dataset.project_name}' has been released.`
+            const results = await email.broadcastEmailsOfProject(
+                dataset.external_project_id,
+                async (send) => {
+                    await send(
+                        `${subject}`,
+                        `${subject}.<br/>
+                    Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
                     Here are the information pertaining to the released dataset:<br/>
                         -   Dataset ID: ${dataset.id}<br/>
                         -   Dataset project id: ${
@@ -70,24 +68,39 @@ export const sendNotificationEmail = async (
                         -   Readset count within the Dataset: ${
                             dataset.readset_count
                         }<br/>
-                        -   Readset released status count: ${
+                        -   Readset released count: ${
                             dataset.released_status_count
                         }<br/>
-                        -   Readset blocked status count: ${
+                        -   Readset blocked count: ${
                             dataset.blocked_status_count
                         }<br/>
-                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}<br/>
-                    You can now stage for download (Via Globus or SFTP) in Triton.<br/>
-
+                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
+                    )
+                },
+            )
+            if (results.some((result) => result.status === "rejected")) {
+                throw new Error(
+                    `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
                 )
-            },
-        )
-    })
+            }
+        }
+
+        // although datasets are sorted by date, we only want to
+        // update the last date if the date is different
+        if (lastDate && dataset.latest_release_update !== lastDate) {
+            await db.updateLatestReleaseNotificationDate(lastDate)
+        }
+        lastDate = dataset.latest_release_update
+    }
+    if (lastDate !== undefined) {
+        // update the last notification date
+        await db.updateLatestReleaseNotificationDate(lastDate)
+    }
 }
 
 export const sendNotificationEmailTest = async (
-    datasets: TritonDataset[] = [mockDataset],
+    datasets: Dataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -116,7 +129,7 @@ export const sendNotificationEmailTest = async (
                         -   Readset blocked status count: ${
                             dataset.blocked_status_count
                         }
-                        -   Dataset latest released update date: ${formatDateAndTime(dataset.latest_release_update)}
+                        -   Dataset latest released update date: ${dataset.latest_release_update}
                     You can now stage for download (Via Globus or SFTP) in Triton.
 
                     Thank you
@@ -132,4 +145,17 @@ export const sendNotificationEmailTest = async (
             }
         })
     })
+}
+
+const mockDataset: Dataset = {
+    id: 987654,
+    lane: 123546,
+    external_project_id: "project-id-testing",
+    project_name: "project name",
+    run_name: "test name",
+    readset_count: 19,
+    released_status_count: 99,
+    blocked_status_count: 64,
+    latest_release_update: new Date().toISOString(),
+    files: [],
 }

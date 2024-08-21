@@ -8,30 +8,47 @@ export default function DatasetList({ runName }: DatasetListProps) {
     const datasetIDs = useAppSelector(
         (state) => state.runsState.runsByName[runName]?.datasets,
     )
+    const datasetsByID = useAppSelector(
+        (state) => state.datasetsState.datasetsById,
+    )
 
     const renderDatasets = useMemo(() => {
-        if (datasetIDs === undefined) return <Spin />
+        if (datasetIDs === undefined) return [<Spin key={"spin"} />]
         if (datasetIDs.length === 0)
-            return (
+            return [
                 <Empty
+                    key={"empty"}
                     description={
                         "There are no sample data available for request."
                     }
-                />
-            )
+                />,
+            ]
         if (datasetIDs.length > 0) {
-            return datasetIDs.map((datasetID, index) => {
-                return (
-                    <>
-                        <DatasetCard key={datasetID} datasetID={datasetID} />
-                        {index < datasetIDs.length - 1 ? (
-                            <Divider style={{ margin: "0.5rem 0" }} />
-                        ) : null}
-                    </>
+            console.info(datasetIDs, datasetsByID)
+
+            return [...datasetIDs]
+                .sort(
+                    (a, b) =>
+                        (datasetsByID[a]?.lane ?? 0) -
+                        (datasetsByID[b]?.lane ?? 0),
                 )
-            })
+                .map((datasetID, index) => {
+                    return (
+                        <>
+                            <DatasetCard
+                                key={datasetID}
+                                datasetID={datasetID}
+                            />
+                            {index < datasetIDs.length - 1 ? (
+                                <Divider style={{ margin: "0.5rem 0" }} />
+                            ) : null}
+                        </>
+                    )
+                })
         }
-    }, [datasetIDs])
+
+        return []
+    }, [datasetIDs, datasetsByID])
 
     return (
         <div

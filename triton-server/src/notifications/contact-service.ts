@@ -38,9 +38,9 @@ export function start() {
                             async (send) => {
                                 await send(
                                     getCredentialSubjectFor(contact),
-                                    getCredentialMessageFor(contact)
+                                    getCredentialMessageFor(contact),
                                 )
-                            }
+                            },
                         )
 
                         logger.info(`[contacts] Removing contact ${contact.id}`)
@@ -49,11 +49,11 @@ export function start() {
                             .catch((error) =>
                                 logger.error(
                                     error,
-                                    `[contacts] Could not remove contact ${contact.id}`
-                                )
+                                    `[contacts] Could not remove contact ${contact.id}`,
+                                ),
                             )
                     }
-                })
+                }),
         )
 
         const requests = await db.listRequests()
@@ -61,7 +61,7 @@ export function start() {
         await Promise.allSettled(
             requests.map(async (request) => {
                 logger.debug(
-                    `[contacts] Processing request: ${JSON.stringify(request)}`
+                    `[contacts] Processing request: ${JSON.stringify(request)}`,
                 )
                 const completionDate =
                     request.completion_date && new Date(request.completion_date)
@@ -83,9 +83,10 @@ export function start() {
                             await send(
                                 `${subject}`,
                                 `${subject}.<br/>
-                        The dataset can be downloaded using ${request.type} using the credential provided to you.`
+                        The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
+                        If you forgot your credential, you can reset your password in the data portal.`,
                             )
-                        }
+                        },
                     )
                     await db.updateNotificationDate(request.id)
                 }
@@ -99,11 +100,11 @@ export function start() {
                         request.project_id,
                         async (send) => {
                             await send(`${subject}`, `${subject}.`)
-                        }
+                        },
                     )
                     await db.updateNotificationDate(request.id)
                 }
-            })
+            }),
         )
     }
 
@@ -113,20 +114,20 @@ export function start() {
 export async function broadcastEmailsOfProject(
     projectID: string,
     fn: (
-        sendEmail: (subject: string, message: string) => Promise<void>
-    ) => Promise<void>
+        sendEmail: (subject: string, message: string) => Promise<void>,
+    ) => Promise<void>,
 ) {
     const emails = await getEmailsForProject(projectID)
 
-    await Promise.allSettled(
+    return await Promise.allSettled(
         emails.map(async (to: string) => {
             await fn(async (subject, message) => {
                 logger.info(`[contacts] Sending email to ${to}`)
                 await sendEmail("", to, subject, message)
             }).catch((error) =>
-                logger.error(error, `[contacts] Could not send email to ${to}`)
+                logger.error(error, `[contacts] Could not send email to ${to}`),
             )
-        })
+        }),
     )
 }
 
@@ -177,7 +178,8 @@ function getCredentialMessageFor(contact: Contact) {
             contact.project_id
         }.<br/>
         <br/>
-        Server:   <b>${config.sftp.server}:${config.sftp.port}</b><br/>
+        Server:   <b>${config.sftp.server}</b><br/>
+        Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
         Password: <b>${contact.depth ?? ""}</b><br/>
         <br/>
@@ -205,7 +207,7 @@ function getCredentialMessageFor(contact: Contact) {
 }
 
 async function getEmailsForProject(
-    projectID: ExternalProjectID
+    projectID: ExternalProjectID,
 ): Promise<string[]> {
     try {
         const { users } = await getProjectUsers(projectID)
@@ -221,12 +223,12 @@ async function getEmailsForProject(
             "",
             config.mail.errorMonitoring,
             subject,
-            `ProjectID: ${projectID}<br/><pre>${stack}</pre>`
+            `ProjectID: ${projectID}<br/><pre>${stack}</pre>`,
         ).catch((error) =>
             logger.error(
                 error,
-                `[contacts] Could not send email to ${config.mail.errorMonitoring}`
-            )
+                `[contacts] Could not send email to ${config.mail.errorMonitoring}`,
+            ),
         )
     }
 
