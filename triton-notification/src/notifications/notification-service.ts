@@ -34,8 +34,7 @@ const getDatasetlatestReleasedUpdate = async () => {
             released_status_count: dataset.released_status_count,
             run_name: dataset.run_name,
             latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update:
-                dataset.latest_validation_status_update,
+            latest_validation_status_update: dataset.latest_release_update,
             blocked_status_count: dataset.blocked_status_count,
             project_name: dataset.project_name,
         }
@@ -61,8 +60,7 @@ const getDatasetLatestValidationStatusUpdate = async () => {
             released_status_count: dataset.released_status_count,
             run_name: dataset.run_name,
             latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update:
-                dataset.latest_validation_status_update,
+            latest_validation_status_update: dataset.latest_release_update,
             blocked_status_count: dataset.blocked_status_count,
             project_name: dataset.project_name,
         }

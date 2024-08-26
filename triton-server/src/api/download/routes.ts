@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
-import { dataHandler, errorHandler } from "@notifications/emails/handlers"
+import { dataHandler, errorHandler } from "../../notifications/emails/handlers"
 import { defaultDatabaseActions } from "@database/download/actions"
 import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
 import { NewDownloadFile } from "../../types/download"

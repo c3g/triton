@@ -19,7 +19,7 @@
         "sourceMap": true,
         "moduleResolution": "Node"
     },
-    "include": ["./src", "./*.ts"],
+    "include": ["./src", "./*.ts", "../notifications"],
     "exclude": ["node_modules/"],
     "references": [
         {

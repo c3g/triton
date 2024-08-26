@@ -2,11 +2,12 @@
  * email.ts
  */
 import nodemailer from "nodemailer"
-import * as email from "./contact-service"
+import * as email from "../contact-service"
 import cron from "node-cron"
-import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
-import { defaultDatabaseActions } from "./download/actions"
-import { Dataset } from "./freezeman/models"
+import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
+import { defaultDatabaseActions } from "@database/download/actions"
+import { Dataset } from "../../types/freezeman"
+import { TritonDataset } from "../../types/api"
 import { logger } from "@core/logger"
 import { formatDateAndTime, mockDataset } from "@notifications/utils"
 
@@ -31,7 +32,7 @@ export const start = () => {
             `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
         )
         if (releasedDatasets.length > 0) {
-            await sendNotificationEmail(releasedDatasets)
+            await sendEmail(releasedDatasets)
         }
     })
 
@@ -40,7 +41,7 @@ export const start = () => {
     }
 }
 
-export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
+export const sendEmail = async (releasedDatasets: Dataset[]) => {
     const db = await defaultDatabaseActions()
     releasedDatasets.sort(
         (a, b) =>
@@ -99,8 +100,8 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     }
 }
 
-export const sendNotificationEmailTest = async (
-    datasets: Dataset[] = [mockDataset],
+export const sendNotificationTest = async (
+    datasets: TritonDataset[] = [mockDataset],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
@@ -145,17 +146,4 @@ export const sendNotificationEmailTest = async (
             }
         })
     })
-}
-
-const mockDataset: Dataset = {
-    id: 987654,
-    lane: 123546,
-    external_project_id: "project-id-testing",
-    project_name: "project name",
-    run_name: "test name",
-    readset_count: 19,
-    released_status_count: 99,
-    blocked_status_count: 64,
-    latest_release_update: new Date().toISOString(),
-    files: [],
 }

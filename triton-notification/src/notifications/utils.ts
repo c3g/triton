@@ -9,7 +9,7 @@ export const mockDataset: TritonDataset = {
     readset_count: 19,
     released_status_count: 99,
     blocked_status_count: 64,
-    latest_release_update: new Date(),
+    latest_release_update: new Date().toDateString(),
 }
 
 export const formatDateAndTime = (date?: Date): string => {
