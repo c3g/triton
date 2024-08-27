@@ -15,7 +15,6 @@ export interface Dataset {
     readonly project_name: string
     readonly run_name: string
     readonly lane: number
-    files?: ReadonlyArray<DatasetFile["id"]> // Let me delete this if it's present. It's pointless
     readonly readset_count: number
     readonly released_status_count: number
     readonly blocked_status_count: number

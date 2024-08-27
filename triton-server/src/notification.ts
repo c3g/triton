@@ -153,5 +153,4 @@ const mockDataset: Dataset = {
     released_status_count: 99,
     blocked_status_count: 64,
     latest_release_update: new Date().toISOString(),
-    files: [],
 }
