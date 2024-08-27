@@ -6,6 +6,7 @@ import type {
     Metric,
     Project,
     Readset,
+    ReleaseFlagReleased,
 } from "./models"
 import config from "../../config"
 import { logger } from "../logger"
@@ -158,9 +159,10 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             listByDatasetId: async (
                 datasetId: Dataset["id"],
             ): Promise<ListResponse<Readset>> => {
+                const RELEASED: ReleaseFlagReleased = 1
                 const params = [
                     `dataset__id__in=${datasetId}`,
-                    "has_released_files=true",
+                    `release_status=${RELEASED}`,
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
