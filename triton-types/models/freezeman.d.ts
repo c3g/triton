@@ -91,3 +91,7 @@ export interface Metric {
     readonly value_numeric?: string // Metric value if numeric. Note: decimals are exported as string because JSON only supports floats and serializing as a number could lose precision.
     readonly value_string?: string // Metric value, if text
 }
+
+export interface ReadsetWithMetrics extends Readset {
+    metrics: readonly Metric[]
+}
