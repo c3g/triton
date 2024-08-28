@@ -46,21 +46,24 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     let lastDate: string | undefined = undefined
     for (const dataset of releasedDatasets) {
         if (dataset.released_status_count > 0) {
-            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
+            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' is ready for staging for download.`
             const results = await email.broadcastEmailsOfProject(
                 dataset.external_project_id,
                 async (send) => {
                     await send(
                         `${subject}`,
-                        `${subject}.<br/>
-                    Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
-                    Here are the information pertaining to the released dataset:<br/>
+                        `${subject}.<br/><br/>
                         -   <b>Project ID: ${dataset.external_project_id}</b><br/>
                         -   <b>Run Name: ${dataset.run_name}</b><br/>
                         -   <b>Dataset ID: ${dataset.id}</b><br/>
                         -   Dataset Lane: ${dataset.lane}<br/>
                         -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
-                    This is an automated email, do not reply back.`,
+                        Datasets can be downloaded from the MCG Data Portal. 
+                        To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
+                        Datasets can be downloaded using SFTP or Globus using the credential provided to you during the staging process.<br/><br/>
+                        If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
+                        If you have any issues please contact us at hercules@mcgill.ca.<br/><br/>
+                        Thank you.<br/>`,
                     )
                 },
             )
