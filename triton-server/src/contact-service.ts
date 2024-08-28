@@ -70,6 +70,8 @@ export function start() {
                     new Date(request.notification_date)
                 const failureDate =
                     request.failure_date && new Date(request.failure_date)
+                const ENDING = `If you have any other issues please contact us at hercules@mcgill.ca.<br/><br/>
+                Thank You.<br/>`
 
                 if (
                     request.status === "SUCCESS" &&
@@ -84,7 +86,7 @@ export function start() {
                                 `${subject}`,
                                 `${subject}.<br/>
                         The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
-                        If you forgot your credential or didn't receive it, you can reset your password in the data portal.`,
+                        If you forgot your credential or didn't receive it, you can reset your password in the data portal.<br/><br/>${ENDING}`,
                             )
                         },
                     )
