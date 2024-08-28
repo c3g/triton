@@ -139,20 +139,21 @@ function getCredentialSubjectFor(contact: Contact) {
 }
 
 function getCredentialMessageFor(contact: Contact) {
+    const ENDING = `If you have any issues please contact us at hercules@mcgill.ca.<br/><br/>
+    Thank You.<br/>`
+
     if (contact.type === "GLOBUS" && contact.status === "NEW") {
         return `
-      Hello,<br/>
-      <br/>
-      A new Globus account has been created for the project ${
-          contact.project_id
-      }.<br/>
-      <br/>
-      Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
-      Username: <b>${contact.project_id}</b><br/>
-      Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/>
-      <br/>
-      Thanks.<br/>
-      `
+        Hello,<br/>
+        <br/>
+        A new Globus account has been created for the project ${
+            contact.project_id
+        }.<br/>
+        <br/>
+        Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
+        Username: <b>${contact.project_id}</b><br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}`
     }
 
     if (contact.type === "GLOBUS" && contact.status === "MODIFIED") {
@@ -165,9 +166,8 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/>
-        <br/>
-        Thanks.<br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
         `
     }
 
@@ -182,9 +182,8 @@ function getCredentialMessageFor(contact: Contact) {
         Server:   <b>${config.sftp.server}</b><br/>
         Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/>
-        <br/>
-        Thanks.<br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
         `
     }
 
@@ -199,9 +198,8 @@ function getCredentialMessageFor(contact: Contact) {
         Server:   <b>${config.sftp.server}</b><br/>
         Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/>
-        <br/>
-        Thanks.<br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
         `
     }
 
