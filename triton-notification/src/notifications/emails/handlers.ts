@@ -2,7 +2,7 @@
  * handlers.js
  */
 import { Response } from "express"
-import { logger } from "@core/logger"
+import { logger } from "../../../../triton-server/src/core/logger"
 
 export const errorHandler =
     (res: Response) =>

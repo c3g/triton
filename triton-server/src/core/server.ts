@@ -21,8 +21,7 @@ import DownloadRouter from "@api/download/routes"
 import * as sqlite3 from "sqlite3"
 import sqliteStoreFactory from "express-session-sqlite"
 import cors from "cors"
-import contactService from "@notifications/contact-service"
-import * as notification from "@notifications/notification-service"
+import { contactService, notificationService } from "@notifications/service"
 
 const SQLiteStore = sqliteStoreFactory(session)
 
@@ -50,7 +49,7 @@ const CLIENT_PORTAL_ORIGIN = new URL(config.client_portal.loginUrl).origin
  */
 
 const stopContactService = contactService.start()
-const stopNotificationService = notification.start()
+const stopNotificationService = notificationService.start()
 
 const app = express()
 

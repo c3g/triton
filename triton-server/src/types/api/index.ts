@@ -15,5 +15,7 @@ export {
     User,
     TritonCreateRequestResponse,
     TritonCreateRequestBody,
+    TritonReadsPerSample,
     ExternalProjectID,
+    TritonNumberOfReads,
 } from "../../../../triton-types/models/api"

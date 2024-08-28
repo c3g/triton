@@ -9,7 +9,6 @@ import { Express } from "express"
 import server from "./server"
 import { initializeFreezemanAPIAuthorization } from "@api/freezeman/authToken"
 import { defaultDatabaseActions } from "@database/download/actions"
-import * as notification from "@notifications/notification-service"
 import { logger } from "./logger"
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production"
@@ -48,7 +47,7 @@ async function startServer() {
  */
 async function createServer(
     handler: Express,
-    port: string
+    port: string,
 ): Promise<http.Server> {
     return await new Promise((resolve, reject) => {
         // set port for Express

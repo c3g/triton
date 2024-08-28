@@ -3,13 +3,12 @@
  */
 /* eslint-disable no-console */
 
-import { Contact } from "../types/download"
-import config from "../../config"
-import { ExternalProjectID } from "../types/api"
-import { logger } from "@core/logger"
-import { defaultDatabaseActions } from "@database/download/actions"
-import { sendEmail } from "@notifications/emails/"
-import { getProjectUsers } from "@api/magic/magic_api"
+import { Contact } from "../../../triton-server/src/types/download"
+import config from "../../../triton-server/config"
+import { ExternalProjectID } from "../../../triton-server/src/types/api"
+import { logger } from "../../../triton-server/src/core/logger"
+import { defaultDatabaseActions } from "../../../triton-server/src/database/download/actions"
+import { getProjectUsers } from "../../../triton-server/src/api/magic/magic_api"
 
 export function start() {
     logger.info("[contacts] Starting service...")

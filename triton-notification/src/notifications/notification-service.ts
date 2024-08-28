@@ -1,70 +1,144 @@
-import cron from "node-cron"
-import { TritonDataset } from "../types/api"
-import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
-import { sendNotificationEmail } from "./emails"
-import { formatDateAndTime } from "./utils"
+import nodemailer from "nodemailer"
+import { TritonDataset } from "../../../triton-types/models/api"
+import { getFreezeManAuthenticatedAPI } from "../../../triton-server/src/api/freezeman/api"
+import * as email from "./contact-service"
+import { defaultDatabaseActions } from "../../../triton-server/src/database/download/actions"
+import { mockDataset } from "./utils"
+import config from "../../config"
+import { logger } from "../../../triton-server/src/core/logger"
 
-export const start = () => {
-    const task = cron.schedule("0 * * * *", async () => {
-        console.info("Notification service started to run.")
-        await getDatasetlatestReleasedUpdate()
-        await getDatasetLatestValidationStatusUpdate()
-    })
-    task.start()
+export const sendDatasetValidationStatusUpdateEmail = async () => {
+    const db = await defaultDatabaseActions()
 
-    return () => {
-        task.stop()
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+    const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
+        .last_released_notification_date
+
+    const validatedDatasets = (
+        await freezemanApi.Dataset.listByReleasedUpdates(lastReleaseDate)
+    ).data.results.map((dataset) => ({ ...dataset }))
+}
+
+export const sendLatestReleasedEmail = async () => {
+    const db = await defaultDatabaseActions()
+    // this db action fails silently if the table does not exist
+    const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
+        .last_released_notification_date
+
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+    const releasedDatasets = (
+        await freezemanApi.Dataset.listByReleasedUpdates(lastReleaseDate)
+    ).data.results.map((dataset) => ({ ...dataset }))
+
+    logger.debug(
+        `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
+    )
+    // the email portion of the logic
+    if (releasedDatasets.length > 0) {
+        await latestReleasedEmail(releasedDatasets, db)
     }
 }
 
-const getDatasetlatestReleasedUpdate = async () => {
-    let releasedDatasets: TritonDataset[] = []
-
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-    const datasetsResponse =
-        await freezemanApi.Dataset.listByReleasedUpdates(formatDateAndTime())
-
-    releasedDatasets = datasetsResponse.data.results.map((dataset) => {
-        return {
-            external_project_id: dataset.external_project_id,
-            id: dataset.id,
-            lane: dataset.lane,
-            readset_count: dataset.readset_count,
-            released_status_count: dataset.released_status_count,
-            run_name: dataset.run_name,
-            latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update: dataset.latest_release_update,
-            blocked_status_count: dataset.blocked_status_count,
-            project_name: dataset.project_name,
+const latestReleasedEmail = async (releasedDatasets: TritonDataset[], db) => {
+    releasedDatasets.sort(
+        (a, b) =>
+            new Date(a.latest_release_update).getTime() -
+            new Date(b.latest_release_update).getTime(),
+    )
+    let lastDate: string | undefined = undefined
+    for (const dataset of releasedDatasets) {
+        if (dataset.released_status_count > 0) {
+            const subject = `Dataset #${dataset.id} for project '${dataset.project_name}' has been released.`
+            const results = await email.broadcastEmailsOfProject(
+                dataset.external_project_id,
+                async (send) => {
+                    await send(
+                        `${subject}`,
+                        `${subject}.<br/>
+                    Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
+                    Here are the information pertaining to the released dataset:<br/>
+                        -   Dataset ID: ${dataset.id}<br/>
+                        -   Dataset project id: ${
+                            dataset.external_project_id
+                        }<br/>
+                        -   Dataset project name: ${dataset.project_name}<br/>
+                        -   Dataset Lane: ${dataset.lane}<br/>
+                        -   Readset count within the Dataset: ${
+                            dataset.readset_count
+                        }<br/>
+                        -   Readset released count: ${
+                            dataset.released_status_count
+                        }<br/>
+                        -   Readset blocked count: ${
+                            dataset.blocked_status_count
+                        }<br/>
+                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
+                    This is an automated email, do not reply back.`,
+                    )
+                },
+            )
+            if (results.some((result) => result.status === "rejected")) {
+                throw new Error(
+                    `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
+                )
+            }
         }
-    })
 
-    sendNotificationEmail(releasedDatasets)
+        // although datasets are sorted by date, we only want to
+        // update the last date if the date is different
+        if (lastDate && dataset.latest_release_update !== lastDate) {
+            await db.updateLatestReleaseNotificationDate(lastDate)
+        }
+        lastDate = dataset.latest_release_update
+    }
+    if (lastDate !== undefined) {
+        // update the last notification date
+        await db.updateLatestReleaseNotificationDate(lastDate)
+    }
 }
 
-const getDatasetLatestValidationStatusUpdate = async () => {
-    let validatedDatasets: TritonDataset[] = []
+const sendNotificationEmailTest = async (
+    dataset: TritonDataset = mockDataset,
+) => {
+    const transporter = nodemailer.createTransport({
+        service: "gmail", // other mailer can be used but right now default is gmail
+        auth: {
+            user: "yourGmailForTesting",
+            pass: "app password",
+        },
+    })
+    const mailOptions = {
+        from: "yourGmail if gmail is being used",
+        to: "theRecipient",
+        subject: "Sending Email using Node.js",
+        text: `The dataset can be downloaded using the Triton platform
+                    Here are the information pertaining to the released dataset:
+                        -   Dataset ID: ${dataset.id}
+                        -   Dataset project id: ${dataset.external_project_id}
+                        -   Dataset project name: ${dataset.project_name}
+                        -   Dataset Lane: ${dataset.lane}
+                        -   Readset count within the Dataset: ${
+                            dataset.readset_count
+                        }
+                        -   Readset released status count: ${
+                            dataset.released_status_count
+                        }
+                        -   Readset blocked status count: ${
+                            dataset.blocked_status_count
+                        }
+                        -   Dataset latest released update date: ${dataset.latest_release_update}
+                    You can now stage for download (Via Globus or SFTP) in Triton.
 
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
+                    This is an automated email, do not reply back.`,
+    }
 
-    const datasetsResponse =
-        await freezemanApi.Dataset.listByReleasedUpdates(formatDateAndTime())
-
-    validatedDatasets = datasetsResponse.data.results.map((dataset) => {
-        return {
-            external_project_id: dataset.external_project_id,
-            id: dataset.id,
-            lane: dataset.lane,
-            readset_count: dataset.readset_count,
-            released_status_count: dataset.released_status_count,
-            run_name: dataset.run_name,
-            latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update: dataset.latest_release_update,
-            blocked_status_count: dataset.blocked_status_count,
-            project_name: dataset.project_name,
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error)
+        } else {
+            console.log("Email sent: " + info.response)
         }
     })
-
-    sendNotificationEmail(validatedDatasets)
 }

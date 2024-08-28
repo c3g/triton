@@ -28,8 +28,8 @@ import {
     TritonRun,
     User,
 } from "../types/api"
-import { listUserProjects } from "./project"
-import { getFreezeManAuthenticatedAPI } from "../freezeman/api"
+import { listUserProjects } from "@api/freezeman/project"
+import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 
 const router = express.Router()
 

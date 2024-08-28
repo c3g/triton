@@ -1,11 +1,11 @@
-import { TritonDataset } from "../types/api"
+import { TritonDataset } from "../../../triton-types/models/api"
 
 export const mockDataset: TritonDataset = {
     id: 987654,
     lane: 123546,
     external_project_id: "project-id-testing",
     project_name: "project name",
-    run_name: "test name",
+    run_name: "run name",
     readset_count: 19,
     released_status_count: 99,
     blocked_status_count: 64,
