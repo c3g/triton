@@ -134,7 +134,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             ): Promise<ListResponse<DatasetFile>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id=${id}&readset__release_status=${RELEASED}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id__in=${id}&readset__release_status=${RELEASED}&limit=100000`,
                 )
             },
         },
