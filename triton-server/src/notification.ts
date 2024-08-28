@@ -46,7 +46,7 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     let lastDate: string | undefined = undefined
     for (const dataset of releasedDatasets) {
         if (dataset.released_status_count > 0) {
-            const subject = `Dataset #${dataset.id} for project '${dataset.project_name}' has been released.`
+            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' has been released.`
             const results = await email.broadcastEmailsOfProject(
                 dataset.external_project_id,
                 async (send) => {
@@ -55,22 +55,11 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         `${subject}.<br/>
                     Datasets can be downloaded from the MCG Data Portal, accessible from Hercules > Data Portal.<br/><br/>
                     Here are the information pertaining to the released dataset:<br/>
-                        -   Dataset ID: ${dataset.id}<br/>
-                        -   Dataset project id: ${
-                            dataset.external_project_id
-                        }<br/>
-                        -   Dataset project name: ${dataset.project_name}<br/>
+                        -   <b>Project ID: ${dataset.external_project_id}</b><br/>
+                        -   <b>Run Name: ${dataset.run_name}</b><br/>
+                        -   <b>Dataset ID: ${dataset.id}</b><br/>
                         -   Dataset Lane: ${dataset.lane}<br/>
-                        -   Readset count within the Dataset: ${
-                            dataset.readset_count
-                        }<br/>
-                        -   Readset released count: ${
-                            dataset.released_status_count
-                        }<br/>
-                        -   Readset blocked count: ${
-                            dataset.blocked_status_count
-                        }<br/>
-                        -   Dataset latest release update time: ${dataset.latest_release_update} (UTC)<br/><br/>
+                        -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
                     This is an automated email, do not reply back.`,
                     )
                 },
