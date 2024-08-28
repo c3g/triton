@@ -1,22 +1,19 @@
-import { ReactElement, useEffect } from "react"
+import { ReactElement, useEffect, useState } from "react"
 import ReadsPerSampleProps from "./interfaces"
-import { useAppSelector } from "@store/hooks"
-import { selectReadsPerSample } from "@store/selectors"
+import { useAppDispatch } from "@store/hooks"
 import { fetchReadsPerSample } from "@store/thunks"
-import { store } from "@store/store"
 import { Spin, Typography } from "antd"
 import { ReadsPerSampleGraph } from "@components/."
+import { TritonNumberOfReads } from "@api/api-types"
 
 export default function ReadsPerSample({
     datasetId,
 }: ReadsPerSampleProps): ReactElement {
+    const dispatch = useAppDispatch()
+    const [readsPerSample, setReadsPerSample] = useState<TritonNumberOfReads[]>()
     useEffect(() => {
-        store.dispatch(fetchReadsPerSample(datasetId))
-    }, [datasetId])
-
-    const readsPerSample = useAppSelector((state) =>
-        selectReadsPerSample(state, datasetId),
-    )
+        dispatch(fetchReadsPerSample(datasetId)).then((readsPerSample) => setReadsPerSample(readsPerSample))
+    }, [dispatch, datasetId])
 
     return (
         <>
@@ -35,7 +32,7 @@ export default function ReadsPerSample({
                 <Spin />
             )}
             <Typography.Text strong>
-                Number of Samples: {readsPerSample?.sampleReads.length}
+                Number of Samples: {readsPerSample?.length ?? 0}
             </Typography.Text>
         </>
     )

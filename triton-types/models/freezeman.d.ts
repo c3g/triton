@@ -15,7 +15,6 @@ export interface Dataset {
     readonly project_name: string
     readonly run_name: string
     readonly lane: number
-    readonly files: ReadonlyArray<DatasetFile["id"]>
     readonly readset_count: number
     readonly released_status_count: number
     readonly blocked_status_count: number
@@ -91,4 +90,8 @@ export interface Metric {
     readonly lane: number // Lane number
     readonly value_numeric?: string // Metric value if numeric. Note: decimals are exported as string because JSON only supports floats and serializing as a number could lose precision.
     readonly value_string?: string // Metric value, if text
+}
+
+export interface ReadsetWithMetrics extends Readset {
+    metrics: Metric[]
 }

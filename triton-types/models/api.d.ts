@@ -6,7 +6,7 @@ import {
     DownloadRequestType,
     Constants,
 } from "./downloads"
-import { Dataset, DatasetFile, Readset } from "./freezeman"
+import { Dataset, DatasetFile, ReadsetWithMetrics } from "./freezeman"
 import * as Magic from "./magic"
 
 /**
@@ -76,7 +76,7 @@ export interface TritonRun {
     availableReadsetsCount: number // The number of readsets which are staged for download
 }
 
-export interface TritonReadset extends Readset {}
+export interface TritonReadset extends ReadsetWithMetrics {}
 
 export interface TritonDatasetFile {
     datasetFile: DatasetFile

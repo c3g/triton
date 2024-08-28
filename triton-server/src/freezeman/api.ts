@@ -3,9 +3,9 @@ import type {
     Dataset,
     DatasetFile,
     FMSList,
-    Metric,
     Project,
-    Readset,
+    ReadsetWithMetrics,
+    ReleaseFlagReleased,
 } from "./models"
 import config from "../../config"
 import { logger } from "../logger"
@@ -129,50 +129,27 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             },
         },
         DatasetFile: {
-            list: async (
-                ids: readonly number[],
+            listByDatasetId: async (
+                id: Dataset["id"],
             ): Promise<ListResponse<DatasetFile>> => {
-                if (ids.length === 0)
-                    throw new Error("Must provide at least one id")
-
+                const RELEASED: ReleaseFlagReleased = 1
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?id__in=${ids.join(
-                        ",",
-                    )}&limit=100000`,
-                )
-            },
-            listByReadsetIds: async (
-                readsetIds: readonly number[],
-            ): Promise<ListResponse<DatasetFile>> => {
-                if (readsetIds.length === 0)
-                    throw new Error("Must provide at least one readset id")
-
-                return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(
-                        ",",
-                    )}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id=${id}&readset__release_status=${RELEASED}&limit=100000`,
                 )
             },
         },
         Readset: {
             listByDatasetId: async (
                 datasetId: Dataset["id"],
-            ): Promise<ListResponse<Readset>> => {
+            ): Promise<ListResponse<ReadsetWithMetrics>> => {
+                const RELEASED: ReleaseFlagReleased = 1
                 const params = [
                     `dataset__id__in=${datasetId}`,
-                    "has_released_files=true",
+                    `release_status=${RELEASED}`,
+                    `withMetrics=true`,
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
-                )
-            },
-        },
-        Metrics: {
-            getReadsPerSampleForDataset: async (
-                datasetId: Dataset["id"],
-            ): Promise<ListResponse<Metric>> => {
-                return await axios.get(
-                    `${LIMS_API_URL}/metrics/?readset__dataset__id__in=${datasetId}&limit=100000&name=nb_reads&metric_group=qc`,
                 )
             },
         },

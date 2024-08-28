@@ -4,7 +4,7 @@ import { ReadsPerSampleGraphProps } from "./interfaces"
 export default function ReadsPerSampleGraph({
     readsPerSample,
 }: ReadsPerSampleGraphProps) {
-    const data = readsPerSample.sampleReads.map((numberOfReads) => ({
+    const data = readsPerSample.map((numberOfReads) => ({
         sample: numberOfReads.sampleName,
         reads: numberOfReads.nbReads,
     }))
