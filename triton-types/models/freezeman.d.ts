@@ -93,5 +93,5 @@ export interface Metric {
 }
 
 export interface ReadsetWithMetrics extends Readset {
-    metrics: readonly Metric[]
+    metrics: Metric[]
 }

@@ -4,6 +4,7 @@ import {
     ExternalProjectID,
     TritonDataset,
     TritonReadset,
+    TritonReadsPerSample,
     TritonRun,
 } from "../api/api-types"
 import { AuthActions } from "./auth"
@@ -207,20 +208,36 @@ export const extendStagingRequest =
 export const fetchReadsPerSample =
     (datasetId: TritonDataset["id"]) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
-        const dataset = getState().datasetsState.datasetsById[datasetId]
-        if (dataset?.readsPerSample) {
-            return dataset?.readsPerSample
-        }
-
-        const readsPerSample =
-            await apiTriton.getReadsPerSampleForDataset(datasetId)
-        // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
-        dispatch(
-            DatasetsStateActions.setReadsPerSample({
-                datasetId,
-                readsPerSample,
-            }),
+        const { readsetsById } = getState().readsetsState
+        const readsets = Object.values(readsetsById).reduce<TritonReadset[]>(
+            (readsets, readset) => {
+                if (readset?.dataset === datasetId) {
+                    readsets.push(readset)
+                }
+                return readsets
+            },
+            [],
         )
+
+        const readsPerSample: TritonReadsPerSample["sampleReads"] = []
+        for (const readset of readsets) {
+            const { metrics } = readset
+            for (const metric of metrics) {
+                if (
+                    metric.name === "nb_reads" &&
+                    metric.metric_group === "qc"
+                ) {
+                    readsPerSample.push({
+                        derivedSampleID: metric.derived_sample_id ?? undefined,
+                        readsetID: metric.readset_id,
+                        sampleName: metric.sample_name,
+                        nbReads: metric.value_numeric
+                            ? Number(metric.value_numeric)
+                            : 0, // The numeric value should always be defined for this type of metric
+                    })
+                }
+            }
+        }
 
         return readsPerSample
     }

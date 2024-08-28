@@ -9,7 +9,6 @@ import {
     TritonDatasetFile,
     TritonProject,
     TritonReadset,
-    TritonReadsPerSample,
     TritonRequest,
     TritonRequestResponse,
     TritonRun,
@@ -114,14 +113,6 @@ export async function resetPassword(
     )
 }
 
-export async function getReadsPerSampleForDataset(
-    datasetID: TritonDataset["id"],
-) {
-    return await tritonGet<TritonReadsPerSample>(
-        `reads-per-sample/?dataset_id=${datasetID}`,
-    )
-}
-
 export default {
     fetchLoginStatus,
     listProjects,
@@ -132,7 +123,6 @@ export default {
     listDatasetFilesForReadset,
     createDownloadRequest,
     getConstants,
-    getReadsPerSampleForDataset,
     deleteDownloadRequest,
     extendStagingRequest,
 }
