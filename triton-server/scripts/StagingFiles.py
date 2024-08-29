@@ -7,11 +7,14 @@ import syslog
 # definitions
 testrecall = "/usr/local/bin/testrecall.sh"
 tritonUser="nodejs"
-tritonServer="bravoportal.genome.mcgill.ca"
+tritonServer="dataportal.genome.mcgill.ca"
 tritonDB="/data/triton/triton.db"
 globusServer="lims-dtn.genome.mcgill.ca"
 httpPrefix="/data/projects"
 globusPrefix="/home/users"
+sftpServer="sftp-lims.genome.mcgill.ca"
+sftpPrefix="/data/home"
+
 keepFiles=7   # nbr of days before deleted
 
 syslog.openlog("StagingFiles", syslog.LOG_PID,syslog.LOG_DAEMON)
@@ -55,21 +58,32 @@ while 1:
       mytype=myrow[2]
 
       # set dataset to PENDING
-      pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'PENDING' WHERE dataset_id='" + dataset + "' and type='" + mytype + "' and status='REQUESTED'\""], stdout=subprocess.PIPE)
+      pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'PENDING' WHERE dataset_id='" + dataset + "' and type='" + mytype + "' and ( status='REQUESTED' or status='QUEUED')\""], stdout=subprocess.PIPE)
       pUpd.communicate()
 
       if (mytype=='HTTP'):
         remoteUser=tritonUser
+        adminUser=tritonUser
         remoteServer=tritonServer
         prefix=httpPrefix
         projLimit=httpProjLimit
-      else:
+      elif (mytype=='GLOBUS'):
         # GLOBUS
         remoteUser=user
+        #adminUser="sbsnovaresearch"
+	adminUser=user
         remoteServer=globusServer
         prefix=globusPrefix
         projLimit=globusProjLimit
-        
+      else:
+	# sftp
+        remoteUser=user
+        adminUser="root"
+        remoteServer=sftpServer
+        prefix=sftpPrefix
+        projLimit=sftpProjLimit
+
+      if (mytype=='GLOBUS'):
         # special check: does user exist?
         p = subprocess.Popen(["ssh", remoteServer, "id", remoteUser], stdout=subprocess.PIPE)
         output, err = p.communicate()
@@ -77,8 +91,21 @@ while 1:
           p = subprocess.Popen(["ssh", remoteServer, "sudo", "/root/addnewuser", "-t", remoteUser], stdout=subprocess.PIPE)
           output, err = p.communicate()
           if p.returncode != 0:
-            syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " can't create user " + remoteUser + " on globus.")
+            syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " can't create user " + remoteUser + " on globus/sftp.")
             break   # next request
+
+
+      if (mytype=='SFTP'):
+        # special check: does user exist?
+        p = subprocess.Popen(["ssh", remoteServer, "id", remoteUser], stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        if p.returncode != 0:
+          p = subprocess.Popen(["ssh", remoteServer, "sudo", "/root/addnewuser", "-t", remoteUser], stdout=subprocess.PIPE)
+          output, err = p.communicate()
+          if p.returncode != 0:
+            syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " can't create user " + remoteUser + " on sftp server " + remoteServer)
+            break   # next request
+
             
       # get all src, dest from fles table
       pFiles = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"SELECT source, destination from files WHERE dataset_id='" + dataset + "'\""], stdout=subprocess.PIPE)
@@ -95,7 +122,7 @@ while 1:
            statinfo=os.stat(src)
            datasetSize = datasetSize + statinfo.st_size
 
-        p = subprocess.Popen(["ssh", remoteUser + "@" + remoteServer, "df", "-P", prefix, "|", "tail", "-1"], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["ssh", adminUser + "@" + remoteServer, "df", "-P", prefix, "|", "tail", "-1"], stdout=subprocess.PIPE)
         output, err = p.communicate()
         if p.returncode != 0:
           available=0
@@ -112,7 +139,8 @@ while 1:
           break
 
         # verify there is enough space left in project
-        p = subprocess.Popen(["ssh", remoteUser + "@" + remoteServer, "du", "-bs", prefix + "/" + user], stdout=subprocess.PIPE)
+        #p = subprocess.Popen(["ssh", adminUser + "@" + remoteServer, "sudo", "du", "-bs", prefix + "/" + user], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["ssh", adminUser + "@" + remoteServer, "du", "-bs", prefix + "/" + user], stdout=subprocess.PIPE)
         output, err = p.communicate()
         if p.returncode != 0:
           projSize=0
@@ -153,7 +181,7 @@ while 1:
  
              # mkdir the path
              destpath=os.path.dirname(destination)
-             p = subprocess.Popen(["ssh",  remoteUser + "@" + remoteServer, "mkdir", "-p", destpath], stdout=subprocess.PIPE)
+             p = subprocess.Popen(["ssh",  adminUser + "@" + remoteServer, "mkdir", "-p", destpath], stdout=subprocess.PIPE)
              output, err = p.communicate()
              if p.returncode != 0:
                failure=1
@@ -161,7 +189,7 @@ while 1:
 
              # scp the file
              #dest=remoteUser + "@" + remoteServer + ":" + dest
-             p = subprocess.Popen(["scp", src, remoteUser + "@" + remoteServer + ":" + destination], stdout=subprocess.PIPE)
+             p = subprocess.Popen(["scp", src, adminUser + "@" + remoteServer + ":" + destination], stdout=subprocess.PIPE)
              # print "scp of " + src + " to " + dest + " pid " + str(p.pid)
              output, err = p.communicate()
              if p.returncode != 0:
@@ -170,9 +198,29 @@ while 1:
              else:
                syslog.syslog(syslog.LOG_INFO, "Dataset " + dataset + " : " + src + " to " + destination + " pid " + str(p.pid) + " transferred.")
 
+             # scp the md5sum file
+             srcMD5=src + ".md5"
+             destinationMD5=destination + ".md5"
+
+             p = subprocess.Popen(["scp", srcMD5, adminUser + "@" + remoteServer + ":" + destinationMD5], stdout=subprocess.PIPE)
+             output, err = p.communicate()
+             if p.returncode != 0:
+               syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " transfer of " +  srcMD5 + " to " + destinationMD5 + " failed: " + str(err))
+             else:
+               syslog.syslog(syslog.LOG_INFO, "Dataset " + dataset + " : " + srcMD5 + " to " + destinationMD5 + " pid " + str(p.pid) + " transferred.")
+
            else:
              failure=1
              syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " source file " + src + " doesn't exist.")
+
+        # special case SFTP chown the files back to user
+        if (mytype=='SFTP' and failure==0):
+	  destDatasetPath=prefix + "/" + remoteUser + "/" + dataset
+    	  p = subprocess.Popen(["ssh",  adminUser + "@" + remoteServer, "chown", "-R", remoteUser, destDatasetPath], stdout=subprocess.PIPE)
+	  output, err = p.communicate()
+          if p.returncode != 0:
+            syslog.syslog(syslog.LOG_WARNING, "Dataset " + dataset + " chown of " + destDatasetPath + " to user " + remoteUser + " on server " + remoteServer + " failed,")
+            failure=1
 
       else:
         # no files is an error
@@ -187,3 +235,4 @@ while 1:
         expiry=datetime.datetime.now() + datetime.timedelta(days=keepFiles)
         pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'SUCCESS',completion_date='" + datetime.datetime.now().isoformat() + "', expiry_date='" + expiry.isoformat() + "' WHERE dataset_id='" + dataset + "' and type ='" + mytype + "'\""], stdout=subprocess.PIPE)
         pUpd.communicate()
+
