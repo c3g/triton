@@ -85,7 +85,7 @@ export function start() {
                                 `${subject}.<br/>
                                 The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
                                 If you forgot your credential or didn't receive it, you can reset your password in the data portal.<br/><br/>
-                                If you have any other issues please contact us at hercules@mcgill.ca.<br/><br/>
+                                If you have any other issues please contact us at ${process.env.REACT_APP_TECH_SUPPORT_EMAIL}.<br/><br/>
                                 Thank You.<br/>`,
                             )
                         },
@@ -104,7 +104,7 @@ export function start() {
                             await send(
                                 `${subject}`,
                                 `${subject}.<br/><br/>
-                                Please contact us at hercules@mcgill.ca.<br/><br/>
+                                Please contact us at ${process.env.REACT_APP_TECH_SUPPORT_EMAIL}.<br/><br/>
                                 Thank You.<br/>`,
                             )
                         },
@@ -146,7 +146,7 @@ function getCredentialSubjectFor(contact: Contact) {
 }
 
 function getCredentialMessageFor(contact: Contact) {
-    const ENDING = `If you have any issues please contact us at hercules@mcgill.ca.<br/><br/>
+    const ENDING = `If you have any issues please contact us at ${process.env.REACT_APP_TECH_SUPPORT_EMAIL}.<br/><br/>
     Thank You.<br/>`
 
     if (contact.type === "GLOBUS" && contact.status === "NEW") {
