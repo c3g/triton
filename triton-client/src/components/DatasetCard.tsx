@@ -181,7 +181,11 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                             if (status === "SUCCESS") {
                                 Modal.info({
                                     title: `Dataset successfully staged`,
-                                    content: `You can now download the dataset using the instruction sent to your email.`,
+                                    content: `
+                                    You can now download the dataset by following the instructions sent to your email.
+                                    If you don't see the email, please check your spam folder.
+                                    If it's still missing, try resetting your password and checking again.
+                                    For further assistance, feel free to contact us at ${process.env.REACT_APP_TECH_SUPPORT_EMAIL}.`,
                                 })
                             }
                         }}
