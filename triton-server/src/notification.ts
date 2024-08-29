@@ -1,3 +1,4 @@
+import config from "../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
 import * as email from "./contact-service"
@@ -62,7 +63,7 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
                         To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
                         Datasets can be downloaded using SFTP or Globus using the credential provided to you during the staging process.<br/><br/>
                         If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
-                        If you have any issues please contact us at hercules@mcgill.ca.<br/><br/>
+                        If you have any issues, please contact us at ${config.mail.techSupport}.<br/><br/>
                         Thank you.<br/>`,
                     )
                 },
