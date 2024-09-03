@@ -31,7 +31,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
 
     const validatedDatasets = (
         await freezemanApi.Dataset.listByValidatedStatusUpdates(
-            "2024-08-28T17:01:26",
+            lastValidationStatusUpdate,
         )
     ).data.results.map((dataset) => ({ ...dataset }))
 
