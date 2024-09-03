@@ -4,31 +4,15 @@ import * as email from "./contact-service"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
 import { logger } from "./logger"
-import { Dataset } from "./freezeman/models"
+import { Dataset, FreezemanUser, ValidationFlag } from "./freezeman/models"
 
 export const start = () => {
-    const cronExpression = "0 * * * *"
+    const cronExpression = "*/1 * * * *"
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, async () => {
         logger.info("Executing notification service.")
-
-        const db = await defaultDatabaseActions()
-        // this db action fails silently if the table does not exist
-        const lastReleaseDate = (await db.getLatestReleaseNotificationDate())
-            .last_released_notification_date
-
-        const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-        const releasedDatasets = (
-            await freezemanApi.Dataset.listByReleasedUpdates(lastReleaseDate)
-        ).data.results.map((dataset) => ({ ...dataset }))
-
-        logger.debug(
-            `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
-        )
-        if (releasedDatasets.length > 0) {
-            await sendNotificationEmail(releasedDatasets)
-        }
+        await sendLatestReleasedNotificationEmail()
+        await sendDatasetValidationStatusUpdateEmail()
     })
 
     return () => {
@@ -36,8 +20,57 @@ export const start = () => {
     }
 }
 
-export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
+export const sendDatasetValidationStatusUpdateEmail = async () => {
     const db = await defaultDatabaseActions()
+
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+    const lastValidationStatusUpdate = (
+        await db.getLatestValidatedNotificationDate()
+    ).last_validated_notification_date
+
+    const validatedDatasets = (
+        await freezemanApi.Dataset.listByValidatedStatusUpdates(
+            "2024-08-28T17:01:26",
+        )
+    ).data.results.map((dataset) => ({ ...dataset }))
+
+    logger.debug(
+        `Found ${validatedDatasets.length} datasets to potentially notify for release.`,
+    )
+    // the email portion of the logic
+    if (validatedDatasets.length > 0) {
+        let formattedData: ExtractedValidatedNotificationData[] =
+            await extractValidatedDatasetsInfo(validatedDatasets)
+        datasetObjectTestEmail(formattedData)
+    }
+}
+
+export const sendLatestReleasedNotificationEmail = async () => {
+    const db = await defaultDatabaseActions()
+
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+
+    const lastReleasedStatusUpdate = (
+        await db.getLatestReleaseNotificationDate()
+    ).last_released_notification_date
+
+    const releasedDatasets = (
+        await freezemanApi.Dataset.listByReleasedUpdates(
+            lastReleasedStatusUpdate,
+        )
+    ).data.results.map((dataset) => ({ ...dataset }))
+
+    logger.debug(
+        `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
+    )
+    // the email portion of the logic
+    if (releasedDatasets.length > 0) {
+        let formattedData: ExtractedValidatedNotificationData[] =
+            await extractValidatedDatasetsInfo(releasedDatasets)
+        datasetObjectTestEmail(formattedData)
+    }
+
     releasedDatasets.sort(
         (a, b) =>
             new Date(a.latest_release_update).getTime() -
@@ -95,51 +128,46 @@ export const sendNotificationEmail = async (releasedDatasets: Dataset[]) => {
     }
 }
 
-export const sendNotificationEmailTest = async (
-    datasets: Dataset[] = [mockDataset],
+export const datasetObjectTestEmail = (
+    datasets: ExtractedValidatedNotificationData[],
 ) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
         auth: {
-            user: "yourGmailForTesting",
-            pass: "app password",
+            user: "sebastianamouzegar@gmail.com",
+            pass: "tlba fptj scli xfdy",
         },
     })
-    datasets.map((dataset) => {
-        const mailOptions = {
-            from: "yourGmail if gmail is being used",
-            to: "theRecipient",
-            subject: "Sending Email using Node.js",
-            text: `The dataset can be downloaded using the Triton platform
-                    Here are the information pertaining to the released dataset:
-                        -   Dataset ID: ${dataset.id}
-                        -   Dataset project id: ${dataset.external_project_id}
-                        -   Dataset project name: ${dataset.project_name}
-                        -   Dataset Lane: ${dataset.lane}
-                        -   Readset count within the Dataset: ${
-                            dataset.readset_count
-                        }
-                        -   Readset released status count: ${
-                            dataset.released_status_count
-                        }
-                        -   Readset blocked status count: ${
-                            dataset.blocked_status_count
-                        }
-                        -   Dataset latest released update date: ${dataset.latest_release_update}
-                    You can now stage for download (Via Globus or SFTP) in Triton.
+    let body =
+        "A run has been validated:" +
+        datasets.map((dataset: ExtractedValidatedNotificationData) => {
+            return `
+                    -   Run Name: ${dataset.projectAndRunInfo.run_name}
+                    -   Validated by: Name of Lab user that validated the run ${dataset.projectAndRunInfo.project_name}
+                    -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""}
+                    - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${dataset.projectAndRunInfo.validationStatus}
+                        - Comments left by ${dataset.basicCommentUserInfo?.name}
+                        - Comment : ${dataset.basicCommentUserInfo?.comment}
+                        - Created at : ${dataset.basicCommentUserInfo?.created_at}
+                    `
+        }) +
+        `Thank you.
 
-                    Thank you
-                    From the Triton Tech team
-                    This is an automated email, do not reply back.`,
+        "This is an automated email, do not reply back.`
+
+    const mailOptions = {
+        from: "sebastianamouzegar@gmail.com",
+        to: "sebastian.amouzegar@computationalgenomics.ca",
+        subject: "Sending Email using Node.js",
+        text: body,
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error)
+        } else {
+            console.log("Email sent: " + info.response)
         }
-
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error)
-            } else {
-                console.log("Email sent: " + info.response)
-            }
-        })
     })
 }
 
@@ -154,4 +182,84 @@ const mockDataset: Dataset = {
     blocked_status_count: 64,
     latest_release_update: new Date().toISOString(),
     files: [],
+    archived_comments: [],
+    validation_status: 0,
+    validated_by: 64,
+}
+
+// this should also do the api call to get the basic info from the user
+const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+    let extractedData: ExtractedValidatedNotificationData[] = []
+    validatedDataset.map((item: Dataset) => {
+        let runsInfo: ProjectAndRunInfo
+        let userCommentInfo: BasicCommentUserInfo | undefined = undefined
+        runsInfo = {
+            run_name: item.run_name,
+            project_name: item.project_name,
+            project_id: item.external_project_id,
+            lane_number: item.lane,
+            validationStatus: item.validation_status,
+            validated_by: item.validated_by ?? 64,
+        }
+        if (item.archived_comments.length > 0) {
+            userCommentInfo = {
+                comment: item.archived_comments[0].comment,
+                created_at: item.archived_comments[0].created_at,
+                user_id: item.archived_comments[0].created_by,
+            }
+        }
+        extractedData.push({
+            basicCommentUserInfo: userCommentInfo,
+            projectAndRunInfo: runsInfo,
+        })
+    })
+    let ids: number[]
+    extractedData.map(async (dataset: ExtractedValidatedNotificationData) => {
+        if (
+            dataset.projectAndRunInfo.validated_by &&
+            dataset.basicCommentUserInfo?.user_id
+        ) {
+            ids.push(dataset.basicCommentUserInfo?.user_id)
+            ids.push(dataset.projectAndRunInfo.validated_by)
+        }
+        if (ids.length > 0) {
+            await freezemanApi.Users.getUsersByIds(ids).then((response) => {
+                response.data.map((user: FreezemanUser) => {
+                    if (dataset.basicCommentUserInfo?.user_id === user.id) {
+                        dataset.basicCommentUserInfo.name =
+                            user.first_name + " " + user.last_name
+                    }
+                    if (dataset.projectAndRunInfo?.validated_by === user.id) {
+                        dataset.projectAndRunInfo.name =
+                            user.first_name + " " + user.last_name
+                    }
+                })
+            })
+        }
+    })
+
+    return extractedData
+}
+
+interface BasicCommentUserInfo {
+    user_id: number
+    created_at: string
+    comment: string
+    name?: string
+}
+
+interface ProjectAndRunInfo {
+    run_name: string
+    lane_number: number
+    validated_by?: number
+    name?: string
+    project_name: string
+    validationStatus: ValidationFlag
+    project_id?: string
+}
+
+interface ExtractedValidatedNotificationData {
+    projectAndRunInfo: ProjectAndRunInfo
+    basicCommentUserInfo?: BasicCommentUserInfo
 }

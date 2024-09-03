@@ -82,4 +82,5 @@ export type Constants = Selectable<ConstantsRecord>
 
 interface NotificationDatesRecord {
     readonly last_released_notification_date: string
+    readonly last_validated_notification_date: string
 }
