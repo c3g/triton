@@ -15,7 +15,6 @@ export interface Dataset {
     readonly project_name: string
     readonly run_name: string
     readonly lane: number
-    readonly files: ReadonlyArray<DatasetFile["id"]>
     readonly readset_count: number
     readonly released_status_count: number
     readonly blocked_status_count: number
@@ -117,4 +116,8 @@ export interface FreezemanUser {
     readonly is_superuser: boolean
     readonly is_staff: boolean
     readonly is_active: boolean
+}
+
+export interface ReadsetWithMetrics extends Readset {
+    metrics: Metric[]
 }
