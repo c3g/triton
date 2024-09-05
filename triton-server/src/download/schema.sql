@@ -4,7 +4,7 @@
 
 create table requests (
     id INTEGER PRIMARY KEY ASC,
-    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED')) not null default 'REQUESTED',
+    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED', 'DELAYED')) not null default 'REQUESTED',
     type       text check(type IN ('HTTP', 'SFTP', 'GLOBUS')) not null,
     dataset_id text not null,
     project_id text not null,
@@ -25,7 +25,7 @@ create unique index idx_dataset_request on requests(dataset_id);
 
 CREATE TABLE historical_requests (
     id INTEGER PRIMARY KEY ASC,
-    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED')) not null default 'REQUESTED',
+    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED', 'DELAYED')) not null default 'REQUESTED',
     type       text check(type IN ('HTTP', 'SFTP', 'GLOBUS')) not null,
     dataset_id text not null,
     project_id text not null,

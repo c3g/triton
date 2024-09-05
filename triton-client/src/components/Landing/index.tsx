@@ -74,7 +74,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             "Failed". If "Queued" is displayed, the dataset is
                             waiting for sufficient disk space to begin staging.
                             If "Failed" is displayed, please contact us at{" "}
-                            <Link to={""}>{"hercules@mcgill.ca"}</Link>
+                            <Link to={""}>{process.env.REACT_APP_TECH_SUPPORT_EMAIL}</Link>
                         </Typography.Title>
                         <Typography.Title level={5}>
                             4. An info icon {"  "}

@@ -23,7 +23,13 @@ export interface Database {
  */
 export interface DownloadRequestRecord {
     readonly id: Generated<number>
-    readonly status: "REQUESTED" | "PENDING" | "QUEUED" | "FAILED" | "SUCCESS"
+    readonly status:
+        | "REQUESTED"
+        | "PENDING"
+        | "QUEUED"
+        | "FAILED"
+        | "SUCCESS"
+        | "DELAYED"
     readonly type: "SFTP" | "GLOBUS"
     readonly dataset_id: string
     readonly project_id: string

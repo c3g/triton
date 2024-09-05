@@ -137,26 +137,12 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             },
         },
         DatasetFile: {
-            list: async (
-                ids: readonly number[],
+            listByDatasetId: async (
+                id: Dataset["id"],
             ): Promise<ListResponse<DatasetFile>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?id__in=${ids.join(
-                        ",",
-                    )}&limit=100000`,
-                )
-            },
-            listByReadsetIds: async (
-                readsetIds: readonly number[],
-            ): Promise<ListResponse<DatasetFile>> => {
-                if (readsetIds.length === 0)
-                    throw new Error("Must provide at least one readset id")
-
-                return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?readset__id__in=${readsetIds.join(
-                        ",",
-                    )}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id__in=${id}&readset__release_status=${RELEASED}&limit=100000`,
                 )
             },
         },
@@ -174,14 +160,6 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
                 )
             },
-        },
-        Users: {
-            getUsersByIds: async (
-                ids: number[],
-            ): Promise<Response<FreezemanUser[]>> =>
-                await axios.get(
-                    `${LIMS_API_URL}/users/?id__in=${ids.join(",")}`,
-                ),
         },
     } as const
 }
