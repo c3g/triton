@@ -23,6 +23,7 @@ export interface Dataset {
     readonly archived_comments: ArchivedComment[]
     readonly validated_by: number
     readonly validation_status: ValidationFlag
+    readonly validation_status_update_timestamp: string
 }
 export interface ArchivedComment {
     readonly id: number

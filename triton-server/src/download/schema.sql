@@ -81,8 +81,8 @@ create table constants (
 
 create table notification_dates (
     id                              INTEGER PRIMARY KEY ASC check(id = 1),
-    last_released_notification_date text not null -- ISO8601
+    last_released_notification_date text not null, -- ISO8601
     last_validated_notification_date text not null -- ISO8601
 );
-insert into notification_dates (last_released_notification_date) values (datetime('now')); -- init notification table
-insert into notification_dates (last_validated_notification_date) values (datetime('now')); -- init notification table
+insert into notification_dates (last_released_notification_date) values (datetime('now')); -- init last_released_notification_date row
+insert into notification_dates (last_validated_notification_date) values (datetime('now')); -- init last_validated_notification_date row

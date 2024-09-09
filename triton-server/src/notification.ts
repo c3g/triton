@@ -5,15 +5,16 @@ import * as email from "./contact-service"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
 import { logger } from "./logger"
-import { Dataset, FreezemanUser, ValidationFlag } from "./freezeman/models"
+import { Dataset, ValidationFlag } from "./freezeman/models"
+import { sendEmail } from "./download/email"
 
-export const start = () => {
-    const cronExpression = "*/1 * * * *"
+export const start = async () => {
+    const cronExpression = "0 * * * *"
     logger.info(`Notification service started to run. (${cronExpression})`)
-    const task = cron.schedule(cronExpression, async () => {
+    const task = cron.schedule(cronExpression, () => {
         logger.info("Executing notification service.")
-        await sendLatestReleasedNotificationEmail()
-        await sendDatasetValidationStatusUpdateEmail()
+        sendLatestReleasedNotificationEmail()
+        sendDatasetValidationStatusUpdateEmail()
     })
 
     return () => {
@@ -23,6 +24,7 @@ export const start = () => {
 
 export const sendDatasetValidationStatusUpdateEmail = async () => {
     const db = await defaultDatabaseActions()
+    let ids: number[] = []
 
     const freezemanApi = await getFreezeManAuthenticatedAPI()
 
@@ -36,14 +38,62 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
         )
     ).data.results.map((dataset) => ({ ...dataset }))
 
-    logger.debug(
-        `Found ${validatedDatasets.length} datasets to potentially notify for release.`,
-    )
+    logger.debug(`Found ${validatedDatasets.length} datasets.`)
     // the email portion of the logic
+
     if (validatedDatasets.length > 0) {
         let formattedData: ExtractedValidatedNotificationData[] =
             await extractValidatedDatasetsInfo(validatedDatasets)
-        datasetObjectTestEmail(formattedData)
+
+        formattedData.map(
+            async (dataset: ExtractedValidatedNotificationData) => {
+                if (
+                    dataset.basicCommentUserInfo?.user_id &&
+                    !ids.includes(dataset.basicCommentUserInfo?.user_id)
+                ) {
+                    ids.push(dataset.basicCommentUserInfo?.user_id)
+                }
+            },
+        )
+        if (ids.length > 0) {
+            ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
+                (freezemanUser) => {
+                    formattedData.map(
+                        (user: ExtractedValidatedNotificationData) => {
+                            if (
+                                user.basicCommentUserInfo?.user_id ===
+                                    freezemanUser.id &&
+                                user.basicCommentUserInfo?.user_id
+                            ) {
+                                user.basicCommentUserInfo.name =
+                                    freezemanUser.first_name +
+                                    " " +
+                                    freezemanUser.last_name
+                            }
+                        },
+                    )
+                },
+            )
+        }
+        let body =
+            "A run has been validated:" +
+            formattedData.map((dataset: ExtractedValidatedNotificationData) => {
+                return `
+                        -   Run Name: ${dataset.projectAndRunInfo.run_name}
+                        -   Validated by: ${dataset.projectAndRunInfo.validated_by}
+                        -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""}
+                        - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)}
+                            ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment : "No comments"}
+                            ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name : ""}
+                            ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] : ""}
+
+                        `
+            }) +
+            `
+            Thank you.
+
+            This is an automated email, do not reply back.`
+        await sendValidationEmail(formattedData, body, db)
     }
 }
 
@@ -67,57 +117,53 @@ export const sendLatestReleasedNotificationEmail = async () => {
     )
     // the email portion of the logic
     if (releasedDatasets.length > 0) {
-        let formattedData: ExtractedValidatedNotificationData[] =
-            await extractValidatedDatasetsInfo(releasedDatasets)
-        datasetObjectTestEmail(formattedData)
-    }
-
-    releasedDatasets.sort(
-        (a, b) =>
-            new Date(a.latest_release_update).getTime() -
-            new Date(b.latest_release_update).getTime(),
-    )
-    let lastDate: string | undefined = undefined
-    for (const dataset of releasedDatasets) {
-        if (dataset.released_status_count > 0) {
-            const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' is ready for staging for download.`
-            const results = await email.broadcastEmailsOfProject(
-                dataset.external_project_id,
-                async (send) => {
-                    await send(
-                        `${subject}`,
-                        `${subject}.<br/><br/>
-                        -   <b>Project ID: ${dataset.external_project_id}</b><br/>
-                        -   <b>Run Name: ${dataset.run_name}</b><br/>
-                        -   <b>Dataset ID: ${dataset.id}</b><br/>
-                        -   Dataset Lane: ${dataset.lane}<br/>
-                        -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
-                        Datasets can be downloaded from the MCG Data Portal.
-                        To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
-                        Datasets can be downloaded using SFTP or Globus using the credential provided to you during the staging process.<br/><br/>
-                        If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
-                        If you have any issues, please contact us at ${config.mail.techSupport}.<br/><br/>
-                        Thank you.<br/>`,
-                    )
-                },
-            )
-            if (results.some((result) => result.status === "rejected")) {
-                throw new Error(
-                    `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
+        releasedDatasets.sort(
+            (a, b) =>
+                new Date(a.latest_release_update).getTime() -
+                new Date(b.latest_release_update).getTime(),
+        )
+        let lastDate: string | undefined = undefined
+        for (const dataset of releasedDatasets) {
+            if (dataset.released_status_count > 0) {
+                const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' is ready for staging for download.`
+                const results = await email.broadcastEmailsOfProject(
+                    dataset.external_project_id,
+                    async (send) => {
+                        await send(
+                            `${subject}`,
+                            `${subject}.<br/><br/>
+                            -   <b>Project ID: ${dataset.external_project_id}</b><br/>
+                            -   <b>Run Name: ${dataset.run_name}</b><br/>
+                            -   <b>Dataset ID: ${dataset.id}</b><br/>
+                            -   Dataset Lane: ${dataset.lane}<br/>
+                            -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
+                            Datasets can be downloaded from the MCG Data Portal.
+                            To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
+                            Datasets can be downloaded using SFTP or Globus using the credential provided to you during the staging process.<br/><br/>
+                            If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
+                            If you have any issues, please contact us at ${config.mail.techSupport}.<br/><br/>
+                            Thank you.<br/>`,
+                        )
+                    },
                 )
+                if (results.some((result) => result.status === "rejected")) {
+                    throw new Error(
+                        `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
+                    )
+                }
             }
-        }
 
-        // although datasets are sorted by date, we only want to
-        // update the last date if the date is different
-        if (lastDate && dataset.latest_release_update !== lastDate) {
+            // although datasets are sorted by date, we only want to
+            // update the last date if the date is different
+            if (lastDate && dataset.latest_release_update !== lastDate) {
+                await db.updateLatestReleaseNotificationDate(lastDate)
+            }
+            lastDate = dataset.latest_release_update
+        }
+        if (lastDate !== undefined) {
+            // update the last notification date
             await db.updateLatestReleaseNotificationDate(lastDate)
         }
-        lastDate = dataset.latest_release_update
-    }
-    if (lastDate !== undefined) {
-        // update the last notification date
-        await db.updateLatestReleaseNotificationDate(lastDate)
     }
 }
 
@@ -136,17 +182,19 @@ export const datasetObjectTestEmail = (
         datasets.map((dataset: ExtractedValidatedNotificationData) => {
             return `
                     -   Run Name: ${dataset.projectAndRunInfo.run_name}
-                    -   Validated by: Name of Lab user that validated the run ${dataset.projectAndRunInfo.project_name}
+                    -   Validated by: ${dataset.projectAndRunInfo.validated_by}
                     -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""}
-                    - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${dataset.projectAndRunInfo.validationStatus}
-                        - Comments left by ${dataset.basicCommentUserInfo?.name}
-                        - Comment : ${dataset.basicCommentUserInfo?.comment}
-                        - Created at : ${dataset.basicCommentUserInfo?.created_at}
+                    - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)}
+                        ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment : "No comments"}
+                        ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name : ""}
+                        ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] : ""}
+
                     `
         }) +
-        `Thank you.
+        `
+        Thank you.
 
-        "This is an automated email, do not reply back.`
+        This is an automated email, do not reply back.`
 
     const mailOptions = {
         from: "sebastianamouzegar@gmail.com",
@@ -174,10 +222,23 @@ const mockDataset: Dataset = {
     released_status_count: 99,
     blocked_status_count: 64,
     latest_release_update: new Date().toISOString(),
-    files: [],
     archived_comments: [],
     validation_status: 0,
     validated_by: 64,
+    validation_status_update_timestamp: new Date().toISOString(),
+}
+
+const getValidationFlagLabel = (status: number) => {
+    switch (status) {
+        case 0:
+            return "Available"
+        case 1:
+            return "Passed"
+        case 2:
+            return "Failed"
+        default:
+            break
+    }
 }
 
 // this should also do the api call to get the basic info from the user
@@ -192,8 +253,10 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             project_name: item.project_name,
             project_id: item.external_project_id,
             lane_number: item.lane,
-            validationStatus: item.validation_status,
+            validation_status: item.validation_status,
             validated_by: item.validated_by ?? 64,
+            validation_status_update_timestamp:
+                item.validation_status_update_timestamp,
         }
         if (item.archived_comments.length > 0) {
             userCommentInfo = {
@@ -206,30 +269,6 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             basicCommentUserInfo: userCommentInfo,
             projectAndRunInfo: runsInfo,
         })
-    })
-    let ids: number[]
-    extractedData.map(async (dataset: ExtractedValidatedNotificationData) => {
-        if (
-            dataset.projectAndRunInfo.validated_by &&
-            dataset.basicCommentUserInfo?.user_id
-        ) {
-            ids.push(dataset.basicCommentUserInfo?.user_id)
-            ids.push(dataset.projectAndRunInfo.validated_by)
-        }
-        if (ids.length > 0) {
-            await freezemanApi.Users.getUsersByIds(ids).then((response) => {
-                response.data.map((user: FreezemanUser) => {
-                    if (dataset.basicCommentUserInfo?.user_id === user.id) {
-                        dataset.basicCommentUserInfo.name =
-                            user.first_name + " " + user.last_name
-                    }
-                    if (dataset.projectAndRunInfo?.validated_by === user.id) {
-                        dataset.projectAndRunInfo.name =
-                            user.first_name + " " + user.last_name
-                    }
-                })
-            })
-        }
     })
 
     return extractedData
@@ -248,11 +287,49 @@ interface ProjectAndRunInfo {
     validated_by?: number
     name?: string
     project_name: string
-    validationStatus: ValidationFlag
+    validation_status: ValidationFlag
+    validation_status_update_timestamp: string
     project_id?: string
 }
 
 interface ExtractedValidatedNotificationData {
     projectAndRunInfo: ProjectAndRunInfo
     basicCommentUserInfo?: BasicCommentUserInfo
+}
+
+export const sendValidationEmail = async (
+    validatedDatasets: ExtractedValidatedNotificationData[],
+    body: string,
+    db: any,
+) => {
+    if (validatedDatasets.length > 0) {
+        let lastDate: string | undefined = undefined
+        for (const dataset of validatedDatasets) {
+            if (dataset.projectAndRunInfo.validation_status > 0) {
+                const subject = `A Run has been validated.`
+                await sendEmail(
+                    "",
+                    "sequencing-runs@computationalgenomics.ca",
+                    subject,
+                    body,
+                )
+            }
+
+            // although datasets are sorted by date, we only want to
+            // update the last date if the date is different
+            if (
+                lastDate &&
+                dataset.projectAndRunInfo.validation_status_update_timestamp !==
+                    lastDate
+            ) {
+                await db.updateLatestReleaseNotificationDate(lastDate)
+            }
+            lastDate =
+                dataset.projectAndRunInfo.validation_status_update_timestamp
+        }
+        if (lastDate !== undefined) {
+            // update the last notification date
+            await db.updateLatestReleaseNotificationDate(lastDate)
+        }
+    }
 }

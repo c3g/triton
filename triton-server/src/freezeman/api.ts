@@ -99,7 +99,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
         Dataset: {
             listByExternalProjectIds: async (
                 externalProjectIds: readonly string[],
-            ): Promise<ListResponse<Dataset[]>> => {
+            ): Promise<ListResponse<Dataset>> => {
                 if (externalProjectIds.length === 0) {
                     throw new Error(
                         "Must provide at least one project id to list datasets",
@@ -160,6 +160,14 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
                 )
             },
+        },
+        Users: {
+            getUsersByIds: async (
+                ids: number[],
+            ): Promise<ListResponse<FreezemanUser>> =>
+                await axios.get(
+                    `${LIMS_API_URL}/users/?id__in=${ids.join(",")}`,
+                ),
         },
     } as const
 }
