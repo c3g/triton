@@ -220,7 +220,7 @@ export async function createActions(db: Kysely<TritonNotificationDatabase>) {
     async function updateLatestValidatedNotificationDate(date: string) {
         return await db
             .updateTable("notification_dates")
-            .set({ last_released_notification_date: date })
+            .set({ last_validated_notification_date: date })
             .returning("last_validated_notification_date")
             .executeTakeFirstOrThrow()
     }
