@@ -199,7 +199,7 @@ export async function createActions(db: Kysely<TritonNotificationDatabase>) {
         return await db
             .selectFrom("notification_dates")
             .select("last_released_notification_date")
-            .executeTakeFirstOrThrow()
+            .executeTakeFirst()
     }
 
     async function updateLatestReleaseNotificationDate(date: string) {
@@ -214,7 +214,7 @@ export async function createActions(db: Kysely<TritonNotificationDatabase>) {
         return await db
             .selectFrom("notification_dates")
             .select("last_validated_notification_date")
-            .executeTakeFirstOrThrow()
+            .executeTakeFirst()
     }
 
     async function updateLatestValidatedNotificationDate(date: string) {

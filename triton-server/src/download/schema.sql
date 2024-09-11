@@ -84,5 +84,4 @@ create table notification_dates (
     last_released_notification_date text not null, -- ISO8601
     last_validated_notification_date text not null -- ISO8601
 );
-insert into notification_dates (last_released_notification_date) values (datetime('now')); -- init last_released_notification_date row
-insert into notification_dates (last_validated_notification_date) values (datetime('now')); -- init last_validated_notification_date row
+insert into notification_dates (last_released_notification_date, last_validated_notification_date) values (datetime('now'), datetime('now')); -- init last_released_notification_date row

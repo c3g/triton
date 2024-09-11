@@ -19,11 +19,12 @@ export interface Dataset {
     readonly released_status_count: number
     readonly blocked_status_count: number
     // readonly metric_report_url?: string // it might reveal details about other projects
+    readonly released_by?: string | number
     readonly latest_release_update: string // triton will only fetch datasets that contains released readsets
     readonly archived_comments: ArchivedComment[]
-    readonly validated_by: number
+    readonly validated_by?: string | number
     readonly validation_status: ValidationFlag
-    readonly validation_status_update_timestamp: string
+    readonly latest_validation_update: string
 }
 export interface ArchivedComment {
     readonly id: number
