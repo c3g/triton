@@ -56,24 +56,24 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 },
             )
             if (ids.length > 0) {
-                ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
-                    (freezemanUser) => {
-                        formattedData.forEach(
-                            (user: ExtractedValidatedNotificationData) => {
-                                if (
-                                    user.basicCommentUserInfo?.user_id ===
-                                        freezemanUser.id &&
-                                    user.basicCommentUserInfo?.user_id
-                                ) {
-                                    user.basicCommentUserInfo.name =
-                                        freezemanUser.first_name +
-                                        " " +
-                                        freezemanUser.last_name
-                                }
-                            },
-                        )
-                    },
-                )
+                ;(
+                    await freezemanApi.Users.getUsersByIds(ids)
+                ).data.results.forEach((freezemanUser) => {
+                    formattedData.forEach(
+                        (user: ExtractedValidatedNotificationData) => {
+                            if (
+                                user.basicCommentUserInfo?.user_id ===
+                                    freezemanUser.id &&
+                                user.basicCommentUserInfo?.user_id
+                            ) {
+                                user.basicCommentUserInfo.name =
+                                    freezemanUser.first_name +
+                                    " " +
+                                    freezemanUser.last_name
+                            }
+                        },
+                    )
+                })
             }
             let body =
                 "A run has been validated:" +
