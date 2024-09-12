@@ -10,11 +10,12 @@ import { sendEmail } from "./download/email"
 
 export const start = async () => {
     const cronExpression = "0 * * * *"
+    logger.info(process.env.NODE_ENV)
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, () => {
         logger.info("Executing notification service.")
-        sendLatestReleasedNotificationEmail()
-        sendDatasetValidationStatusUpdateEmail()
+        // sendLatestReleasedNotificationEmail()
+        // sendDatasetValidationStatusUpdateEmail()
     })
 
     return () => {
@@ -293,7 +294,14 @@ export const sendValidationEmail = async (
         for (const dataset of validatedDatasets) {
             if (dataset.projectAndRunInfo.validation_status > 0) {
                 const subject = `A Run has been validated.`
-                await sendEmail("", config.email_testing.to, subject, body)
+                await sendEmail(
+                    "",
+                    process.env.NODE_ENV?.includes("dev")
+                        ? config.mail.toValidationNotification
+                        : config.mail.toTestEmail,
+                    subject,
+                    body,
+                )
             }
 
             // although datasets are sorted by date, we only want to

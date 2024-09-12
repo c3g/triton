@@ -1,3 +1,4 @@
+import { triggerAsyncId } from "async_hooks"
 import "dotenv/config"
 
 const TRITON_ENVIRONMENTS = {
@@ -14,7 +15,7 @@ const TRITON_ENVIRONMENTS = {
     SFTP_SERVER: "",
     SFTP_PORT: "",
     ERROR_MONITORING_EMAIL: "",
-    TECH_SUPPORT_EMAIL: "",
+    TECH_SUPPORT_EMAIL: "don",
     TO_VALIDATION_EMAIL: "sequencing-runs@computationalgenomics.ca",
     TO_TEST_EMAIL: "andres.tocasuche@c3g.ca",
     TRITON_HTTPS_PROXY: "",
@@ -54,6 +55,8 @@ export default {
     mail: {
         errorMonitoring: TRITON_ENVIRONMENTS.ERROR_MONITORING_EMAIL,
         techSupport: TRITON_ENVIRONMENTS.TECH_SUPPORT_EMAIL,
+        toValidationNotification: TRITON_ENVIRONMENTS.TO_VALIDATION_EMAIL,
+        toTestEmail: TRITON_ENVIRONMENTS.TO_TEST_EMAIL,
     },
 
     sftp: {
