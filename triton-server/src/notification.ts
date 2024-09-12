@@ -9,7 +9,7 @@ import { Dataset, ValidationFlag } from "./freezeman/models"
 import { sendEmail } from "./download/email"
 
 export const start = async () => {
-    const cronExpression = "*/1 * * * *"
+    const cronExpression = "0 * * * *"
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, () => {
         logger.info("Executing notification service.")
@@ -24,7 +24,7 @@ export const start = async () => {
 
 export const sendDatasetValidationStatusUpdateEmail = async () => {
     const db = await defaultDatabaseActions()
-    let ids: number[] = []
+    const ids: number[] = []
 
     const freezemanApi = await getFreezeManAuthenticatedAPI()
 
