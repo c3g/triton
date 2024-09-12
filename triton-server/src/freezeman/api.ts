@@ -3,6 +3,7 @@ import type {
     Dataset,
     DatasetFile,
     FMSList,
+    FreezemanUser,
     Project,
     ReadsetWithMetrics,
     ReleaseFlagReleased,
@@ -127,6 +128,13 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/datasets/?latest_release_update=${dates}`,
                 )
             },
+            listByValidatedStatusUpdates: async (
+                dates: string,
+            ): Promise<ListResponse<Dataset>> => {
+                return await axios.get(
+                    `${LIMS_API_URL}/datasets/?latest_validation_update=${dates}`,
+                )
+            },
         },
         DatasetFile: {
             listByDatasetId: async (
@@ -152,6 +160,14 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
                 )
             },
+        },
+        Users: {
+            getUsersByIds: async (
+                ids: number[],
+            ): Promise<ListResponse<FreezemanUser>> =>
+                await axios.get(
+                    `${LIMS_API_URL}/users/?id__in=${ids.join(",")}`,
+                ),
         },
     } as const
 }
