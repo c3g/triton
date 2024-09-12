@@ -6,6 +6,7 @@ import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
 import "./index.scss"
 import { Link } from "react-router-dom"
+import config from "@common/config"
 
 const { Title, Text } = Typography
 
@@ -74,7 +75,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             "Failed". If "Queued" is displayed, the dataset is
                             waiting for sufficient disk space to begin staging.
                             If "Failed" is displayed, please contact us at{" "}
-                            <Link to={""}>{process.env.REACT_APP_TECH_SUPPORT_EMAIL}</Link>
+                            <Link to={""}>{config.supportEmail}</Link>
                         </Typography.Title>
                         <Typography.Title level={5}>
                             4. An info icon {"  "}

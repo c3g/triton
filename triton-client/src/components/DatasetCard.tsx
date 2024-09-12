@@ -18,6 +18,7 @@ import { selectRequestOfDatasetId } from "@store/selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 import { Provider } from "react-redux"
 import { store } from "@store/store"
+import config from "@common/config"
 
 interface DatasetCardProps {
     datasetID: number
@@ -186,7 +187,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                                                If it's still missing, try resetting your password and checking again.
                                                For further assistance, feel free to contact us at`,
                                         ' ',
-                                        <a key={0} href={`mailto:${process.env.REACT_APP_TECH_SUPPORT_EMAIL}`}>{process.env.REACT_APP_TECH_SUPPORT_EMAIL}</a>
+                                        <a key={0} href={`mailto:${config.supportEmail}`}>{config.supportEmail}</a>
                                     ],
                                 })
                             }
