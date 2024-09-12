@@ -10,12 +10,12 @@ import { sendEmail } from "./download/email"
 
 export const start = async () => {
     const cronExpression = "0 * * * *"
-    logger.info(process.env.NODE_ENV)
+    logger.info(`Environment running: ${process.env.NODE_ENV}`)
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, () => {
         logger.info("Executing notification service.")
-        // sendLatestReleasedNotificationEmail()
-        // sendDatasetValidationStatusUpdateEmail()
+        sendLatestReleasedNotificationEmail()
+        sendDatasetValidationStatusUpdateEmail()
     })
 
     return () => {
@@ -296,7 +296,7 @@ export const sendValidationEmail = async (
                 const subject = `A Run has been validated.`
                 await sendEmail(
                     "",
-                    process.env.NODE_ENV?.includes("dev")
+                    !process.env.NODE_ENV?.includes("development")
                         ? config.mail.toValidationNotification
                         : config.mail.toTestEmail,
                     subject,
