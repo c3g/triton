@@ -293,12 +293,7 @@ export const sendValidationEmail = async (
         for (const dataset of validatedDatasets) {
             if (dataset.projectAndRunInfo.validation_status > 0) {
                 const subject = `A Run has been validated.`
-                await sendEmail(
-                    "",
-                    "sequencing-runs@computationalgenomics.ca",
-                    subject,
-                    body,
-                )
+                await sendEmail("", config.email_testing.to, subject, body)
             }
 
             // although datasets are sorted by date, we only want to
