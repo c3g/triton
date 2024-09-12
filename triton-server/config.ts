@@ -14,7 +14,7 @@ const TRITON_ENVIRONMENTS = {
     SFTP_SERVER: "",
     SFTP_PORT: "",
     ERROR_MONITORING_EMAIL: "",
-    TECH_SUPPORT_EMAIL: "don",
+    TECH_SUPPORT_EMAIL: "",
     TO_VALIDATION_EMAIL: "sequencing-runs@computationalgenomics.ca",
     TO_TEST_EMAIL: "andres.tocasuche@c3g.ca",
     TRITON_HTTPS_PROXY: "",
