@@ -45,8 +45,8 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             let formattedData: ExtractedValidatedNotificationData[] =
                 await extractValidatedDatasetsInfo(validatedDatasets)
 
-            formattedData.map(
-                async (dataset: ExtractedValidatedNotificationData) => {
+            formattedData.forEach(
+                (dataset: ExtractedValidatedNotificationData) => {
                     if (
                         dataset.basicCommentUserInfo?.user_id &&
                         !ids.includes(dataset.basicCommentUserInfo?.user_id)
@@ -58,7 +58,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             if (ids.length > 0) {
                 ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
                     (freezemanUser) => {
-                        formattedData.map(
+                        formattedData.forEach(
                             (user: ExtractedValidatedNotificationData) => {
                                 if (
                                     user.basicCommentUserInfo?.user_id ===
@@ -77,7 +77,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             }
             let body =
                 "A run has been validated:" +
-                formattedData.map(
+                formattedData.forEach(
                     (dataset: ExtractedValidatedNotificationData) => {
                         return `
                             -   Run Name: ${dataset.projectAndRunInfo.run_name}
@@ -232,7 +232,7 @@ const getValidationFlagLabel = (status: number) => {
 // this should also do the api call to get the basic info from the user
 const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
     let extractedData: ExtractedValidatedNotificationData[] = []
-    validatedDataset.map((item: Dataset) => {
+    validatedDataset.forEach((item: Dataset) => {
         let runsInfo: ProjectAndRunInfo
         let userCommentInfo: BasicCommentUserInfo | undefined = undefined
         runsInfo = {
