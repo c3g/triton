@@ -1,5 +1,8 @@
 import "dotenv/config"
 
+/**
+ * Setting empty string as default value leads to exception if the environment variable is not set.
+ */
 const TRITON_ENVIRONMENTS = {
     API_URL: "",
     LOGGER_LEVEL: "info",
@@ -15,6 +18,8 @@ const TRITON_ENVIRONMENTS = {
     SFTP_PORT: "",
     ERROR_MONITORING_EMAIL: "",
     TECH_SUPPORT_EMAIL: "",
+    TO_VALIDATION_EMAIL: "",
+    TO_TEST_EMAIL: "scooby-doo@hotmail.ca",
     TRITON_HTTPS_PROXY: "",
     DOWNLOAD_DATABASE_PATH: "",
 }
@@ -52,11 +57,16 @@ export default {
     mail: {
         errorMonitoring: TRITON_ENVIRONMENTS.ERROR_MONITORING_EMAIL,
         techSupport: TRITON_ENVIRONMENTS.TECH_SUPPORT_EMAIL,
+        toValidationNotification: TRITON_ENVIRONMENTS.TO_VALIDATION_EMAIL,
     },
 
     sftp: {
         server: TRITON_ENVIRONMENTS.SFTP_SERVER,
         port: TRITON_ENVIRONMENTS.SFTP_PORT,
+    },
+
+    email_testing: {
+        to: TRITON_ENVIRONMENTS.TO_TEST_EMAIL,
     },
 
     client_portal: {
