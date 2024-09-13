@@ -45,39 +45,37 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             let formattedData: ExtractedValidatedNotificationData[] =
                 await extractValidatedDatasetsInfo(validatedDatasets)
 
-            formattedData.forEach(
-                (dataset: ExtractedValidatedNotificationData) => {
-                    if (
-                        dataset.basicCommentUserInfo?.user_id &&
-                        !ids.includes(dataset.basicCommentUserInfo?.user_id)
-                    ) {
-                        ids.push(dataset.basicCommentUserInfo?.user_id)
-                    }
-                },
-            )
+            formattedData.map((dataset: ExtractedValidatedNotificationData) => {
+                if (
+                    dataset.basicCommentUserInfo?.user_id &&
+                    !ids.includes(dataset.basicCommentUserInfo?.user_id)
+                ) {
+                    ids.push(dataset.basicCommentUserInfo?.user_id)
+                }
+            })
             if (ids.length > 0) {
-                ;(
-                    await freezemanApi.Users.getUsersByIds(ids)
-                ).data.results.forEach((freezemanUser) => {
-                    formattedData.forEach(
-                        (user: ExtractedValidatedNotificationData) => {
-                            if (
-                                user.basicCommentUserInfo?.user_id ===
-                                    freezemanUser.id &&
-                                user.basicCommentUserInfo?.user_id
-                            ) {
-                                user.basicCommentUserInfo.name =
-                                    freezemanUser.first_name +
-                                    " " +
-                                    freezemanUser.last_name
-                            }
-                        },
-                    )
-                })
+                ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
+                    (freezemanUser) => {
+                        formattedData.map(
+                            (user: ExtractedValidatedNotificationData) => {
+                                if (
+                                    user.basicCommentUserInfo?.user_id ===
+                                        freezemanUser.id &&
+                                    user.basicCommentUserInfo?.user_id
+                                ) {
+                                    user.basicCommentUserInfo.name =
+                                        freezemanUser.first_name +
+                                        " " +
+                                        freezemanUser.last_name
+                                }
+                            },
+                        )
+                    },
+                )
             }
             let body =
                 "A run has been validated:" +
-                formattedData.forEach(
+                formattedData.map(
                     (dataset: ExtractedValidatedNotificationData) => {
                         return `
                             -   Run Name: ${dataset.projectAndRunInfo.run_name}
