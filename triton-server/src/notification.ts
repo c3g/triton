@@ -75,25 +75,25 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 )
             }
             let body =
-                "A run has been validated:" +
+                "A run has been validated: <br/>" +
                 formattedData.map(
                     (dataset: ExtractedValidatedNotificationData) => {
                         return `
-                            -   Run Name: ${dataset.projectAndRunInfo.run_name}
-                            -   Validated by: ${dataset.projectAndRunInfo.validated_by}
-                            -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""}
-                            - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment : "No comments"}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name : ""}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] : ""}
+                            -   Run Name: ${dataset.projectAndRunInfo.run_name} <br/>
+                            -   Validated by: ${dataset.projectAndRunInfo.validated_by} <br/>
+                            -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
+                            - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
+                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
+                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
+                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
 
                             `
                     },
                 ) +
                 `
-                Thank you.
+                Thank you.<br/>
 
-                This is an automated email, do not reply back.`
+                This is an automated email, do not reply back.<br/>`
             // await sendTestEmail(body)
             await sendValidationEmail(formattedData, body, db)
         }
