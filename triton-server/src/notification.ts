@@ -29,11 +29,11 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
 
     const freezemanApi = await getFreezeManAuthenticatedAPI()
 
-    // const lastValidationStatusUpdate = (
-    //     await db.getLatestValidatedNotificationDate()
-    // )?.last_validated_notification_date
+    const lastValidationStatusUpdate = (
+        await db.getLatestValidatedNotificationDate()
+    )?.last_validated_notification_date
 
-    if (true) {
+    if (lastValidationStatusUpdate) {
         const validatedDatasets = (
             await freezemanApi.Dataset.listByValidatedStatusUpdates(
                 "2024-08-13T16:19:24.268Z",
@@ -94,7 +94,6 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 Thank you.<br/>
 
                 This is an automated email, do not reply back.<br/>`
-            // logger.info(body)
             // await sendTestEmail(body)
             await sendValidationEmail(formattedData, body, db)
         }
