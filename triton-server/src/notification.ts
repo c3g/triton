@@ -29,14 +29,14 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
 
     const freezemanApi = await getFreezeManAuthenticatedAPI()
 
-    const lastValidationStatusUpdate = (
-        await db.getLatestValidatedNotificationDate()
-    )?.last_validated_notification_date
+    // const lastValidationStatusUpdate = (
+    //     await db.getLatestValidatedNotificationDate()
+    // )?.last_validated_notification_date
 
-    if (lastValidationStatusUpdate) {
+    if (true) {
         const validatedDatasets = (
             await freezemanApi.Dataset.listByValidatedStatusUpdates(
-                lastValidationStatusUpdate,
+                "2024-08-13T16:19:24.268Z",
             )
         ).data.results.map((dataset) => ({ ...dataset }))
         logger.debug(`Found ${validatedDatasets.length} datasets.`)
@@ -85,7 +85,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                             - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
+                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + new Date(dataset.basicCommentUserInfo?.created_at).toJSON().split("T")[0] + " " + new Date(dataset.basicCommentUserInfo?.created_at).toJSON().split("T")[1] + "<br/>" : ""}
 
                             `
                     },
@@ -94,6 +94,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 Thank you.<br/>
 
                 This is an automated email, do not reply back.<br/>`
+            // logger.info(body)
             // await sendTestEmail(body)
             await sendValidationEmail(formattedData, body, db)
         }
@@ -244,10 +245,13 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             latest_validation_update: item.latest_validation_update,
         }
         if (item.archived_comments.length > 0) {
+            let latestComment = item.archived_comments.reduce((a, b) => {
+                return new Date(a.created_at) > new Date(b.created_at) ? a : b
+            })
             userCommentInfo = {
-                comment: item.archived_comments[0].comment,
-                created_at: item.archived_comments[0].created_at,
-                user_id: item.archived_comments[0].created_by,
+                comment: latestComment.comment,
+                created_at: latestComment.created_at,
+                user_id: latestComment.created_by,
             }
         }
         extractedData.push({
@@ -261,7 +265,7 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
 
 interface BasicCommentUserInfo {
     user_id: number
-    created_at: string
+    created_at: string | Date | number
     comment: string
     name?: string
 }

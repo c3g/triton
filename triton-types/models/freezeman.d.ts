@@ -28,7 +28,7 @@ export interface Dataset {
 }
 export interface ArchivedComment {
     readonly id: number
-    readonly created_at: string
+    readonly created_at: string | Date | number
     readonly updated_at: string
     readonly deleted: false
     readonly object_id: number
