@@ -296,9 +296,7 @@ export const sendValidationEmail = async (
                 const subject = `A Run has been validated.`
                 await sendEmail(
                     "",
-                    !process.env.NODE_ENV?.includes("development")
-                        ? config.mail.toValidationNotification
-                        : config.mail.toTestEmail,
+                    config.mail.toValidationNotification,
                     subject,
                     body,
                 )

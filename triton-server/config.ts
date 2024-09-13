@@ -16,7 +16,6 @@ const TRITON_ENVIRONMENTS = {
     ERROR_MONITORING_EMAIL: "",
     TECH_SUPPORT_EMAIL: "",
     TO_VALIDATION_EMAIL: "sequencing-runs@computationalgenomics.ca",
-    TO_TEST_EMAIL: "andres.tocasuche@c3g.ca",
     TRITON_HTTPS_PROXY: "",
     DOWNLOAD_DATABASE_PATH: "",
 }
