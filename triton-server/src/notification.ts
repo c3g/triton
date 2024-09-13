@@ -244,10 +244,13 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             latest_validation_update: item.latest_validation_update,
         }
         if (item.archived_comments.length > 0) {
+            let latestComment = item.archived_comments.reduce((a, b) => {
+                return new Date(a.created_at) > new Date(b.created_at) ? a : b
+            })
             userCommentInfo = {
-                comment: item.archived_comments[0].comment,
-                created_at: item.archived_comments[0].created_at,
-                user_id: item.archived_comments[0].created_by,
+                comment: latestComment.comment,
+                created_at: latestComment.created_at,
+                user_id: latestComment.created_by,
             }
         }
         extractedData.push({
