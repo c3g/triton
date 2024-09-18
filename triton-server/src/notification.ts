@@ -292,27 +292,12 @@ export const sendValidationEmail = async (
 ) => {
     if (validatedDatasets.length > 0) {
         let lastDate: string | undefined = undefined
-        for (const dataset of validatedDatasets) {
-            if (dataset.projectAndRunInfo.validation_status > 0) {
-                const subject = `A Run has been validated.`
-                await sendEmail(
-                    "",
-                    config.mail.toValidationNotification,
-                    subject,
-                    body,
-                )
-            }
+        const subject = `A Run has been validated.`
 
-            // although datasets are sorted by date, we only want to
-            // update the last date if the date is different
-            if (
-                lastDate &&
-                dataset.projectAndRunInfo.latest_validation_update !== lastDate
-            ) {
-                await db.updateLatestValidatedNotificationDate(lastDate)
-            }
-            lastDate = dataset.projectAndRunInfo.latest_validation_update
-        }
+        await sendEmail("", config.mail.toValidationNotification, subject, body)
+
+        lastDate =
+            validatedDatasets[0].projectAndRunInfo.latest_validation_update
         if (lastDate !== undefined) {
             // update the last notification date
             await db.updateLatestValidatedNotificationDate(lastDate)
