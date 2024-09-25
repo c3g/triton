@@ -23,6 +23,8 @@ const TRITON_ENVIRONMENTS = {
     TO_TEST_EMAIL: "scooby-doo@hotmail.ca",
     TRITON_HTTPS_PROXY: "",
     DOWNLOAD_DATABASE_PATH: "",
+    RELEASE_CRON: "*/30 * * * * *", // 30 seconds
+    VALIDATION_CRON: "0 * * * *", // 1 hour
 }
 
 const missingEnvVars: string[] = []
@@ -94,7 +96,8 @@ export default {
         url: TRITON_ENVIRONMENTS.CLIENT_ORIGIN,
     },
 
-    request_service: {
-        tick_frequency: 30000 /* miliseconds */,
+    cron: {
+        release: TRITON_ENVIRONMENTS.RELEASE_CRON,
+        validation: TRITON_ENVIRONMENTS.VALIDATION_CRON,
     },
 }

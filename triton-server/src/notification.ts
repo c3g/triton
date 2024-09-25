@@ -9,10 +9,11 @@ import { Dataset, ValidationFlag } from "./freezeman/models"
 import { sendEmail } from "./download/email"
 
 export const start = async () => {
-    const cronExpression = "0 * * * *"
     logger.info(`Environment running: ${process.env.NODE_ENV}`)
-    logger.info(`Notification service started to run. (${cronExpression})`)
-    const task = cron.schedule(cronExpression, () => {
+    logger.info(
+        `Notification service started to run. (${config.cron.validation})`,
+    )
+    const task = cron.schedule(config.cron.validation, () => {
         logger.info("Executing notification service.")
         sendLatestReleasedNotificationEmail()
         sendDatasetValidationStatusUpdateEmail()
