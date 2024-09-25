@@ -4,9 +4,9 @@ import { useAppSelector } from "@store/hooks"
 import DatasetCard from "@components/DatasetCard"
 import { DatasetListProps } from "./interfaces"
 
-export default function DatasetList({ runName }: DatasetListProps) {
+export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const datasetIDs = useAppSelector(
-        (state) => state.runsState.runsByName[runName]?.datasets,
+        (state) => state.projectsState.projectsById[externalProjectID]?.,
     )
     const datasetsByID = useAppSelector(
         (state) => state.datasetsState.datasetsById,

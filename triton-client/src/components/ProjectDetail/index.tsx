@@ -2,14 +2,13 @@ import { useEffect, useMemo } from "react"
 import { Step } from "react-joyride"
 import { useParams } from "react-router-dom"
 import { Collapse, CollapseProps, Space, Typography } from "antd"
-import { TritonDataset, TritonProject, TritonRun } from "@api/api-types"
+import { TritonDataset, TritonProject } from "@api/api-types"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectConstants } from "@store/constants"
 import {
     fetchDatasets,
     fetchReadsets,
     fetchRequests,
-    fetchRuns,
 } from "@store/thunks"
 import {
     DatasetList,
@@ -50,28 +49,15 @@ function ProjectDetail() {
     ]
 
     useEffect(() => {
-        ;(async () => {
-            const runs = await dispatch(fetchRuns(projectExternalId))
+        ; (async () => {
             const datasets: TritonDataset[] = []
-            for (const run of runs) {
-                datasets.push(...(await dispatch(fetchDatasets(run.name))))
-            }
+            datasets.push(...(await dispatch(fetchDatasets(run.name))))
             await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
             for (const dataset of datasets) {
                 await dispatch(fetchReadsets(dataset.id))
             }
         })()
     }, [dispatch, projectExternalId])
-
-    const runsByName = useAppSelector((state) => state.runsState.runsByName)
-    const runs = useMemo(() => {
-        return Object.values(runsByName).reduce<TritonRun[]>((runs, run) => {
-            if (run && run.external_project_id === projectExternalId) {
-                runs.push(run)
-            }
-            return runs
-        }, [])
-    }, [projectExternalId, runsByName])
 
     const items = useMemo(() => runs.map((run) => runItem(run)), [runs])
 

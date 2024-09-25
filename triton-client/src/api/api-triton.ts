@@ -11,7 +11,6 @@ import {
     TritonReadset,
     TritonRequest,
     TritonRequestResponse,
-    TritonRun,
 } from "./api-types"
 import {
     tritonGet,
@@ -30,16 +29,16 @@ export async function listProjects() {
 }
 
 /**
- * Fetch the datasets associated with one or more projects. Specify one or more
- * freezeman project ids.
- * @param externalProjectIds One or more external project id's
+ * Fetch the datasets associated with a project.
+ * @param externalProjectID external project id
  * @returns TritonDataset[]
  */
-export async function listDatasetsByIds(
-    datasetIDs: Array<TritonDataset["id"]>,
+export async function listDatasetsByExternalProjectID(
+    externalProjectID: ExternalProjectID,
 ) {
-    const idList = datasetIDs.join(",")
-    return await tritonGet<TritonDataset[]>(`runs-datasets?ids=${idList}`)
+    return await tritonGet<TritonDataset[]>(
+        `runs-datasets/?external_project_ids=${externalProjectID}/`,
+    )
 }
 
 export async function listRequestsByDatasetIds(
@@ -48,15 +47,6 @@ export async function listRequestsByDatasetIds(
     const idList = datasetIDs.join(",")
     return await tritonGet<TritonRequest[]>(
         `list-requests?dataset_ids=${idList}`,
-    )
-}
-
-export async function listRunsForProjects(
-    externalProjectIds: ExternalProjectID[],
-) {
-    const idList = externalProjectIds.join(",")
-    return await tritonGet<TritonRun[]>(
-        `project-runs?external_project_ids=${idList}`,
     )
 }
 
@@ -116,8 +106,7 @@ export async function resetPassword(
 export default {
     fetchLoginStatus,
     listProjects,
-    listRunsForProjects,
-    listDatasetsByIds,
+    listDatasetsByExternalProjectID,
     listRequestsByDatasetIds,
     listReadsetsForDataset,
     listDatasetFilesForReadset,

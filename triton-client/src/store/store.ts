@@ -8,7 +8,6 @@ import DatasetFilesReducer, {
     DatasetFilesState,
     DatasetFilesStateAction,
 } from "./datasetFiles"
-import RunsReducer, { RunsState, RunsStateAction } from "./runs"
 import ConstantsReducers, {
     ConstantsState,
     ConstantsStateAction,
@@ -18,7 +17,6 @@ import RequestReducers, { RequestsState, RequestsStateAction } from "./requests"
 export interface RootState {
     readonly auth: AuthState
     readonly projectsState: ProjectsState
-    readonly runsState: RunsState
     readonly datasetsState: DatasetsState
     readonly requestsState: RequestsState
     readonly readsetsState: ReadsetsState
@@ -33,14 +31,12 @@ export type AppAction =
     | RequestsStateAction
     | ReadsetsStateAction
     | DatasetFilesStateAction
-    | RunsStateAction
     | ConstantsStateAction
 
 export const store = configureStore({
     reducer: {
         auth: AuthReducer,
         projectsState: ProjectsReducer,
-        runsState: RunsReducer,
         datasetsState: DatasetsReducer,
         requestsState: RequestReducers,
         readsetsState: ReadsetsReducer,

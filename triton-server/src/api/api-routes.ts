@@ -99,10 +99,10 @@ router.get(
     "/runs-datasets/",
     asyncHandler(async (req, res) => {
         const idParam = req.query.ids as string
-        const ids = idParam.split(",")
+        const external_project_ids = idParam.split(",")
 
         // At least one project ID must be specified
-        if (ids.length === 0) {
+        if (external_project_ids.length === 0) {
             res.status(400).send(
                 "external_project_ids must contain at least one hercules project ID",
             )
