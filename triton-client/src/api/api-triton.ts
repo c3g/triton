@@ -37,7 +37,7 @@ export async function listDatasetsByExternalProjectID(
     externalProjectID: ExternalProjectID,
 ) {
     return await tritonGet<TritonDataset[]>(
-        `runs-datasets/?external_project_ids=${externalProjectID}/`,
+        `datasets/?external_project_ids=${externalProjectID}/`,
     )
 }
 

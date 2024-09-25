@@ -1,31 +1,20 @@
-import { useEffect, useMemo } from "react"
 import { Step } from "react-joyride"
 import { useParams } from "react-router-dom"
 import { Collapse, CollapseProps, Space, Typography } from "antd"
-import { TritonDataset, TritonProject } from "@api/api-types"
-import { useAppDispatch, useAppSelector } from "@store/hooks"
+import { TritonProject } from "@api/api-types"
+import { useAppSelector } from "@store/hooks"
 import { selectConstants } from "@store/constants"
-import {
-    fetchDatasets,
-    fetchReadsets,
-    fetchRequests,
-} from "@store/thunks"
 import {
     DatasetList,
     GuidedOnboarding,
     ProjectActionsDropdown,
     ProjectDiskUsage,
 } from "@components/."
-import {
-    selectDisksUsageByRunName,
-    selectRequestsByRunName,
-} from "@store/selectors"
 import "./index.scss"
 
 const { Text, Title } = Typography
 
 function ProjectDetail() {
-    const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
     const project: TritonProject | undefined = useAppSelector(
         (state) => state.projectsState.projectsById[projectExternalId],
@@ -48,19 +37,6 @@ function ProjectDetail() {
         },
     ]
 
-    useEffect(() => {
-        ; (async () => {
-            const datasets: TritonDataset[] = []
-            datasets.push(...(await dispatch(fetchDatasets(run.name))))
-            await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
-            for (const dataset of datasets) {
-                await dispatch(fetchReadsets(dataset.id))
-            }
-        })()
-    }, [dispatch, projectExternalId])
-
-    const items = useMemo(() => runs.map((run) => runItem(run)), [runs])
-
     return (
         <div style={{ margin: "0rem 0.5rem" }}>
             <GuidedOnboarding step={steps} />
@@ -77,40 +53,11 @@ function ProjectDetail() {
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
                     <div style={{ padding: "0.5rem" }} />
-                    <Collapse className="data-sets-container" items={items} />
+                    <DatasetList externalProjectID={projectExternalId} />
                 </>
             )}
         </div>
     )
-}
-
-function runItem(run: TritonRun): NonNullable<CollapseProps["items"]>[number] {
-    function Extra({ run }: { run: TritonRun }) {
-        const requests = useAppSelector((state) =>
-            selectRequestsByRunName(state, run.name),
-        )
-        const diskUsage = useAppSelector((state) =>
-            selectDisksUsageByRunName(state, run.name),
-        )
-        const constants = useAppSelector(selectConstants)
-        return (
-            <Space size={"middle"}>
-                {`SFTP: ${((diskUsage.SFTP / constants.diskCapacity.SFTP) * 100).toFixed(2)}%`}
-                {`GLOBUS: ${((diskUsage.GLOBUS / constants.diskCapacity.GLOBUS) * 100).toFixed(2)}%`}
-                <Text strong>
-                    {`${requests.filter((r) => r.status === "SUCCESS" || r.should_delete).length}/${run.datasets.length} Datasets Ready for Download`}
-                </Text>
-            </Space>
-        )
-    }
-
-    return {
-        extra: <Extra run={run} />,
-        label: <b>{run.name}</b>,
-        key: run.name,
-        showArrow: true,
-        children: <DatasetList runName={run.name} />,
-    }
 }
 
 export default ProjectDetail

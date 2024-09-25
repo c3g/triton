@@ -1,8 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit"
 import { RootState } from "@store/store"
-import { DownloadRequestType } from "@api/api-types"
-import { RequestState } from "@store/requests"
-import { ReadsetState } from "@store/readsets"
+import { ExternalProjectID } from "@api/api-types"
 import { DatasetState } from "@store/datasets"
 
 export const selectRequestById = (state: RootState) =>
@@ -24,65 +22,16 @@ export const selectRequestOfDatasetId = createSelector(
     },
 )
 
-export const selectDatasetsByRunName = createSelector(
-    [selectDatasetsById, (_, runName: string) => runName],
-    (datasetsById, runName) => {
+export const selectDatasetsByExternalProjectID = createSelector(
+    [selectDatasetsById, (_, projectID: ExternalProjectID) => projectID],
+    (datasetsById, projectID) => {
         const datasets: DatasetState[] = []
         for (const datasetId in datasetsById) {
             const dataset = datasetsById[datasetId]
-            if (dataset && dataset.run_name === runName) {
+            if (dataset && dataset.external_project_id === projectID) {
                 datasets.push(dataset)
             }
         }
         return datasets
-    },
-)
-export const selectReadsetsByRunName = createSelector(
-    [selectDatasetsByRunName, selectReadsetsById],
-    (datasets, readsetsById) => {
-        const datasetIds = new Set(datasets.map((dataset) => dataset.id))
-        const readsets: ReadsetState[] = []
-        for (const readsetId in readsetsById) {
-            const readset = readsetsById[readsetId]
-            if (readset && datasetIds.has(readset.dataset)) {
-                readsets.push(readset)
-            }
-        }
-        return readsets
-    },
-)
-export const selectRequestsByRunName = createSelector(
-    [selectDatasetsByRunName, selectRequestById],
-    (datasets, requestById) => {
-        const datasetIds = new Set(datasets.map((dataset) => dataset.id))
-        const requests: RequestState[] = []
-        for (const requestId in requestById) {
-            const request = requestById[requestId]
-            if (request && datasetIds.has(Number(request.dataset_id))) {
-                requests.push(request)
-            }
-        }
-        return requests
-    },
-)
-export const selectDisksUsageByRunName = createSelector(
-    [selectReadsetsByRunName, selectRequestsByRunName],
-    (readsets, requests) => {
-        return readsets.reduce<Record<DownloadRequestType, number>>(
-            (diskUsage, readset) => {
-                const request = requests.find(
-                    (request) => Number(request.dataset_id) === readset.dataset,
-                )
-                if (request) {
-                    diskUsage[request.type] =
-                        (diskUsage[request.type] || 0) + readset.total_size
-                }
-                return diskUsage
-            },
-            {
-                GLOBUS: 0,
-                SFTP: 0,
-            },
-        )
     },
 )

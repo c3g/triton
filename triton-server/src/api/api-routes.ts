@@ -16,15 +16,13 @@ import {
     TritonProject,
     TritonReadset,
     TritonRequest,
-    TritonRun,
     User,
 } from "./api-types"
 import {
     listDatasetFilesByDataset,
-    listDatasetsByIds,
+    listDatasetsByExternalProjectID,
     listReadsetsByDataset,
     listRequests,
-    listRunsByExternalProjectId,
 } from "./datasets"
 import { listUserProjects } from "./project"
 
@@ -77,26 +75,9 @@ router.get(
         }
     }),
 )
-router.get(
-    "/project-runs/",
-    asyncHandler(async (req, res) => {
-        const idParam = req.query.external_project_ids as string
-        const projectIds = idParam.split(",")
 
-        // At least one project ID must be specified
-        if (projectIds.length === 0) {
-            res.status(400).send(
-                "external_project_ids must contain at least one hercules project ID",
-            )
-            return
-        }
-
-        const runs = await listRunsByExternalProjectId(projectIds)
-        res.json(okReply<TritonRun[]>(runs))
-    }),
-)
 router.get(
-    "/runs-datasets/",
+    "/datasets/",
     asyncHandler(async (req, res) => {
         const idParam = req.query.ids as string
         const external_project_ids = idParam.split(",")
@@ -109,7 +90,9 @@ router.get(
             return
         }
 
-        const datasets = await listDatasetsByIds(ids)
+        const datasets = await listDatasetsByExternalProjectID(
+            ...external_project_ids,
+        )
         res.json(okReply<TritonDataset[]>(datasets))
     }),
 )

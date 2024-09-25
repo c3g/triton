@@ -98,7 +98,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
         },
         Dataset: {
             listByExternalProjectIds: async (
-                externalProjectIds: readonly string[],
+                ...externalProjectIds: readonly string[]
             ): Promise<ListResponse<Dataset>> => {
                 if (externalProjectIds.length === 0) {
                     throw new Error(

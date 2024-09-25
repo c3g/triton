@@ -5,60 +5,25 @@ import {
     TritonRequest,
     TritonDatasetFile,
     TritonReadset,
-    TritonRun,
+    ExternalProjectID,
 } from "./api-types"
-
-export async function listRunsByExternalProjectId(
-    externalProjectIds: string[],
-): Promise<TritonRun[]> {
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
-    const datasetsResponse =
-        await freezemanApi.Dataset.listByExternalProjectIds(externalProjectIds)
-    const datasets = datasetsResponse.data.results.filter(
-        (dataset) => dataset.released_status_count > 0,
-    )
-    const datasetsByRunIDAndProjectID = datasets.reduce<{
-        [projectID: string]: { [runName: string]: typeof datasets }
-    }>((runsByProjectID, dataset) => {
-        const runName = dataset.run_name
-        const externalProjectID = dataset.external_project_id
-        const run = (runsByProjectID[externalProjectID] ??= {})
-        const datasetIDs = (run[runName] ??= [])
-        datasetIDs.push(dataset)
-        return runsByProjectID
-    }, {})
-
-    const tritonRuns: TritonRun[] = []
-    for (const externalProjectID in datasetsByRunIDAndProjectID) {
-        for (const runName in datasetsByRunIDAndProjectID[externalProjectID]) {
-            const date = new Date()
-            const datasets =
-                datasetsByRunIDAndProjectID[externalProjectID][runName]
-            tritonRuns.push({
-                external_project_id: externalProjectID,
-                name: runName,
-                runDate: date,
-                datasets: datasets.map((d) => d.id),
-                readsetCount: datasets.reduce(
-                    (total, d) => total + d.readset_count,
-                    0,
-                ),
-                availableReadsetsCount: datasets.reduce(
-                    (total, d) => total + d.released_status_count,
-                    0,
-                ),
-            })
-        }
-    }
-
-    return tritonRuns
-}
 
 export async function listDatasetsByIds(
     datasetIds: string[],
 ): Promise<TritonDataset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
+    return datasetsResponse.data.results.map((d) => d)
+}
+
+export async function listDatasetsByExternalProjectID(
+    ...externalProjectIDs: ExternalProjectID[]
+): Promise<TritonDataset[]> {
+    const freezemanApi = await getFreezeManAuthenticatedAPI()
+    const datasetsResponse =
+        await freezemanApi.Dataset.listByExternalProjectIds(
+            ...externalProjectIDs,
+        )
     return datasetsResponse.data.results.map((d) => d)
 }
 
