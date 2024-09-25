@@ -23,7 +23,7 @@ export const projectsSlice = createSlice({
     name: "projects",
     initialState,
     reducers: {
-        setLoading: (state, action: PayloadAction<void>) => {
+        setLoading: (state) => {
             state.loading = true
         },
         setProjects: (state, action: PayloadAction<TritonProject[]>) => {

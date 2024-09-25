@@ -86,13 +86,3 @@ export const selectDisksUsageByRunName = createSelector(
         )
     },
 )
-
-export const selectReadsPerSample = createSelector(
-    [(_, datasetID: number) => datasetID, selectDatasetsById],
-    (datasetID, datasetsById) => {
-        const dataset = datasetsById[datasetID]
-        if (dataset) {
-            return dataset.readsPerSample
-        }
-    },
-)

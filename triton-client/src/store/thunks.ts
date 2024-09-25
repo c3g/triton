@@ -51,8 +51,7 @@ export const fetchProjects =
     }
 
 export const fetchRuns =
-    (externalProjectId: ExternalProjectID) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (externalProjectId: ExternalProjectID) => async (dispatch: AppDispatch) => {
         const runs = await apiTriton.listRunsForProjects([externalProjectId])
         // console.info('Loaded runs succesfully', runs)
         dispatch(RunsStateActions.setRuns(runs))
@@ -149,8 +148,7 @@ export const fetchReadsets =
     }
 
 export const fetchDatasetFiles =
-    (readsetId: TritonReadset["id"]) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (readsetId: TritonReadset["id"]) => async (dispatch: AppDispatch) => {
         const datasetFiles =
             await apiTriton.listDatasetFilesForReadset(readsetId)
         // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
@@ -165,7 +163,7 @@ export const createDownloadRequest =
         datasetID: number,
         type: DownloadRequestType,
     ) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    async (dispatch: AppDispatch) => {
         // TODO: check loading state here
         const response = await apiTriton.createDownloadRequest({
             projectID: projectId,
@@ -177,30 +175,25 @@ export const createDownloadRequest =
         dispatch(updateProjectUsage(projectId))
     }
 
-export const fetchConstants =
-    () => async (dispatch: AppDispatch, getState: () => RootState) => {
-        try {
-            const constants = await apiTriton.getConstants()
-            dispatch(ConstantsStateActions.setConstants(constants))
-        } catch (err) {
-            dispatch(
-                ConstantsStateActions.setError(convertToSerializedError(err)),
-            )
-            throw err
-        }
+export const fetchConstants = () => async (dispatch: AppDispatch) => {
+    try {
+        const constants = await apiTriton.getConstants()
+        dispatch(ConstantsStateActions.setConstants(constants))
+    } catch (err) {
+        dispatch(ConstantsStateActions.setError(convertToSerializedError(err)))
+        throw err
     }
+}
 
 export const deleteDownloadRequest =
-    (datasetID: number) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (datasetID: number) => async (dispatch: AppDispatch) => {
         const response = await apiTriton.deleteDownloadRequest(datasetID)
         // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
         dispatch(RequestsStateActions.setRequests([response.request]))
     }
 
 export const extendStagingRequest =
-    (datasetID: number) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (datasetID: number) => async (dispatch: AppDispatch) => {
         const response = await apiTriton.extendStagingRequest(datasetID)
         dispatch(RequestsStateActions.setRequests([response]))
     }
