@@ -13,12 +13,17 @@ import { getProjectUsers } from "./magic/magic_api"
 import cron from "node-cron"
 
 export function start() {
-    logger.info("[contacts] Starting service...")
+    logger.info(
+        `[contacts] Starting service... (${config.cron.contactService})`,
+    )
 
-    const task = cron.schedule(config.cron.release, () => {
-        void tick()
-    })
-    task.start()
+    const task = cron.schedule(
+        config.cron.contactService,
+        () => {
+            void tick()
+        },
+        { runOnInit: true },
+    )
 
     const stop = () => {
         logger.info("[contacts] Stopping service...")
