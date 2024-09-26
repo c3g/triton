@@ -79,8 +79,13 @@ router.get(
 router.get(
     "/datasets/",
     asyncHandler(async (req, res) => {
-        const idParam = req.query.ids as string
-        const external_project_ids = idParam.split(",")
+        if (typeof req.query.external_project_ids !== "string") {
+            res.status(400).send(
+                "external_project_ids's value must be a comma separated string",
+            )
+            return
+        }
+        const external_project_ids = req.query.external_project_ids.split(",")
 
         // At least one project ID must be specified
         if (external_project_ids.length === 0) {

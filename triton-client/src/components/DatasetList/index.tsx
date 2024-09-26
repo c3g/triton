@@ -36,11 +36,11 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
             ]
         else if (datasets.length > 0) {
             return datasets
-                .sort(
-                    (a, b) =>
-                        (a.lane ?? 0) -
-                        (b.lane ?? 0),
-                )
+                .sort((a, b) => {
+                    const aDate = new Date(a.latest_release_update)
+                    const bDate = new Date(b.latest_release_update)
+                    return bDate.getTime() - aDate.getTime()
+                })
                 .map((dataset, index) => {
                     return (
                         <>
