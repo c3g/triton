@@ -55,7 +55,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
         }
 
         return []
-    }, [datasets])
+    }, [datasets, isFetching])
 
     return (
         <div
