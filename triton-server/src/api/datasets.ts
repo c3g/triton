@@ -17,13 +17,11 @@ export async function listDatasetsByIds(
 }
 
 export async function listDatasetsByExternalProjectID(
-    ...externalProjectIDs: ExternalProjectID[]
+    externalProjectIDs: ExternalProjectID[],
 ): Promise<TritonDataset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse =
-        await freezemanApi.Dataset.listByExternalProjectIds(
-            ...externalProjectIDs,
-        )
+        await freezemanApi.Dataset.listByExternalProjectIds(externalProjectIDs)
     return datasetsResponse.data.results.map((d) => d)
 }
 

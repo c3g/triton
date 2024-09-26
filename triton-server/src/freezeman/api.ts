@@ -98,7 +98,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
         },
         Dataset: {
             listByExternalProjectIds: async (
-                ...externalProjectIds: readonly string[]
+                externalProjectIds: readonly string[],
             ): Promise<ListResponse<Dataset>> => {
                 if (externalProjectIds.length === 0) {
                     throw new Error(
@@ -106,9 +106,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(
-                        ",",
-                    )}`,
+                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(",")}&latest_release_update=0001-01-01T01:01:00Z`,
                 )
             },
             list: async (ids: string[]): Promise<ListResponse<Dataset>> => {
@@ -118,7 +116,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
+                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}&latest_release_update=0001-01-01T01:01:00Z`,
                 )
             },
             listByReleasedUpdates: async (

@@ -95,9 +95,8 @@ router.get(
             return
         }
 
-        const datasets = await listDatasetsByExternalProjectID(
-            ...external_project_ids,
-        )
+        const datasets =
+            await listDatasetsByExternalProjectID(external_project_ids)
         res.json(okReply<TritonDataset[]>(datasets))
     }),
 )
