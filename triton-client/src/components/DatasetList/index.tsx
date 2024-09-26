@@ -16,9 +16,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
             const datasets = await dispatch(fetchDatasets(externalProjectID))
             // prefetch requests and readsets for each dataset
             await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
-            for (const dataset of datasets) {
-                await dispatch(fetchReadsets(dataset.id))
-            }
+            await dispatch(fetchReadsets(datasets.map((dataset) => dataset.id)))
             setIsFetching(false)
         })()
     }, [dispatch, externalProjectID])

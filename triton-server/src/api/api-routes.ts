@@ -21,7 +21,7 @@ import {
 import {
     listDatasetFilesByDataset,
     listDatasetsByExternalProjectID,
-    listReadsetsByDataset,
+    listReadsetsByDatasets,
     listRequests,
 } from "./datasets"
 import { listUserProjects } from "./project"
@@ -124,9 +124,15 @@ router.get(
 router.get(
     "/dataset-readsets/",
     asyncHandler(async (req, res) => {
-        const idParam = Number(req.query.dataset_id)
-        const readsets = await listReadsetsByDataset(idParam)
-        res.json(okReply<TritonReadset[]>(readsets))
+        if (typeof req.query.dataset_ids !== "string") {
+            res.status(400).send(
+                "dataset_ids's value must be a comma separated string",
+            )
+            return
+        }
+        const idParams = req.query.dataset_ids.split(",").map(Number)
+        const readsets = await listReadsetsByDatasets(idParams)
+        res.json(okReply<readonly TritonReadset[]>(readsets))
     }),
 )
 

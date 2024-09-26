@@ -147,12 +147,12 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             },
         },
         Readset: {
-            listByDatasetId: async (
-                datasetId: Dataset["id"],
+            listByDatasetIDs: async (
+                datasetIDs: Array<Dataset["id"]>,
             ): Promise<ListResponse<ReadsetWithMetrics>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 const params = [
-                    `dataset__id__in=${datasetId}`,
+                    `dataset__id__in=${datasetIDs.join(",")}`,
                     `release_status=${RELEASED}`,
                     `withMetrics=true`,
                 ]

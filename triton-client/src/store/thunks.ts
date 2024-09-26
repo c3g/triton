@@ -115,17 +115,21 @@ const updateProjectUsage =
     }
 
 export const fetchReadsets =
-    (datasetId: TritonDataset["id"]) =>
+    (datasetIDs: Array<TritonDataset["id"]>) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
-        const readsets = await apiTriton.listReadsetsForDataset(datasetId)
+        const readsets = await apiTriton.listReadsetsForDatasets(datasetIDs)
         // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
         dispatch(ReadsetsStateActions.setReadsets(readsets))
 
-        const projectId =
-            getState().datasetsState.datasetsById[datasetId]
-                ?.external_project_id
-        if (projectId) {
-            dispatch(updateProjectUsage(projectId))
+        const projectIDs: Set<string> = new Set()
+        for (const datasetId of datasetIDs) {
+            const projectId =
+                getState().datasetsState.datasetsById[datasetId]
+                    ?.external_project_id
+            if (projectId && !projectIDs.has(projectId)) {
+                dispatch(updateProjectUsage(projectId))
+                projectIDs.add(projectId)
+            }
         }
 
         return readsets

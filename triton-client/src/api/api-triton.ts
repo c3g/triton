@@ -50,9 +50,11 @@ export async function listRequestsByDatasetIds(
     )
 }
 
-export async function listReadsetsForDataset(datasetID: TritonDataset["id"]) {
+export async function listReadsetsForDatasets(
+    datasetIDs: Array<TritonDataset["id"]>,
+) {
     return await tritonGet<TritonReadset[]>(
-        `dataset-readsets?dataset_id=${datasetID}`,
+        `dataset-readsets?dataset_ids=${datasetIDs.join(",")}`,
     )
 }
 
@@ -108,7 +110,7 @@ export default {
     listProjects,
     listDatasetsByExternalProjectID,
     listRequestsByDatasetIds,
-    listReadsetsForDataset,
+    listReadsetsForDatasets,
     listDatasetFilesForReadset,
     createDownloadRequest,
     getConstants,

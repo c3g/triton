@@ -46,14 +46,13 @@ export async function listRequests(
     }, [])
 }
 
-export async function listReadsetsByDataset(
-    datasetId: TritonDataset["id"],
-): Promise<TritonReadset[]> {
+export async function listReadsetsByDatasets(
+    datasetIDs: Array<TritonDataset["id"]>,
+): Promise<readonly TritonReadset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const readsetsResponse =
-        await freezemanApi.Readset.listByDatasetId(datasetId)
-    const readsets = [...readsetsResponse.data.results] // it's a readonly array
-    return readsets
+        await freezemanApi.Readset.listByDatasetIDs(datasetIDs)
+    return readsetsResponse.data.results
 }
 
 export async function listDatasetFilesByDataset(
