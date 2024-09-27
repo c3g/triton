@@ -153,6 +153,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     `dataset__id__in=${datasetIDs.join(",")}`,
                     `release_status=${RELEASED}`,
                     `withMetrics=true`,
+                    `limit=100000`,
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
