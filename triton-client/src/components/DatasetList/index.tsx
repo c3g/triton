@@ -1,4 +1,4 @@
-import { Divider, Empty, Spin } from "antd"
+import { Affix, Divider, Empty, Pagination, Spin } from "antd"
 import { useEffect, useMemo, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import DatasetCard from "@components/DatasetCard"
@@ -12,6 +12,8 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const datasets = useAppSelector((state) =>
         selectDatasetsByExternalProjectID(state, externalProjectID),
     )
+    const [page, setPage] = useState(1)
+    const pageSize = 10
 
     useEffect(() => {
         ;(async () => {
@@ -45,6 +47,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
                     const bDate = new Date(b.latest_release_update)
                     return bDate.getTime() - aDate.getTime()
                 })
+                .slice((page - 1) * pageSize, page * pageSize)
                 .map((dataset, index) => {
                     return (
                         <>
@@ -61,7 +64,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
         }
 
         return []
-    }, [datasets, isFetching])
+    }, [datasets, isFetching, page, pageSize])
 
     return (
         <div
@@ -73,6 +76,13 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
             }}
         >
             {renderDatasets}
+            <Pagination
+                defaultCurrent={1}
+                current={page}
+                pageSize={pageSize}
+                onChange={(page) => setPage(page)}
+                total={datasets.length}
+            />
         </div>
     )
 }
