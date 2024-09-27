@@ -9,15 +9,21 @@ import { fetchDatasets, fetchReadsets, fetchRequests } from "@store/thunks"
 export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const dispatch = useAppDispatch()
     const [isFetching, setIsFetching] = useState(true)
-    const datasets = useAppSelector((state) => selectDatasetsByExternalProjectID(state, externalProjectID))
+    const datasets = useAppSelector((state) =>
+        selectDatasetsByExternalProjectID(state, externalProjectID),
+    )
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const datasets = await dispatch(fetchDatasets(externalProjectID))
-            // prefetch requests and readsets for each dataset
-            await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
-            await dispatch(fetchReadsets(datasets.map((dataset) => dataset.id)))
             setIsFetching(false)
+            // prefetch requests and readsets for each dataset
+            await Promise.allSettled(
+                datasets.map(async (dataset) => {
+                    await dispatch(fetchRequests([dataset.id]))
+                    await dispatch(fetchReadsets([dataset.id]))
+                }),
+            )
         })()
     }, [dispatch, externalProjectID])
 
