@@ -12,12 +12,12 @@ import {
 import { selectConstants } from "@store/constants"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ActionDropdown, ReadsPerSample } from "@components/."
-import { selectReadsetsByDatasetID, selectRequestOfDatasetId } from "@store/selectors"
 import { Provider } from "react-redux"
 import { store } from "@store/store"
 import config from "@common/config"
 import { ColumnsType } from "antd/es/table"
 import { dataSize } from "@common/functions"
+import { RequestState } from "@store/requests"
 
 export interface DatasetColumnSource {
     id: TritonDataset["id"]
@@ -25,6 +25,7 @@ export interface DatasetColumnSource {
     external_project_id: TritonDataset["external_project_id"]
     latest_release_update: TritonDataset["latest_release_update"]
     isFetchingRequest: boolean
+    activeRequest: RequestState | undefined
     totalSize: number
 }
 
@@ -89,7 +90,7 @@ export function useDatasetColumns(updateDataset: (datasetID: TritonDataset["id"]
             dataIndex: "id",
             key: "expiration",
             width: "10%",
-            render: (id) => <Expiration datasetID={id} />,
+            render: (id, { activeRequest }) => <Expiration activeRequest={activeRequest} />,
         })
         columns.push({
             title: "Latest Release Date (UTC)",
@@ -154,6 +155,7 @@ function MetricButton({ dataset }: MetricProps) {
 interface StagingButtonProps {
     dataset: DatasetColumnSource
     type: DownloadRequestType
+    activeRequest: RequestState | undefined
     updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>
 }
 
@@ -164,9 +166,7 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
     const dispatch = useAppDispatch()
     const [updatingRequest, setUpdatingRequest] = useState(false)
 
-    const activeRequest = useAppSelector((state) =>
-        selectRequestOfDatasetId(state, dataset.id),
-    )
+    const activeRequest = dataset.activeRequest
     const alreadyRequested = !!activeRequest
     const currentRequest = activeRequest?.type === type ? activeRequest : undefined
 
@@ -345,15 +345,12 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
 }
 
 interface ExpirationProps {
-    datasetID: number
+    activeRequest: RequestState | undefined
 }
 
-function Expiration({ datasetID }: ExpirationProps) {
-    const req = useAppSelector((state) =>
-        selectRequestOfDatasetId(state, datasetID),
-    )
-    const expiration = req?.expiry_date
-        ? new Date(req.expiry_date).toLocaleDateString()
+function Expiration({ activeRequest }: ExpirationProps) {
+    const expiration = activeRequest?.expiry_date
+        ? new Date(activeRequest.expiry_date).toLocaleDateString()
         : "-"
     return <>{expiration}</>
 }

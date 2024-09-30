@@ -20,6 +20,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
                 external_project_id: dataset.external_project_id,
                 latest_release_update: dataset.latest_release_update,
                 isFetchingRequest: true,
+                activeRequest: undefined,
                 totalSize: 0 // size of 0 indicates that the size is not yet fetched
             })))
             setIsFetching(false)
