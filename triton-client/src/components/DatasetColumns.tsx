@@ -18,10 +18,21 @@ import { store } from "@store/store"
 import config from "@common/config"
 import { ColumnsType } from "antd/es/table"
 import { dataSize } from "@common/functions"
+import { RequestState } from "@store/requests"
 
-export function useDatasetColumns(totalSize: number) {
+export interface DatasetColumnSource {
+    id: number
+    lane: number
+    external_project_id: string
+    latest_release_update: string
+    activeRequest: RequestState | undefined
+    isFetchingRequest: boolean
+    totalSize: number
+}
+
+export function useDatasetColumns() {
     return useMemo(() => {
-        const columns: ColumnsType<TritonDataset> = []
+        const columns: ColumnsType<DatasetColumnSource> = []
         columns.push({
             title: "",
             dataIndex: "id",
@@ -51,11 +62,12 @@ export function useDatasetColumns(totalSize: number) {
             key: "sftp",
             width: "5%",
             render: (id, dataset) => (
-                <StagingButton
-                    dataset={dataset}
-                    type={"SFTP"}
-                    totalSize={totalSize}
-                />
+                dataset.isFetchingRequest
+                    ? <Spin />
+                    : <StagingButton
+                        dataset={dataset}
+                        type={"SFTP"}
+                    />
             ),
         })
         columns.push({
@@ -64,11 +76,12 @@ export function useDatasetColumns(totalSize: number) {
             key: "globus",
             width: "5%",
             render: (id, dataset) => (
-                <StagingButton
-                    dataset={dataset}
-                    type={"GLOBUS"}
-                    totalSize={totalSize}
-                />
+                dataset.isFetchingRequest
+                    ? <Spin />
+                    : <StagingButton
+                        dataset={dataset}
+                        type={"GLOBUS"}
+                    />
             ),
         })
         columns.push({
@@ -103,11 +116,11 @@ export function useDatasetColumns(totalSize: number) {
             render: (id) => <DatasetSize datasetID={id} />,
         })
         return columns
-    }, [totalSize])
+    }, [])
 }
 
 interface MetricProps {
-    dataset: TritonDataset
+    dataset: DatasetColumnSource
 }
 
 function MetricButton({ dataset }: MetricProps) {
@@ -119,12 +132,7 @@ function MetricButton({ dataset }: MetricProps) {
 
     const showModal = useCallback(() => {
         Modal.info({
-            title: [
-                `Reads Per Sample for lane ${dataset?.lane} of run `,
-                <i key={"run"}>{dataset?.run_name}</i>,
-                ` for project `,
-                <i key={"external_name"}>{project?.external_name}</i>,
-            ],
+            title: `Reads Per Sample for lane ${dataset?.lane} for project ${project?.external_name}`,
             content: (
                 <Provider store={store}>
                     <ReadsPerSample datasetId={dataset.id} />
@@ -132,7 +140,7 @@ function MetricButton({ dataset }: MetricProps) {
             ),
             width: "80%",
         })
-    }, [dataset.id, dataset?.lane, dataset?.run_name, project?.external_name])
+    }, [dataset.id, dataset?.lane, project?.external_name])
 
     return (
         <Button
@@ -144,18 +152,23 @@ function MetricButton({ dataset }: MetricProps) {
 }
 
 interface StagingButtonProps {
-    dataset: TritonDataset
+    dataset: DatasetColumnSource
     type: DownloadRequestType
-    totalSize: number
 }
 
-function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
+function StagingButton({ dataset, type }: StagingButtonProps) {
+    const totalSize = dataset.totalSize
+    const datasetID = dataset.id
+
     const dispatch = useAppDispatch()
     const [updatingRequest, setUpdatingRequest] = useState(false)
 
-    const req = useAppSelector((state) =>
+    const activeRequest = useAppSelector((state) =>
         selectRequestOfDatasetId(state, dataset.id),
     )
+    const alreadyRequested = !!activeRequest
+    const req = activeRequest?.type === type ? activeRequest : undefined
+
     const project = useAppSelector((state) =>
         dataset?.external_project_id
             ? state.projectsState.projectsById[dataset.external_project_id]
@@ -213,39 +226,42 @@ function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
 
     if (req && !req.should_delete && req.status !== "FAILED") {
         const { type, status } = req
-
         const actions: ActionDropdownProps["actions"] = [
             {
                 action: {
                     name: "Unstage dataset",
                     actionCall: () =>
-                        dispatch(deleteDownloadRequest(dataset.id)).then(
+                        dispatch(deleteDownloadRequest(datasetID)).then(
                             () => {
                                 notification.success({
                                     message: "Dataset Unstaging",
-                                    description: `Dataset #${dataset.id} will be unstaged shortly.`,
+                                    description: `Dataset #${datasetID} will be unstaged shortly.`,
                                 })
                             },
                             (e) => {
                                 notification.error({
                                     message: "Error Unstaging Dataset",
-                                    description: `Dataset #${dataset.id} could not be unstaged.`,
+                                    description: `Dataset #${datasetID} could not be unstaged.`,
                                 })
                                 console.error(e)
                             },
                         ),
                 },
-                icon: <CloseCircleOutlined style={{ color: "#c9162b" }} />,
+                icon: (
+                    <CloseCircleOutlined style={{ color: "#c9162b" }} />
+                ),
             },
             {
                 action: {
                     name: "Extend staging",
                     actionCall: () =>
-                        dispatch(extendStagingRequest(dataset.id)).catch((e) =>
-                            console.error(e),
+                        dispatch(extendStagingRequest(datasetID)).catch(
+                            (e) => console.error(e),
                         ),
                 },
-                icon: <PlusCircleOutlined style={{ color: "#097969" }} />,
+                icon: (
+                    <PlusCircleOutlined style={{ color: "#097969" }} />
+                ),
             },
         ]
 
@@ -264,24 +280,22 @@ function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
                     if (status === "SUCCESS") {
                         Modal.info({
                             title: `Dataset successfully staged`,
-                            content: [
-                                `You can now download the dataset by following the instructions sent to your email.
-                                   If you don't see the email, please check your spam folder.
-                                   If it's still missing, try resetting your password and checking again.
-                                   For further assistance, feel free to contact us at`,
-                                " ",
-                                <a
-                                    key={0}
-                                    href={`mailto:${config.supportEmail}`}
-                                >
-                                    {config.supportEmail}
-                                </a>,
+                            content: [`You can now download the dataset by following the instructions sent to your email.
+                                       If you don't see the email, please check your spam folder.
+                                       If it's still missing, try resetting your password and checking again.
+                                       For further assistance, feel free to contact us at`,
+                                ' ',
+                                <a key={0} href={`mailto:${config.supportEmail}`}>{config.supportEmail}</a>
                             ],
                         })
                     }
                 }}
             >
-                <Space>{statusDescription}</Space>
+                <Space>
+                    {type}
+                    {"|"}
+                    {statusDescription}
+                </Space>
             </Button>
         )
 
@@ -307,14 +321,20 @@ function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
                 style={{ paddingLeft: "4", paddingRight: "4" }}
                 disabled={
                     !totalSize ||
-                    req?.type === type ||
+                    alreadyRequested ||
                     updatingRequest ||
                     !dataset ||
                     !project
                 }
-                onClick={() => req?.status !== "FAILED" && request(type)}
+                onClick={() =>
+                    req?.status !== "FAILED" && request(type)
+                }
             >
-                <Space>{statusDescription}</Space>
+                <Space>
+                    {type}
+                    {"|"}
+                    {statusDescription}
+                </Space>
             </Button>
         )
     }
@@ -347,5 +367,5 @@ export function DatasetSize({ datasetID }: SizeProps) {
         [readsetsByDatasetID],
     )
 
-    return totalSize === 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />
+    return totalSize !== 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />
 }
