@@ -1,5 +1,5 @@
 import { Table, TableProps } from "antd"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { DatasetListProps } from "./interfaces"
 import { selectDatasetsByExternalProjectID } from "@store/selectors"
@@ -33,7 +33,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const columns = useDatasetColumns(69)
 
     return (
-        <Table
+        <Table<TritonDataset>
             dataSource={dataSource}
             columns={columns}
             rowKey={(d) => d.id}

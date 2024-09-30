@@ -1,4 +1,4 @@
-import { Button, Modal, notification, Space } from "antd"
+import { Button, Modal, notification, Space, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -10,14 +10,14 @@ import {
     extendStagingRequest,
 } from "@store/thunks"
 import { selectConstants } from "@store/constants"
-import { DatasetSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ActionDropdown, ReadsPerSample } from "@components/."
-import { selectRequestOfDatasetId } from "@store/selectors"
+import { selectReadsetsByDatasetID, selectRequestOfDatasetId } from "@store/selectors"
 import { Provider } from "react-redux"
 import { store } from "@store/store"
 import config from "@common/config"
 import { ColumnsType } from "antd/es/table"
+import { dataSize } from "@common/functions"
 
 export function useDatasetColumns(totalSize: number) {
     return useMemo(() => {
@@ -332,4 +332,20 @@ function Expiration({ datasetID }: ExpirationProps) {
         ? new Date(req.expiry_date).toLocaleDateString()
         : "-"
     return <>{expiration}</>
+}
+
+export interface SizeProps {
+    datasetID: TritonDataset["id"]
+}
+
+export function DatasetSize({ datasetID }: SizeProps) {
+    const readsetsByDatasetID = useAppSelector((state) =>
+        selectReadsetsByDatasetID(state, datasetID),
+    )
+    const totalSize = useMemo(
+        () => readsetsByDatasetID.reduce((total, r) => total + r.total_size, 0),
+        [readsetsByDatasetID],
+    )
+
+    return totalSize === 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />
 }
