@@ -18,14 +18,12 @@ import { store } from "@store/store"
 import config from "@common/config"
 import { ColumnsType } from "antd/es/table"
 import { dataSize } from "@common/functions"
-import { RequestState } from "@store/requests"
 
 export interface DatasetColumnSource {
     id: number
     lane: number
     external_project_id: string
     latest_release_update: string
-    activeRequest: RequestState | undefined
     isFetchingRequest: boolean
     totalSize: number
 }
@@ -167,7 +165,7 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
         selectRequestOfDatasetId(state, dataset.id),
     )
     const alreadyRequested = !!activeRequest
-    const req = activeRequest?.type === type ? activeRequest : undefined
+    const currentRequest = activeRequest?.type === type ? activeRequest : undefined
 
     const project = useAppSelector((state) =>
         dataset?.external_project_id
@@ -224,8 +222,13 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
         ],
     )
 
-    if (req && !req.should_delete && req.status !== "FAILED") {
-        const { type, status } = req
+    if (
+        activeRequest !== undefined &&
+        currentRequest == activeRequest &&
+        !currentRequest.should_delete &&
+        currentRequest.status !== "FAILED"
+    ) {
+        const { type, status } = currentRequest
         const actions: ActionDropdownProps["actions"] = [
             {
                 action: {
@@ -291,11 +294,7 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
                     }
                 }}
             >
-                <Space>
-                    {type}
-                    {"|"}
-                    {statusDescription}
-                </Space>
+                {statusDescription}
             </Button>
         )
 
@@ -308,9 +307,9 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
         )
     } else {
         let statusDescription: ReactNode
-        if (req && req.should_delete) {
+        if (currentRequest?.should_delete) {
             statusDescription = "UNSTAGING"
-        } else if (req?.status === "FAILED") {
+        } else if (currentRequest?.status === "FAILED") {
             statusDescription = "FAILED"
         } else {
             statusDescription = "STAGE"
@@ -320,21 +319,16 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
                 key={type}
                 style={{ paddingLeft: "4", paddingRight: "4" }}
                 disabled={
-                    !totalSize ||
+                    totalSize === 0 ||
                     alreadyRequested ||
                     updatingRequest ||
-                    !dataset ||
-                    !project
+                    project === undefined
                 }
                 onClick={() =>
-                    req?.status !== "FAILED" && request(type)
+                    currentRequest?.status !== "FAILED" && request(type)
                 }
             >
-                <Space>
-                    {type}
-                    {"|"}
-                    {statusDescription}
-                </Space>
+                {statusDescription}
             </Button>
         )
     }

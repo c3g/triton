@@ -18,7 +18,6 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
                 lane: dataset.lane,
                 external_project_id: dataset.external_project_id,
                 latest_release_update: dataset.latest_release_update,
-                activeRequest: undefined,
                 isFetchingRequest: true,
                 totalSize: 0 // size of 0 indicates that the size is not yet fetched
             })))
@@ -26,15 +25,15 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
             // prefetch requests and readsets for each dataset
             await Promise.allSettled(
                 datasets.map(async (dataset) => {
-                    await dispatch(fetchReadsets([dataset.id]))
+                    const readsets = await dispatch(fetchReadsets([dataset.id]))
                     setDataSource((prev) => prev.map((d) => d.id === dataset.id ? ({
                         ...d,
-                        isFetchingRequest: false,
-                        activeRequest: undefined
+                        totalSize: d.totalSize + readsets.reduce((acc, readset) => acc + readset.total_size, 0)
                     }) : d))
                     const requests = await dispatch(fetchRequests([dataset.id]))
                     setDataSource((prev) => prev.map((d) => d.id === dataset.id ? ({
                         ...d,
+                        isFetchingRequest: false,
                         activeRequest: requests[0] // only one request per dataset
                     }) : d))
                 }),
