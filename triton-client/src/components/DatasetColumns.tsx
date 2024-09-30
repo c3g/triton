@@ -29,7 +29,9 @@ export interface DatasetColumnSource {
     totalSize: number
 }
 
-export function useDatasetColumns(updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>) {
+export function useDatasetColumns(
+    updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>,
+) {
     return useMemo(() => {
         const columns: ColumnsType<DatasetColumnSource> = []
         columns.push({
@@ -60,37 +62,41 @@ export function useDatasetColumns(updateDataset: (datasetID: TritonDataset["id"]
             dataIndex: "id",
             key: "sftp",
             width: "5%",
-            render: (id, dataset) => (
-                dataset.isFetchingRequest
-                    ? <Spin />
-                    : <StagingButton
+            render: (id, dataset) =>
+                dataset.isFetchingRequest ? (
+                    <Spin />
+                ) : (
+                    <StagingButton
                         dataset={dataset}
                         type={"SFTP"}
                         updateDataset={updateDataset}
                     />
-            ),
+                ),
         })
         columns.push({
             title: "Globus",
             dataIndex: "id",
             key: "globus",
             width: "5%",
-            render: (id, dataset) => (
-                dataset.isFetchingRequest
-                    ? <Spin />
-                    : <StagingButton
+            render: (id, dataset) =>
+                dataset.isFetchingRequest ? (
+                    <Spin />
+                ) : (
+                    <StagingButton
                         dataset={dataset}
                         type={"GLOBUS"}
                         updateDataset={updateDataset}
                     />
-            ),
+                ),
         })
         columns.push({
             title: "Expiration",
             dataIndex: "id",
             key: "expiration",
             width: "10%",
-            render: (id, { activeRequest }) => <Expiration activeRequest={activeRequest} />,
+            render: (id, { activeRequest }) => (
+                <Expiration activeRequest={activeRequest} />
+            ),
         })
         columns.push({
             title: "Latest Release Date (UTC)",
@@ -107,14 +113,19 @@ export function useDatasetColumns(updateDataset: (datasetID: TritonDataset["id"]
                 } else {
                     return "-"
                 }
-            }
+            },
         })
         columns.push({
             title: "Size",
             dataIndex: "id",
             key: "size",
             width: "5%",
-            render: (id, { totalSize }) => totalSize !== 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />,
+            render: (id, { totalSize }) =>
+                totalSize !== 0 ? (
+                    <>{dataSize(totalSize).join(" ")}</>
+                ) : (
+                    <Spin />
+                ),
         })
         return columns
     }, [])
@@ -168,7 +179,8 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
 
     const activeRequest = dataset.activeRequest
     const alreadyRequested = !!activeRequest
-    const currentRequest = activeRequest?.type === type ? activeRequest : undefined
+    const currentRequest =
+        activeRequest?.type === type ? activeRequest : undefined
 
     const project = useAppSelector((state) =>
         dataset?.external_project_id
@@ -187,11 +199,13 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
                         dataset.id,
                         type,
                     ),
-                ).then(() => {
-                    updateDataset(datasetID)
-                }).finally(() => {
-                    setUpdatingRequest(false)
-                })
+                )
+                    .then(() => {
+                        updateDataset(datasetID)
+                    })
+                    .finally(() => {
+                        setUpdatingRequest(false)
+                    })
             }
         },
         [dataset, dispatch],
@@ -258,9 +272,7 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
                             },
                         ),
                 },
-                icon: (
-                    <CloseCircleOutlined style={{ color: "#c9162b" }} />
-                ),
+                icon: <CloseCircleOutlined style={{ color: "#c9162b" }} />,
             },
             {
                 action: {
@@ -272,9 +284,7 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
                         await updateDataset(datasetID)
                     },
                 },
-                icon: (
-                    <PlusCircleOutlined style={{ color: "#097969" }} />
-                ),
+                icon: <PlusCircleOutlined style={{ color: "#097969" }} />,
             },
         ]
 
@@ -293,12 +303,18 @@ function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
                     if (status === "SUCCESS") {
                         Modal.info({
                             title: `Dataset successfully staged`,
-                            content: [`You can now download the dataset by following the instructions sent to your email.
+                            content: [
+                                `You can now download the dataset by following the instructions sent to your email.
                                        If you don't see the email, please check your spam folder.
                                        If it's still missing, try resetting your password and checking again.
                                        For further assistance, feel free to contact us at`,
-                                ' ',
-                                <a key={0} href={`mailto:${config.supportEmail}`}>{config.supportEmail}</a>
+                                " ",
+                                <a
+                                    key={0}
+                                    href={`mailto:${config.supportEmail}`}
+                                >
+                                    {config.supportEmail}
+                                </a>,
                             ],
                         })
                     }
