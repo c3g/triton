@@ -70,13 +70,11 @@ export const fetchRequests =
             const projectId =
                 getState().datasetsState.datasetsById[datasetId]
                     ?.external_project_id
-            if (projectId) {
+            if (projectId && !projectIDs.has(projectId)) {
+                dispatch(updateProjectUsage(projectId))
                 projectIDs.add(projectId)
             }
         }
-        projectIDs.forEach((projectId) =>
-            dispatch(updateProjectUsage(projectId)),
-        )
 
         return requests
     }

@@ -1,9 +1,10 @@
 import { Table, TableProps } from "antd"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useAppDispatch } from "@store/hooks"
 import { DatasetListProps } from "./interfaces"
 import { fetchDatasets, fetchReadsets, fetchRequests } from "@store/thunks"
 import { DatasetColumnSource, useDatasetColumns } from "@components/DatasetColumns"
+import { TritonDataset, TritonRequest } from "@api/api-types"
 
 export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const dispatch = useAppDispatch()
@@ -22,27 +23,40 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
                 totalSize: 0 // size of 0 indicates that the size is not yet fetched
             })))
             setIsFetching(false)
-            // prefetch requests and readsets for each dataset
-            await Promise.allSettled(
-                datasets.map(async (dataset) => {
-                    const readsets = await dispatch(fetchReadsets([dataset.id]))
-                    setDataSource((prev) => prev.map((d) => d.id === dataset.id ? ({
-                        ...d,
-                        totalSize: d.totalSize + readsets.reduce((acc, readset) => acc + readset.total_size, 0)
-                    }) : d))
-                    const requests = await dispatch(fetchRequests([dataset.id]))
-                    setDataSource((prev) => prev.map((d) => d.id === dataset.id ? ({
-                        ...d,
-                        isFetchingRequest: false,
-                        activeRequest: requests[0] // only one request per dataset
-                    }) : d))
-                }),
-            )
+            const readsets = await dispatch(fetchReadsets(datasets.map((dataset) => dataset.id)))
+            const requests = await dispatch(fetchRequests(datasets.map((dataset) => dataset.id)))
+            const totalSizeByDatasets = readsets.reduce<Record<TritonDataset["id"], number>>((acc, readset) => {
+                acc[readset.dataset] = (acc[readset.dataset] || 0) + readset.total_size
+                return acc
+            }, {})
+            const activeRequestByDatasets = requests.reduce<Record<TritonDataset["id"], TritonRequest | undefined>>((acc, request) => {
+                acc[request.dataset_id] = request
+                return acc
+            }, {})
+            setDataSource((prev) => prev.map((d) => ({
+                ...d,
+                isFetchingRequest: false,
+                totalSize: totalSizeByDatasets[d.id] || 0,
+                activeRequest: activeRequestByDatasets[d.id]
+            })))
         })()
     }, [dispatch, externalProjectID])
 
 
-    const columns = useDatasetColumns()
+    const updateDataset = useCallback(async (datasetID: TritonDataset["id"]) => {
+        // only update request for now since readsets are not updated
+        setDataSource((prev) => prev.map((d) => d.id === datasetID ? ({
+            ...d,
+            isFetchingRequest: true
+        }) : d))
+        const requests = await dispatch(fetchRequests([datasetID]))
+        setDataSource((prev) => prev.map((d) => d.id === datasetID ? ({
+            ...d,
+            isFetchingRequest: false,
+            activeRequest: requests.length > 0 ? requests[0] : undefined // only one request per dataset
+        }) : d))
+    }, [])
+    const columns = useDatasetColumns(updateDataset)
 
     return (
         <Table<DatasetColumnSource>

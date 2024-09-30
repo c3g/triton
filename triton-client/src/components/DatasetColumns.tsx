@@ -1,4 +1,4 @@
-import { Button, Modal, notification, Space, Spin } from "antd"
+import { Button, Modal, notification, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
@@ -20,15 +20,15 @@ import { ColumnsType } from "antd/es/table"
 import { dataSize } from "@common/functions"
 
 export interface DatasetColumnSource {
-    id: number
-    lane: number
-    external_project_id: string
-    latest_release_update: string
+    id: TritonDataset["id"]
+    lane: TritonDataset["lane"]
+    external_project_id: TritonDataset["external_project_id"]
+    latest_release_update: TritonDataset["latest_release_update"]
     isFetchingRequest: boolean
     totalSize: number
 }
 
-export function useDatasetColumns() {
+export function useDatasetColumns(updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>) {
     return useMemo(() => {
         const columns: ColumnsType<DatasetColumnSource> = []
         columns.push({
@@ -65,6 +65,7 @@ export function useDatasetColumns() {
                     : <StagingButton
                         dataset={dataset}
                         type={"SFTP"}
+                        updateDataset={updateDataset}
                     />
             ),
         })
@@ -79,6 +80,7 @@ export function useDatasetColumns() {
                     : <StagingButton
                         dataset={dataset}
                         type={"GLOBUS"}
+                        updateDataset={updateDataset}
                     />
             ),
         })
@@ -111,7 +113,7 @@ export function useDatasetColumns() {
             dataIndex: "id",
             key: "size",
             width: "5%",
-            render: (id) => <DatasetSize datasetID={id} />,
+            render: (id, { totalSize }) => totalSize !== 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />,
         })
         return columns
     }, [])
@@ -152,9 +154,10 @@ function MetricButton({ dataset }: MetricProps) {
 interface StagingButtonProps {
     dataset: DatasetColumnSource
     type: DownloadRequestType
+    updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>
 }
 
-function StagingButton({ dataset, type }: StagingButtonProps) {
+function StagingButton({ dataset, type, updateDataset }: StagingButtonProps) {
     const totalSize = dataset.totalSize
     const datasetID = dataset.id
 
@@ -184,7 +187,11 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
                         dataset.id,
                         type,
                     ),
-                ).finally(() => setUpdatingRequest(false))
+                ).then(() => {
+                    updateDataset(datasetID)
+                }).finally(() => {
+                    setUpdatingRequest(false)
+                })
             }
         },
         [dataset, dispatch],
@@ -233,13 +240,14 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
             {
                 action: {
                     name: "Unstage dataset",
-                    actionCall: () =>
+                    actionCall: async () =>
                         dispatch(deleteDownloadRequest(datasetID)).then(
                             () => {
                                 notification.success({
                                     message: "Dataset Unstaging",
                                     description: `Dataset #${datasetID} will be unstaged shortly.`,
                                 })
+                                updateDataset(datasetID)
                             },
                             (e) => {
                                 notification.error({
@@ -257,10 +265,12 @@ function StagingButton({ dataset, type }: StagingButtonProps) {
             {
                 action: {
                     name: "Extend staging",
-                    actionCall: () =>
-                        dispatch(extendStagingRequest(datasetID)).catch(
+                    actionCall: async () => {
+                        await dispatch(extendStagingRequest(datasetID)).catch(
                             (e) => console.error(e),
-                        ),
+                        )
+                        await updateDataset(datasetID)
+                    },
                 },
                 icon: (
                     <PlusCircleOutlined style={{ color: "#097969" }} />
@@ -346,20 +356,4 @@ function Expiration({ datasetID }: ExpirationProps) {
         ? new Date(req.expiry_date).toLocaleDateString()
         : "-"
     return <>{expiration}</>
-}
-
-export interface SizeProps {
-    datasetID: TritonDataset["id"]
-}
-
-export function DatasetSize({ datasetID }: SizeProps) {
-    const readsetsByDatasetID = useAppSelector((state) =>
-        selectReadsetsByDatasetID(state, datasetID),
-    )
-    const totalSize = useMemo(
-        () => readsetsByDatasetID.reduce((total, r) => total + r.total_size, 0),
-        [readsetsByDatasetID],
-    )
-
-    return totalSize !== 0 ? <>{dataSize(totalSize).join(" ")}</> : <Spin />
 }
