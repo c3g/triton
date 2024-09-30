@@ -137,7 +137,6 @@ export const sendLatestReleasedNotificationEmail = async () => {
                                 `${subject}`,
                                 `${subject}.<br/><br/>
                                 -   <b>Project ID: ${dataset.external_project_id}</b><br/>
-                                -   <b>Run Name: ${dataset.run_name}</b><br/>
                                 -   <b>Dataset ID: ${dataset.id}</b><br/>
                                 -   Dataset Lane: ${dataset.lane}<br/>
                                 -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
