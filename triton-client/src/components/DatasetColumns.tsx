@@ -10,7 +10,7 @@ import {
     extendStagingRequest,
 } from "@store/thunks"
 import { selectConstants } from "@store/constants"
-import { DataSize } from "@components/shared"
+import { DatasetSize } from "@components/shared"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ActionDropdown, ReadsPerSample } from "@components/."
 import { selectRequestOfDatasetId } from "@store/selectors"
@@ -23,25 +23,33 @@ export function useDatasetColumns(totalSize: number) {
     return useMemo(() => {
         const columns: ColumnsType<TritonDataset> = []
         columns.push({
-            title: "Metric",
+            title: "",
             dataIndex: "id",
             key: "metric",
+            width: "1%",
+            align: "center",
             render: (id, dataset) => <MetricButton dataset={dataset} />,
         })
         columns.push({
             title: "ID",
             dataIndex: "id",
             key: "id",
+            width: "5%",
+            sorter: (a, b) => a.id - b.id,
         })
         columns.push({
             title: "Lane",
             dataIndex: "lane",
             key: "lane",
+            width: "5%",
+            sorter: (a, b) => a.lane - b.lane,
+            render: (lane) => <>{`Lane ${lane}`}</>,
         })
         columns.push({
             title: "SFTP",
             dataIndex: "id",
             key: "sftp",
+            width: "5%",
             render: (id, dataset) => (
                 <StagingButton
                     dataset={dataset}
@@ -54,6 +62,7 @@ export function useDatasetColumns(totalSize: number) {
             title: "Globus",
             dataIndex: "id",
             key: "globus",
+            width: "5%",
             render: (id, dataset) => (
                 <StagingButton
                     dataset={dataset}
@@ -66,13 +75,32 @@ export function useDatasetColumns(totalSize: number) {
             title: "Expiration",
             dataIndex: "id",
             key: "expiration",
+            width: "10%",
             render: (id) => <Expiration datasetID={id} />,
+        })
+        columns.push({
+            title: "Latest Release Date (UTC)",
+            dataIndex: "latest_release_update",
+            key: "latest_release_date",
+            width: "10%",
+            defaultSortOrder: "descend",
+            sorter: (a, b) =>
+                new Date(a.latest_release_update).getTime() -
+                new Date(b.latest_release_update).getTime(),
+            render: (date) => {
+                if (date) {
+                    return new Date(date).toUTCString()
+                } else {
+                    return "-"
+                }
+            }
         })
         columns.push({
             title: "Size",
             dataIndex: "id",
             key: "size",
-            render: (id) => <DataSize size={id} />,
+            width: "5%",
+            render: (id) => <DatasetSize datasetID={id} />,
         })
         return columns
     }, [totalSize])
@@ -253,11 +281,7 @@ function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
                     }
                 }}
             >
-                <Space>
-                    {type}
-                    {"|"}
-                    {statusDescription}
-                </Space>
+                <Space>{statusDescription}</Space>
             </Button>
         )
 
@@ -290,11 +314,7 @@ function StagingButton({ dataset, type, totalSize }: StagingButtonProps) {
                 }
                 onClick={() => req?.status !== "FAILED" && request(type)}
             >
-                <Space>
-                    {type}
-                    {"|"}
-                    {statusDescription}
-                </Space>
+                <Space>{statusDescription}</Space>
             </Button>
         )
     }

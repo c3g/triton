@@ -5,6 +5,7 @@ import { DatasetListProps } from "./interfaces"
 import { selectDatasetsByExternalProjectID } from "@store/selectors"
 import { fetchDatasets, fetchReadsets, fetchRequests } from "@store/thunks"
 import { useDatasetColumns } from "@components/DatasetColumns"
+import { TritonDataset } from "@api/api-types"
 
 export default function DatasetList({ externalProjectID }: DatasetListProps) {
     const dispatch = useAppDispatch()
@@ -14,7 +15,7 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
     )
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const datasets = await dispatch(fetchDatasets(externalProjectID))
             setIsFetching(false)
             // prefetch requests and readsets for each dataset
@@ -27,16 +28,16 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
         })()
     }, [dispatch, externalProjectID])
 
-    const dataSource: TableProps["dataSource"] = useMemo(() => {
-        return datasets.map((dataset) => ({
-            key: dataset.id,
-            dataset,
-        }))
-    }, [datasets])
-
+    const dataSource: NonNullable<TableProps<TritonDataset>["dataSource"]> =
+        datasets
     const columns = useDatasetColumns(69)
 
     return (
-        <Table dataSource={dataSource} columns={columns} loading={isFetching} />
+        <Table
+            dataSource={dataSource}
+            columns={columns}
+            rowKey={(d) => d.id}
+            loading={isFetching}
+        />
     )
 }

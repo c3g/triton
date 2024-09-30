@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit"
 import { RootState } from "@store/store"
 import { ExternalProjectID } from "@api/api-types"
 import { DatasetState } from "@store/datasets"
+import { ReadsetState } from "./readsets"
 
 export const selectRequestById = (state: RootState) =>
     state.requestsState.requestById
@@ -33,5 +34,19 @@ export const selectDatasetsByExternalProjectID = createSelector(
             }
         }
         return datasets
+    },
+)
+
+export const selectReadsetsByDatasetID = createSelector(
+    [selectReadsetsById, (_, datasetID: number) => datasetID],
+    (readsetsById, datasetID) => {
+        const readsets: ReadsetState[] = []
+        for (const readsetId in readsetsById) {
+            const readset = readsetsById[readsetId]
+            if (readset && readset.dataset === datasetID) {
+                readsets.push(readset)
+            }
+        }
+        return readsets
     },
 )
