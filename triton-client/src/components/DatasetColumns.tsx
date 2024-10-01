@@ -166,7 +166,6 @@ function MetricButton({ dataset }: MetricProps) {
 interface StagingButtonProps {
     dataset: DatasetColumnSource
     type: DownloadRequestType
-    activeRequest: RequestState | undefined
     updateDataset: (datasetID: TritonDataset["id"]) => Promise<void>
 }
 
