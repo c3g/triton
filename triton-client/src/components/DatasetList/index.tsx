@@ -24,7 +24,9 @@ export default function DatasetList({ externalProjectID }: DatasetListProps) {
                     id: dataset.id,
                     lane: dataset.lane,
                     external_project_id: dataset.external_project_id,
-                    latest_release_update: dataset.latest_release_update,
+                    latest_release_update: new Date(
+                        dataset.latest_release_update,
+                    ),
                     isFetchingRequest: true,
                     activeRequest: undefined,
                     totalSize: 0, // size of 0 indicates that the size is not yet fetched

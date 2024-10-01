@@ -23,7 +23,7 @@ export interface DatasetColumnSource {
     id: TritonDataset["id"]
     lane: TritonDataset["lane"]
     external_project_id: TritonDataset["external_project_id"]
-    latest_release_update: TritonDataset["latest_release_update"]
+    latest_release_update: Date
     isFetchingRequest: boolean
     activeRequest: RequestState | undefined
     totalSize: number
@@ -105,11 +105,11 @@ export function useDatasetColumns(
             width: "10%",
             defaultSortOrder: "descend",
             sorter: (a, b) =>
-                new Date(a.latest_release_update).getTime() -
-                new Date(b.latest_release_update).getTime(),
+                a.latest_release_update.getTime() -
+                b.latest_release_update.getTime(),
             render: (date) => {
                 if (date) {
-                    return new Date(date).toUTCString()
+                    return date.toUTCString()
                 } else {
                     return "-"
                 }
