@@ -67,7 +67,6 @@ async function requestToken() {
     const oauthConfig = {
         method: "POST",
         baseURL: clientPortalConfig.tokenUrl,
-        url: "/oauth/token",
         headers: {
             Authorization: credentials,
             "Content-Type": "application/x-www-form-urlencoded",
@@ -79,7 +78,6 @@ async function requestToken() {
         {
             method: oauthConfig.method,
             baseURL: oauthConfig.baseURL,
-            url: oauthConfig.url,
             headers: {
                 // TODO: Redact the Authorization header
                 Authorization: oauthConfig.headers.Authorization,
