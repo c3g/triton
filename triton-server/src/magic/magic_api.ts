@@ -47,10 +47,15 @@ async function checkUserAuthenticated(
     userID: string,
     userToken: string,
 ): Promise<boolean> {
-    const response = await axios.get<MagicReply<boolean>>(
-        "/userAuthenticated/",
-        userParams(userID, userToken),
-    )
+    const response = await axios
+        .get<
+            MagicReply<boolean>
+        >("/userAuthenticated/", userParams(userID, userToken))
+        .catch((error) => {
+            throw new Error(
+                `Magic API Error: ${JSON.stringify(error.response) ?? "no error message"}`,
+            )
+        })
     const reply = response.data
 
     if (isReplyOkay(reply)) {
