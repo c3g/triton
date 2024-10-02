@@ -9,6 +9,7 @@ const TRITON_ENVIRONMENTS = {
     CLIENT_ORIGIN: "",
     CLIENT_PORTAL_LOGIN: "",
     CLIENT_PORTAL_API_URL: "",
+    CLIENT_PORTAL_TOKEN_URL: "",
     CLIENT_PORTAL_USERNAME: "",
     CLIENT_PORTAL_PASSWORD: "",
     LIMS_API_URL: "",
@@ -74,7 +75,9 @@ export default {
         // Hercules login page url - the user logs in on this page.
         loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
         // Api endpoint base url
-        url: TRITON_ENVIRONMENTS.CLIENT_PORTAL_API_URL,
+        apiUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_API_URL,
+        // Token url to get the token
+        tokenUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_TOKEN_URL,
         // Credentials for the Triton server to call the Magic api
         user: TRITON_ENVIRONMENTS.CLIENT_PORTAL_USERNAME,
         password: TRITON_ENVIRONMENTS.CLIENT_PORTAL_PASSWORD,
