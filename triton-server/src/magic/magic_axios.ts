@@ -66,7 +66,7 @@ async function requestToken() {
     const credentials = `Basic ${Buffer.from(`${clientPortalConfig.user}:${clientPortalConfig.password}`).toString("base64")}`
     const oauthConfig = {
         method: "POST",
-        baseURL: clientPortalConfig.url,
+        baseURL: clientPortalConfig.tokenUrl,
         url: "/oauth/token",
         headers: {
             Authorization: credentials,
@@ -114,14 +114,11 @@ async function requestToken() {
         // Set a timer to flush the token when it reaches its expiry time.
         // The next call to getToken() will request a new token from hercules.
         const timeout = (auth.expires_in - 1) * 1000
-        setTimeout(
-            () => {
-                logger.debug("requestToken: Flushing token in timeout")
-                currentToken = undefined
-                authorizedAxios = undefined
-            },
-            timeout,
-        )
+        setTimeout(() => {
+            logger.debug("requestToken: Flushing token in timeout")
+            currentToken = undefined
+            authorizedAxios = undefined
+        }, timeout)
         logger.debug(
             {
                 currentToken,
@@ -149,7 +146,7 @@ const getAuthorizedAxios = async () => {
         headers: {
             Authorization: `Bearer ${token}`,
         },
-        baseURL: `${clientPortalConfig.url}/hercules`, // all api calls use hercules endpoint
+        baseURL: `${clientPortalConfig.apiUrl}`,
         httpsAgent,
     })
 
