@@ -245,6 +245,7 @@ class FreezemanAPIAuthorization {
                             `Is LIMS running?`,
                             `Does user '${LIMS_USERNAME}' exist in LIMS?`,
                             `Does it have the correct password?`,
+                            `Is the certificate valid or up-to-date?`,
                         ],
                         method: error.config.method,
                         url: error.config.url,
