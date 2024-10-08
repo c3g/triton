@@ -1,5 +1,4 @@
-import { Middleware, SerializedError, configureStore } from "@reduxjs/toolkit"
-import { createLogger } from "redux-logger"
+import { SerializedError, configureStore } from "@reduxjs/toolkit"
 
 import AuthReducer, { AuthState, AuthAction } from "./auth"
 import ProjectsReducer, { ProjectsState, ProjectsStateAction } from "./projects"
@@ -36,16 +35,6 @@ export type AppAction =
     | DatasetFilesStateAction
     | RunsStateAction
     | ConstantsStateAction
-
-// below logger isnt being used
-// const loggerMiddleware: [Middleware<{}, RootState>] | [] =
-//     process.env.NODE_ENV === "development"
-//         ? [
-//               createLogger({
-//                   level: "info",
-//               }),
-//           ]
-//         : []
 
 export const store = configureStore({
     reducer: {
