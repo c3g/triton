@@ -10,17 +10,24 @@ import { logger } from "./logger"
 import { defaultDatabaseActions } from "./download/actions"
 import { sendEmail } from "./download/email"
 import { getProjectUsers } from "./magic/magic_api"
+import cron from "node-cron"
 
 export function start() {
-    logger.info("[contacts] Starting service...")
-    const intervalID = setInterval(() => {
-        void tick()
-    }, 30 * 1000)
-    void tick()
+    logger.info(
+        `[contacts] Starting service... (${config.cron.contactService})`,
+    )
+
+    const task = cron.schedule(
+        config.cron.contactService,
+        () => {
+            void tick()
+        },
+        { runOnInit: true },
+    )
 
     const stop = () => {
         logger.info("[contacts] Stopping service...")
-        clearInterval(intervalID)
+        task.stop()
     }
 
     async function tick() {
