@@ -43,7 +43,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
         // the email portion of the logic
 
         if (validatedDatasets.length > 0) {
-            let formattedData: ExtractedValidatedNotificationData[] =
+            const formattedData: ExtractedValidatedNotificationData[] =
                 await extractValidatedDatasetsInfo(validatedDatasets)
 
             formattedData.map((dataset: ExtractedValidatedNotificationData) => {
@@ -74,7 +74,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                     },
                 )
             }
-            let body =
+            const body =
                 "A run has been validated: <br/>" +
                 formattedData.map(
                     (dataset: ExtractedValidatedNotificationData) => {
@@ -200,22 +200,6 @@ export const sendTestEmail = (body: string) => {
     })
 }
 
-const mockDataset: Dataset = {
-    id: 987654,
-    lane: 123546,
-    external_project_id: "project-id-testing",
-    project_name: "project name",
-    run_name: "test name",
-    readset_count: 19,
-    released_status_count: 99,
-    blocked_status_count: 64,
-    latest_release_update: new Date().toISOString(),
-    archived_comments: [],
-    validation_status: 0,
-    validated_by: 64,
-    latest_validation_update: new Date().toISOString(),
-}
-
 const getValidationFlagLabel = (status: number) => {
     switch (status) {
         case 0:
@@ -231,11 +215,9 @@ const getValidationFlagLabel = (status: number) => {
 
 // this should also do the api call to get the basic info from the user
 const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
-    let extractedData: ExtractedValidatedNotificationData[] = []
+    const extractedData: ExtractedValidatedNotificationData[] = []
     validatedDataset.forEach((item: Dataset) => {
-        let runsInfo: ProjectAndRunInfo
-        let userCommentInfo: BasicCommentUserInfo | undefined = undefined
-        runsInfo = {
+        const runsInfo: ProjectAndRunInfo = {
             run_name: item.run_name,
             project_name: item.project_name,
             project_id: item.external_project_id,
@@ -244,8 +226,9 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             validated_by: item.validated_by ?? "",
             latest_validation_update: item.latest_validation_update,
         }
+        let userCommentInfo: BasicCommentUserInfo | undefined = undefined
         if (item.archived_comments.length > 0) {
-            let latestComment = item.archived_comments.reduce((a, b) => {
+            const latestComment = item.archived_comments.reduce((a, b) => {
                 return new Date(a.created_at) > new Date(b.created_at) ? a : b
             })
             userCommentInfo = {

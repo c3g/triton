@@ -110,7 +110,7 @@ const magicCallbackHandler = asyncHandler(async (req, res, next) => {
     }
 
     // Ask Magic for the user's details.
-    const userDetails = await getUserDetails(userId, token)
+    const userDetails = await getUserDetails(userId)
 
     // Store the user details and their login credentials in the session.
     // We need the user id and token because triton has to check if the user is

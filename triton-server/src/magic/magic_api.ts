@@ -96,7 +96,7 @@ async function getMagic<T>(axiosConfig: AxiosRequestConfig) {
  * @param userToken
  * @returns
  */
-export const getUserProjects = async (userID: string, userToken: string) => {
+export const getUserProjects = async (userID: string) => {
     return await getMagic<UserProjects>({
         method: "get",
         url: "/userProjects/",
@@ -112,7 +112,7 @@ export const getUserProjects = async (userID: string, userToken: string) => {
  * @param userToken
  * @returns
  */
-export const getUserDetails = async (userID: string, userToken: string) => {
+export const getUserDetails = async (userID: string) => {
     return await getMagic<UserDetails>({
         method: "get",
         url: "/userDetails/",

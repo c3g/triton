@@ -37,13 +37,6 @@ function okReply<T>(data: T): ApiReply<T> {
     }
 }
 
-function errorReply(error: Error): ApiReply<unknown> {
-    return {
-        ok: false,
-        message: error.message,
-    }
-}
-
 /**
  * user/is-logged-in
  *
@@ -64,7 +57,7 @@ router.get(
             // so this call is redundant.
             isLoggedIn = await isUserAuthenticated(userId, token)
             if (isLoggedIn) {
-                const userDetails = await getUserDetails(userId, token)
+                const userDetails = await getUserDetails(userId)
                 user = userDetails
             }
         }
@@ -76,8 +69,8 @@ router.get(
     "/list-projects/",
     asyncHandler(async (req, res) => {
         if (req.session.credentials) {
-            const { userId, token } = req.session.credentials
-            const projects = await listUserProjects(userId, token)
+            const { userId } = req.session.credentials
+            const projects = await listUserProjects(userId)
             res.json(okReply<TritonProject[]>(projects))
         } else {
             res.sendStatus(401)
