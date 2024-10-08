@@ -19,19 +19,15 @@ async function doTest(): Promise<void> {
     const isAuthenticated = await isUserAuthenticated(USER_ID, USER_TOKEN)
     console.log(isAuthenticated ? "authenticated" : "not authenticated")
 
-    const userDetails = await getUserDetails(USER_ID, USER_TOKEN)
+    const userDetails = await getUserDetails(USER_ID)
     console.log(userDetails)
 
-    const userProjects = await getUserProjects(USER_ID, USER_TOKEN)
+    const userProjects = await getUserProjects(USER_ID)
     console.log(userProjects)
 
     if (userProjects.projects.length > 0) {
         const project = userProjects.projects[0]
-        const projectUsers = await getProjectUsers(
-            USER_ID,
-            USER_TOKEN,
-            project.projectNumber,
-        )
+        const projectUsers = await getProjectUsers(project.projectNumber)
         console.log(JSON.stringify(projectUsers))
     } else {
         console.log("No projects, so no project users")

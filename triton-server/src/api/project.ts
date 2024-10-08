@@ -16,9 +16,8 @@ import { TritonProject } from "./api-types"
  */
 export async function listUserProjects(
     userId: string,
-    userToken: string
 ): Promise<TritonProject[]> {
-    const magicProjects = await getUserProjects(userId, userToken)
+    const magicProjects = await getUserProjects(userId)
 
     return magicProjects.projects.map((userProject) => {
         const tritonProject: TritonProject = {
