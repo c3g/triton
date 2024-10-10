@@ -45,12 +45,12 @@ function ProjectDetail() {
         {
             target: ".data-sets-container",
             content:
-                "The datasets that have been released in Freezeman, relating to the project, will be displayed here.",
+                "The datasets that have been released, relating to the project, will be displayed here.",
         },
     ]
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const runs = await dispatch(fetchRuns(projectExternalId))
             const datasets: TritonDataset[] = []
             for (const run of runs) {
