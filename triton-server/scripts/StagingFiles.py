@@ -228,11 +228,11 @@ while 1:
         failure=1
 
       if (failure==1):
-        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'FAILED',failure_date='" + datetime.datetime.now(datetime.timezone.utc).isoformat() + " WHERE dataset_id='" + dataset + "' and type='" + mytype + "'\""], stdout=subprocess.PIPE)
+        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'FAILED',failure_date='" + datetime.datetime.now().isoformat() + " WHERE dataset_id='" + dataset + "' and type='" + mytype + "'\""], stdout=subprocess.PIPE)
         pUpd.communicate()
       else:
-        completed=datetime.datetime.now(datetime.timezone.utc)
-        expiry=completed + datetime.timedelta(days=keepFiles)
-        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'SUCCESS',completion_date='" + completed.isoformat() + "', expiry_date='" + expiry.isoformat() + "' WHERE dataset_id='" + dataset + "' and type ='" + mytype + "'\""], stdout=subprocess.PIPE)
+        completed=datetime.datetime.now()
+        expiry=datetime.datetime.now() + datetime.timedelta(days=keepFiles)
+        pUpd = subprocess.Popen(["ssh", tritonUser + "@" + tritonServer, "/usr/bin/sqlite3", tritonDB, "\"UPDATE requests SET status = 'SUCCESS',completion_date='" + datetime.datetime.now().isoformat() + "', expiry_date='" + expiry.isoformat() + "' WHERE dataset_id='" + dataset + "' and type ='" + mytype + "'\""], stdout=subprocess.PIPE)
         pUpd.communicate()
 
