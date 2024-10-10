@@ -70,15 +70,13 @@ export function start() {
                 logger.debug(
                     `[contacts] Processing request: ${JSON.stringify(request)}`,
                 )
-                const completionDate = !request.completion_date
-                    ? undefined
-                    : new Date(Date.parse(request.completion_date))
-                const notificationDate = !request.notification_date
-                    ? undefined
-                    : new Date(Date.parse(request.notification_date))
-                const failureDate = !request.failure_date
-                    ? undefined
-                    : new Date(Date.parse(request.failure_date))
+                const completionDate =
+                    request.completion_date && new Date(request.completion_date)
+                const notificationDate =
+                    request.notification_date &&
+                    new Date(request.notification_date)
+                const failureDate =
+                    request.failure_date && new Date(request.failure_date)
 
                 if (
                     request.status === "SUCCESS" &&
