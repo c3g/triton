@@ -1,3 +1,5 @@
+import { ExternalProjectID } from "@api/api-types"
+
 export interface DatasetListProps {
-    runName: string
+    externalProjectID: ExternalProjectID
 }

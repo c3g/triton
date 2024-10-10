@@ -1,65 +1,105 @@
-import { Divider, Empty, Spin } from "antd"
-import { useMemo } from "react"
-import { useAppSelector } from "@store/hooks"
-import DatasetCard from "@components/DatasetCard"
+import { Table, TableProps } from "antd"
+import { useCallback, useEffect, useState } from "react"
+import { useAppDispatch } from "@store/hooks"
 import { DatasetListProps } from "./interfaces"
+import { fetchDatasets, fetchReadsets, fetchRequests } from "@store/thunks"
+import {
+    DatasetColumnSource,
+    useDatasetColumns,
+} from "@components/DatasetColumns"
+import { TritonDataset, TritonRequest } from "@api/api-types"
 
-export default function DatasetList({ runName }: DatasetListProps) {
-    const datasetIDs = useAppSelector(
-        (state) => state.runsState.runsByName[runName]?.datasets,
+export default function DatasetList({ externalProjectID }: DatasetListProps) {
+    const dispatch = useAppDispatch()
+    const [isFetching, setIsFetching] = useState(true)
+    const [dataSource, setDataSource] = useState<
+        NonNullable<TableProps<DatasetColumnSource>["dataSource"]>
+    >([])
+
+    useEffect(() => {
+        ;(async () => {
+            const datasets = await dispatch(fetchDatasets(externalProjectID))
+            setDataSource(
+                datasets.map((dataset) => ({
+                    id: dataset.id,
+                    lane: dataset.lane,
+                    external_project_id: dataset.external_project_id,
+                    latest_release_update: new Date(
+                        dataset.latest_release_update,
+                    ),
+                    isFetchingRequest: true,
+                    activeRequest: undefined,
+                    totalSize: 0, // size of 0 indicates that the size is not yet fetched
+                })),
+            )
+            setIsFetching(false)
+            const readsets = await dispatch(
+                fetchReadsets(datasets.map((dataset) => dataset.id)),
+            )
+            const requests = await dispatch(
+                fetchRequests(datasets.map((dataset) => dataset.id)),
+            )
+            const totalSizeByDatasets = readsets.reduce<
+                Record<TritonDataset["id"], number>
+            >((acc, readset) => {
+                acc[readset.dataset] =
+                    (acc[readset.dataset] || 0) + readset.total_size
+                return acc
+            }, {})
+            const activeRequestByDatasets = requests.reduce<
+                Record<TritonDataset["id"], TritonRequest | undefined>
+            >((acc, request) => {
+                acc[request.dataset_id] = request
+                return acc
+            }, {})
+            setDataSource((prev) =>
+                prev.map((d) => ({
+                    ...d,
+                    isFetchingRequest: false,
+                    totalSize: totalSizeByDatasets[d.id] || 0,
+                    activeRequest: activeRequestByDatasets[d.id],
+                })),
+            )
+        })()
+    }, [dispatch, externalProjectID])
+
+    const updateDataset = useCallback(
+        async (datasetID: TritonDataset["id"]) => {
+            // only update request for now since readsets are not updated
+            setDataSource((prev) =>
+                prev.map((d) =>
+                    d.id === datasetID
+                        ? {
+                              ...d,
+                              isFetchingRequest: true,
+                          }
+                        : d,
+                ),
+            )
+            const requests = await dispatch(fetchRequests([datasetID]))
+            setDataSource((prev) =>
+                prev.map((d) =>
+                    d.id === datasetID
+                        ? {
+                              ...d,
+                              isFetchingRequest: false,
+                              activeRequest:
+                                  requests.length > 0 ? requests[0] : undefined, // only one request per dataset
+                          }
+                        : d,
+                ),
+            )
+        },
+        [],
     )
-    const datasetsByID = useAppSelector(
-        (state) => state.datasetsState.datasetsById,
-    )
-
-    const renderDatasets = useMemo(() => {
-        if (datasetIDs === undefined) return [<Spin key={"spin"} />]
-        if (datasetIDs.length === 0)
-            return [
-                <Empty
-                    key={"empty"}
-                    description={
-                        "There are no sample data available for request."
-                    }
-                />,
-            ]
-        if (datasetIDs.length > 0) {
-            console.info(datasetIDs, datasetsByID)
-
-            return [...datasetIDs]
-                .sort(
-                    (a, b) =>
-                        (datasetsByID[a]?.lane ?? 0) -
-                        (datasetsByID[b]?.lane ?? 0),
-                )
-                .map((datasetID, index) => {
-                    return (
-                        <>
-                            <DatasetCard
-                                key={datasetID}
-                                datasetID={datasetID}
-                            />
-                            {index < datasetIDs.length - 1 ? (
-                                <Divider style={{ margin: "0.5rem 0" }} />
-                            ) : null}
-                        </>
-                    )
-                })
-        }
-
-        return []
-    }, [datasetIDs, datasetsByID])
+    const columns = useDatasetColumns(updateDataset)
 
     return (
-        <div
-            className="data-sets-container"
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.25rem",
-            }}
-        >
-            {renderDatasets}
-        </div>
+        <Table<DatasetColumnSource>
+            dataSource={dataSource}
+            columns={columns}
+            rowKey={(d) => d.id}
+            loading={isFetching}
+        />
     )
 }

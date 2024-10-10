@@ -106,9 +106,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(
-                        ",",
-                    )}`,
+                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(",")}&latest_release_update=0001-01-01T01:01:00Z`,
                 )
             },
             list: async (ids: string[]): Promise<ListResponse<Dataset>> => {
@@ -118,7 +116,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}`,
+                    `${LIMS_API_URL}/datasets/?id__in=${ids.join(",")}&latest_release_update=0001-01-01T01:01:00Z`,
                 )
             },
             listByReleasedUpdates: async (
@@ -147,14 +145,15 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             },
         },
         Readset: {
-            listByDatasetId: async (
-                datasetId: Dataset["id"],
+            listByDatasetIDs: async (
+                datasetIDs: Array<Dataset["id"]>,
             ): Promise<ListResponse<ReadsetWithMetrics>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 const params = [
-                    `dataset__id__in=${datasetId}`,
+                    `dataset__id__in=${datasetIDs.join(",")}`,
                     `release_status=${RELEASED}`,
                     `withMetrics=true`,
+                    `limit=100000`,
                 ]
                 return await axios.get(
                     `${LIMS_API_URL}/readsets/?${params.join("&")}`,
