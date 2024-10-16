@@ -65,17 +65,6 @@ export interface TritonDataset extends Omit<Dataset, "files"> {}
 
 export interface TritonRequest extends DownloadRequest {}
 
-export interface TritonRun {
-    external_project_id: ExternalProjectID // Project this run belongs to
-    name: string // Run name (from datasets)
-    runDate: Date // Date run was performed (TODO since we don't have that yet)
-    datasets: number[] // The list of dataset ID's associated with this run
-
-    // In the future it would be nice to have some statistics
-    readsetCount: number // The total number of readsets in the run
-    availableReadsetsCount: number // The number of readsets which are staged for download
-}
-
 export interface TritonReadset extends ReadsetWithMetrics {}
 
 export interface TritonDatasetFile {

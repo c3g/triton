@@ -16,15 +16,13 @@ import {
     TritonProject,
     TritonReadset,
     TritonRequest,
-    TritonRun,
     User,
 } from "./api-types"
 import {
     listDatasetFilesByDataset,
-    listDatasetsByIds,
-    listReadsetsByDataset,
+    listDatasetsByExternalProjectID,
+    listReadsetsByDatasets,
     listRequests,
-    listRunsByExternalProjectId,
 } from "./datasets"
 import { listUserProjects } from "./project"
 
@@ -77,39 +75,28 @@ router.get(
         }
     }),
 )
+
 router.get(
-    "/project-runs/",
+    "/datasets/",
     asyncHandler(async (req, res) => {
-        const idParam = req.query.external_project_ids as string
-        const projectIds = idParam.split(",")
+        if (typeof req.query.external_project_ids !== "string") {
+            res.status(400).send(
+                "external_project_ids's value must be a comma separated string",
+            )
+            return
+        }
+        const external_project_ids = req.query.external_project_ids.split(",")
 
         // At least one project ID must be specified
-        if (projectIds.length === 0) {
+        if (external_project_ids.length === 0) {
             res.status(400).send(
                 "external_project_ids must contain at least one hercules project ID",
             )
             return
         }
 
-        const runs = await listRunsByExternalProjectId(projectIds)
-        res.json(okReply<TritonRun[]>(runs))
-    }),
-)
-router.get(
-    "/runs-datasets/",
-    asyncHandler(async (req, res) => {
-        const idParam = req.query.ids as string
-        const ids = idParam.split(",")
-
-        // At least one project ID must be specified
-        if (ids.length === 0) {
-            res.status(400).send(
-                "external_project_ids must contain at least one hercules project ID",
-            )
-            return
-        }
-
-        const datasets = await listDatasetsByIds(ids)
+        const datasets =
+            await listDatasetsByExternalProjectID(external_project_ids)
         res.json(okReply<TritonDataset[]>(datasets))
     }),
 )
@@ -136,9 +123,15 @@ router.get(
 router.get(
     "/dataset-readsets/",
     asyncHandler(async (req, res) => {
-        const idParam = Number(req.query.dataset_id)
-        const readsets = await listReadsetsByDataset(idParam)
-        res.json(okReply<TritonReadset[]>(readsets))
+        if (typeof req.query.dataset_ids !== "string") {
+            res.status(400).send(
+                "dataset_ids's value must be a comma separated string",
+            )
+            return
+        }
+        const idParams = req.query.dataset_ids.split(",").map(Number)
+        const readsets = await listReadsetsByDatasets(idParams)
+        res.json(okReply<readonly TritonReadset[]>(readsets))
     }),
 )
 
