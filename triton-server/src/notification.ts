@@ -130,7 +130,7 @@ export const sendLatestReleasedNotificationEmail = async () => {
             let lastDate: string | undefined = undefined
             for (const dataset of releasedDatasets) {
                 if (dataset.released_status_count > 0) {
-                    const subject = `Dataset #${dataset.id} for project '${dataset.external_project_id}' is ready for staging for download.`
+                    const subject = `The dataset for project '${dataset.external_project_id}' (Dataset #${dataset.id}) is now ready for staging and then download.`
                     const results = await email.broadcastEmailsOfProject(
                         dataset.external_project_id,
                         async (send) => {
@@ -144,7 +144,7 @@ export const sendLatestReleasedNotificationEmail = async () => {
                                 -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
                                 Datasets can be downloaded from the MCG Data Portal.
                                 To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
-                                Datasets can be downloaded using SFTP or Globus using the credential provided to you during the staging process.<br/><br/>
+                                You can download the dataset via SFTP or Globus using the credentials provided during the staging process.<br/><br/>
                                 If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
                                 If you have any issues, please contact us at ${config.mail.techSupport}.<br/><br/>
                                 Thank you.<br/>`,
