@@ -293,23 +293,17 @@ export const sendValidationEmail = async (
     if (validatedDatasets.length > 0) {
         const db = await defaultDatabaseActions()
 
-        let lastDate: string | undefined = undefined
         const subject = `A Run has been validated.`
 
         await sendEmail("", config.mail.toValidationNotification, subject, body)
 
-        lastDate = validatedDatasets
-            .map(
-                (dataset) =>
-                    new Date(
-                        dataset.projectAndRunInfo.latest_validation_update,
-                    ),
-            )
-            .sort((a, b) => a.getTime() - b.getTime())
-            [validatedDatasets.length - 1].toISOString()
-        if (lastDate !== undefined) {
-            // update the last notification date
-            await db.updateLatestValidatedNotificationDate(lastDate)
-        }
+        const lastDate = validatedDatasets.sort((a, b) =>
+            new Date(a.projectAndRunInfo.latest_validation_update).getTime() >
+            new Date(b.projectAndRunInfo.latest_validation_update).getTime()
+                ? 1
+                : -1,
+        )[validatedDatasets.length - 1].projectAndRunInfo
+            .latest_validation_update
+        await db.updateLatestValidatedNotificationDate(lastDate)
     }
 }
