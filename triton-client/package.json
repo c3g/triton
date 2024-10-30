@@ -53,9 +53,9 @@
         "@types/react-dom": "^18.0.6",
         "@types/redux-logger": "^3.0.9",
         "node-sass": "^7.0.3",
+        "react-infinite-scroll-component": "6.1.0",
         "react-joyride": "^2.8.2",
         "react-scripts": "5.0.1",
-        "react-infinite-scroll-component": "6.1.0",
         "sass": "^1.54.3",
         "typescript": "^3.3.4",
         "webpack": "^5.88.2"
