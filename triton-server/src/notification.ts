@@ -1,3 +1,4 @@
+/* eslint-disable no-unexpected-multiline */
 import config from "../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
@@ -95,7 +96,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
 
                 This is an automated email, do not reply back.<br/>`
             // await sendTestEmail(body)
-            await sendValidationEmail(formattedData, body, db)
+            await sendValidationEmail(formattedData, body)
         }
     }
 }
@@ -288,16 +289,24 @@ interface ExtractedValidatedNotificationData {
 export const sendValidationEmail = async (
     validatedDatasets: ExtractedValidatedNotificationData[],
     body: string,
-    db: any,
 ) => {
     if (validatedDatasets.length > 0) {
+        const db = await defaultDatabaseActions()
+
         let lastDate: string | undefined = undefined
         const subject = `A Run has been validated.`
 
         await sendEmail("", config.mail.toValidationNotification, subject, body)
 
-        lastDate =
-            validatedDatasets[0].projectAndRunInfo.latest_validation_update
+        lastDate = validatedDatasets
+            .map(
+                (dataset) =>
+                    new Date(
+                        dataset.projectAndRunInfo.latest_validation_update,
+                    ),
+            )
+            .sort((a, b) => a.getTime() - b.getTime())
+            [validatedDatasets.length - 1].toISOString()
         if (lastDate !== undefined) {
             // update the last notification date
             await db.updateLatestValidatedNotificationDate(lastDate)
