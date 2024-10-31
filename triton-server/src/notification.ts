@@ -304,22 +304,19 @@ export const sendValidationEmail = async (
     }
 }
 
-function compareTimestamp(a: string, b: string) {
-    const aParts = a.split(".")
-    const bParts = b.split(".")
-
-    const dateA = aParts[0]
-    const dateB = bParts[0]
-    const afterDecimalA = aParts[1].slice(0, -1)
-    const afterDecimalB = bParts[1].slice(0, -1)
-
-    if (dateA > dateB) {
+/**
+ *
+ * @param {string} a ISO 8601 timestamp (UTC)
+ * @param {string} b ISO 8601 timestamp (UTC)
+ * @returns {-1 | 0 | 1}
+ */
+function compareTimestamp(a: string, b: string): -1 | 0 | 1 {
+    // remove the last character which should be 'Z'
+    a = a.slice(0, -1)
+    b = b.slice(0, -1)
+    if (a > b) {
         return 1
-    } else if (dateA < dateB) {
-        return -1
-    } else if (afterDecimalA > afterDecimalB) {
-        return 1
-    } else if (afterDecimalA < afterDecimalB) {
+    } else if (a < b) {
         return -1
     } else {
         return 0
