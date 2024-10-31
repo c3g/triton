@@ -307,17 +307,21 @@ export const sendValidationEmail = async (
 function compareTimestamp(a: string, b: string) {
     const aParts = a.split(".")
     const bParts = b.split(".")
+
     const dateA = aParts[0]
     const dateB = bParts[0]
+    const afterDecimalA = aParts[1].slice(0, -1)
+    const afterDecimalB = bParts[1].slice(0, -1)
+
     if (dateA > dateB) {
         return 1
     } else if (dateA < dateB) {
         return -1
+    } else if (afterDecimalA > afterDecimalB) {
+        return 1
+    } else if (afterDecimalA < afterDecimalB) {
+        return -1
     } else {
-        const milisecondsA =
-            aParts.length > 1 ? parseInt(aParts[1].slice(0, -1)) : 0
-        const milisecondsB =
-            bParts.length > 1 ? parseInt(bParts[1].slice(0, -1)) : 0
-        return milisecondsA - milisecondsB
+        return 0
     }
 }
