@@ -122,10 +122,11 @@ export const sendLatestReleasedNotificationEmail = async () => {
         )
         // the email portion of the logic
         if (releasedDatasets.length > 0) {
-            releasedDatasets.sort(
-                (a, b) =>
-                    new Date(a.latest_release_update).getTime() -
-                    new Date(b.latest_release_update).getTime(),
+            releasedDatasets.sort((a, b) =>
+                compareTimestamp(
+                    a.latest_validation_update,
+                    b.latest_validation_update,
+                ),
             )
             let lastDate: string | undefined = undefined
             for (const dataset of releasedDatasets) {
@@ -297,13 +298,27 @@ export const sendValidationEmail = async (
 
         await sendEmail("", config.mail.toValidationNotification, subject, body)
 
-        const lastDate = validatedDatasets.sort((a, b) =>
-            new Date(a.projectAndRunInfo.latest_validation_update).getTime() >
-            new Date(b.projectAndRunInfo.latest_validation_update).getTime()
-                ? 1
-                : -1,
-        )[validatedDatasets.length - 1].projectAndRunInfo
-            .latest_validation_update
+        const lastDate = validatedDatasets
+            .map((x) => x.projectAndRunInfo.latest_validation_update)
+            .sort(compareTimestamp)[validatedDatasets.length - 1]
         await db.updateLatestValidatedNotificationDate(lastDate)
+    }
+}
+
+function compareTimestamp(a: string, b: string) {
+    const aParts = a.split(".")
+    const bParts = b.split(".")
+    const dateA = aParts[0]
+    const dateB = bParts[0]
+    if (dateA > dateB) {
+        return 1
+    } else if (dateA < dateB) {
+        return -1
+    } else {
+        const milisecondsA =
+            aParts.length > 1 ? parseInt(aParts[1].slice(0, -1)) : 0
+        const milisecondsB =
+            bParts.length > 1 ? parseInt(bParts[1].slice(0, -1)) : 0
+        return milisecondsA - milisecondsB
     }
 }
