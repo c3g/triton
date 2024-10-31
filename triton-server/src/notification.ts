@@ -179,6 +179,22 @@ export const sendLatestReleasedNotificationEmail = async () => {
     }
 }
 
+// Function to test new email integrations locally.
+// Required variables:
+// const transporter = nodemailer.createTransport({
+//     service: "gmail", // current email transporter is gmail but other mailer can be used.
+//     auth: {
+//         user: "", // your email(should be a gmail if using gmail email transporter service)
+//         pass: "", // your gmail secret passkey to allow the app to use the gmail api through your gmail
+//     },
+// })
+// const mailOptions = {
+//     from: "", // the from email is required to have filled in order to test emails locally.
+//     to: "",   // the to email to send the test emails.
+//     subject: "Sending Email using Node.js",
+//     text: body,
+// Returns:
+//     Returns void, the function executes the action
 export const sendTestEmail = (body: string) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
