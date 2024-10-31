@@ -1,4 +1,3 @@
-/* eslint-disable no-unexpected-multiline */
 import config from "../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
