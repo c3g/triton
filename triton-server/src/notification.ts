@@ -123,8 +123,8 @@ export const sendLatestReleasedNotificationEmail = async () => {
         if (releasedDatasets.length > 0) {
             releasedDatasets.sort((a, b) =>
                 compareTimestamp(
-                    a.latest_validation_update,
-                    b.latest_validation_update,
+                    a.latest_release_update,
+                    b.latest_release_update,
                 ),
             )
             let lastDate: string | undefined = undefined
