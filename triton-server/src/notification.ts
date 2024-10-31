@@ -183,14 +183,14 @@ export const sendTestEmail = (body: string) => {
     const transporter = nodemailer.createTransport({
         service: "gmail", // other mailer can be used but right now default is gmail
         auth: {
-            user: "sebastianamouzegar@gmail.com",
-            pass: "tlba fptj scli xfdy",
+            user: "", // your email(should be a gmail if using gmail email transporter service)
+            pass: "", // your gmail secret passkey to allow the app to use the gmail api through your gmail
         },
     })
 
     const mailOptions = {
-        from: "sebastianamouzegar@gmail.com",
-        to: "sebastian.amouzegar@computationalgenomics.ca",
+        from: "",
+        to: "",
         subject: "Sending Email using Node.js",
         text: body,
     }
