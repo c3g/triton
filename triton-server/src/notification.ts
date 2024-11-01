@@ -1,4 +1,3 @@
-/* eslint-disable no-unexpected-multiline */
 import config from "../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
@@ -122,10 +121,11 @@ export const sendLatestReleasedNotificationEmail = async () => {
         )
         // the email portion of the logic
         if (releasedDatasets.length > 0) {
-            releasedDatasets.sort(
-                (a, b) =>
-                    new Date(a.latest_release_update).getTime() -
-                    new Date(b.latest_release_update).getTime(),
+            releasedDatasets.sort((a, b) =>
+                compareTimestamp(
+                    a.latest_release_update,
+                    b.latest_release_update,
+                ),
             )
             let lastDate: string | undefined = undefined
             for (const dataset of releasedDatasets) {
@@ -297,13 +297,28 @@ export const sendValidationEmail = async (
 
         await sendEmail("", config.mail.toValidationNotification, subject, body)
 
-        const lastDate = validatedDatasets.sort((a, b) =>
-            new Date(a.projectAndRunInfo.latest_validation_update).getTime() >
-            new Date(b.projectAndRunInfo.latest_validation_update).getTime()
-                ? 1
-                : -1,
-        )[validatedDatasets.length - 1].projectAndRunInfo
-            .latest_validation_update
+        const lastDate = validatedDatasets
+            .map((x) => x.projectAndRunInfo.latest_validation_update)
+            .sort(compareTimestamp)[validatedDatasets.length - 1]
         await db.updateLatestValidatedNotificationDate(lastDate)
+    }
+}
+
+/**
+ *
+ * @param {string} a ISO 8601 timestamp (UTC)
+ * @param {string} b ISO 8601 timestamp (UTC)
+ * @returns {-1 | 0 | 1}
+ */
+function compareTimestamp(a: string, b: string): -1 | 0 | 1 {
+    // remove the last character which should be 'Z'
+    a = a.slice(0, -1)
+    b = b.slice(0, -1)
+    if (a > b) {
+        return 1
+    } else if (a < b) {
+        return -1
+    } else {
+        return 0
     }
 }
