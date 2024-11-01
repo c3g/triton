@@ -79,9 +79,9 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 formattedData.map(
                     (dataset: ExtractedValidatedNotificationData) => {
                         return `<br/><br/>
-                            -   <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>
-                            -   <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>
-                            -   <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
+                            - <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>
+                            - <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>
+                            - <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
                             - <b>Dataset/lane ${dataset.projectAndRunInfo.lane_number} status</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
