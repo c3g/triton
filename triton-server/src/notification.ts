@@ -80,14 +80,14 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 )
             }
             const body =
-                "A run has been validated: <br/>" +
+                "<b>A run has been validated:</b> <br/>" +
                 formattedData.map(
                     (dataset: ExtractedValidatedNotificationData) => {
                         return `<br/><br/>
-                            -   Run Name: ${dataset.projectAndRunInfo.run_name} <br/>
-                            -   Validated by: ${dataset.projectAndRunInfo.validated_by} <br/>
-                            -   Project: ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
-                            - Dataset/lane ${dataset.projectAndRunInfo.lane_number} status ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
+                            -   <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>
+                            -   <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>
+                            -   <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
+                            - <b>Dataset/lane ${dataset.projectAndRunInfo.lane_number} status</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments: " + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Comments left by: " + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- Created at: " + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
