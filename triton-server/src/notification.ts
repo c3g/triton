@@ -87,7 +87,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Comments left by: </b>" + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Created at: </b>" + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
 
-                            `
+                            ----------------------`
                     },
                 ) +
                 `
