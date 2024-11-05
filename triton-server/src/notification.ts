@@ -17,8 +17,12 @@ export const start = async () => {
         config.cron.notification,
         () => {
             logger.info("Executing notification service.")
-            sendLatestReleasedNotificationEmail()
-            sendDatasetValidationStatusUpdateEmail()
+            sendLatestReleasedNotificationEmail().catch((err) =>
+                logger.error(err),
+            )
+            sendDatasetValidationStatusUpdateEmail().catch((err) =>
+                logger.error(err),
+            )
         },
         { runOnInit: true },
     )
