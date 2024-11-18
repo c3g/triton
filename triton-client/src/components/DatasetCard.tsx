@@ -167,12 +167,6 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     },
                 ]
 
-                let statusDescription: ReactNode
-                if (status === "SUCCESS") {
-                    statusDescription = "DOWNLOAD"
-                } else {
-                    statusDescription = "QUEUED"
-                }
                 const buttonStagingActive = (
                     <Button
                         key={type}
@@ -196,7 +190,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         <Space>
                             {type}
                             {"|"}
-                            {statusDescription}
+                            {"DOWNLOAD"}
                         </Space>
                     </Button>
                 )
@@ -214,6 +208,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                     statusDescription = "UNSTAGING"
                 } else if (req?.status) {
                     statusDescription = req.status
+                } else {
+                    statusDescription = "STAGE"
                 }
                 return (
                     <Button
