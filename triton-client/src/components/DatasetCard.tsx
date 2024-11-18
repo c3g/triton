@@ -126,7 +126,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const requestDetails = useMemo(() => {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
             const req = requestByType[type]
-            if (req && !req.should_delete && req.status !== "FAILED") {
+            if (req && !req.should_delete && req.status === "SUCCESS") {
                 const { type, status } = req
                 const actions: ActionDropdownProps["actions"] = [
                     {
