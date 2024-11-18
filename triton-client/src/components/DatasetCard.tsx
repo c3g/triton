@@ -212,10 +212,8 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                 let statusDescription: ReactNode
                 if (req && req.should_delete) {
                     statusDescription = "UNSTAGING"
-                } else if (req?.status === "FAILED") {
-                    statusDescription = "FAILED"
-                } else {
-                    statusDescription = "STAGE"
+                } else if (req?.status) {
+                    statusDescription = req.status
                 }
                 return (
                     <Button
