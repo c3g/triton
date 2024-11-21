@@ -1,18 +1,3 @@
-<<<<<<< Updated upstream
-import cron from "node-cron"
-import { TritonDataset } from "../types/api"
-import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
-import { sendNotificationEmail } from "./emails"
-import { formatDateAndTime } from "./utils"
-
-export const start = () => {
-    const task = cron.schedule("0 * * * *", async () => {
-        console.info("Notification service started to run.")
-        await getDatasetlatestReleasedUpdate()
-        await getDatasetLatestValidationStatusUpdate()
-    })
-    task.start()
-=======
 import config from "../../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
@@ -26,82 +11,27 @@ import { sendEmail } from "@notifications/emails"
 export const start = async () => {
     logger.info(`Environment running: ${process.env.NODE_ENV}`)
     logger.info(
-        `Notification service started to run. (${config.cron.notification})`
+        `Notification service started to run. (${config.cron.notification})`,
     )
     const task = cron.schedule(
         config.cron.notification,
         () => {
             logger.info("Executing notification service.")
             sendLatestReleasedNotificationEmail().catch((err) =>
-                logger.error(err)
+                logger.error(err),
             )
             sendDatasetValidationStatusUpdateEmail().catch((err) =>
-                logger.error(err)
+                logger.error(err),
             )
         },
-        { runOnInit: true }
+        { runOnInit: true },
     )
->>>>>>> Stashed changes
 
     return () => {
         task.stop()
     }
 }
 
-<<<<<<< Updated upstream
-const getDatasetlatestReleasedUpdate = async () => {
-    let releasedDatasets: TritonDataset[] = []
-
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-    const datasetsResponse =
-        await freezemanApi.Dataset.listByReleasedUpdates(formatDateAndTime())
-
-    releasedDatasets = datasetsResponse.data.results.map((dataset) => {
-        return {
-            external_project_id: dataset.external_project_id,
-            id: dataset.id,
-            lane: dataset.lane,
-            readset_count: dataset.readset_count,
-            released_status_count: dataset.released_status_count,
-            run_name: dataset.run_name,
-            latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update:
-                dataset.latest_validation_status_update,
-            blocked_status_count: dataset.blocked_status_count,
-            project_name: dataset.project_name,
-        }
-    })
-
-    sendNotificationEmail(releasedDatasets)
-}
-
-const getDatasetLatestValidationStatusUpdate = async () => {
-    let validatedDatasets: TritonDataset[] = []
-
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-    const datasetsResponse =
-        await freezemanApi.Dataset.listByReleasedUpdates(formatDateAndTime())
-
-    validatedDatasets = datasetsResponse.data.results.map((dataset) => {
-        return {
-            external_project_id: dataset.external_project_id,
-            id: dataset.id,
-            lane: dataset.lane,
-            readset_count: dataset.readset_count,
-            released_status_count: dataset.released_status_count,
-            run_name: dataset.run_name,
-            latest_release_update: dataset.latest_release_update,
-            latest_validation_status_update:
-                dataset.latest_validation_status_update,
-            blocked_status_count: dataset.blocked_status_count,
-            project_name: dataset.project_name,
-        }
-    })
-
-    sendNotificationEmail(validatedDatasets)
-=======
 export const sendDatasetValidationStatusUpdateEmail = async () => {
     const db = await defaultDatabaseActions()
     const ids: number[] = []
@@ -115,7 +45,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
     if (lastValidationStatusUpdate) {
         const validatedDatasets = (
             await freezemanApi.Dataset.listByValidatedStatusUpdates(
-                lastValidationStatusUpdate
+                lastValidationStatusUpdate,
             )
         ).data.results.map((dataset) => ({ ...dataset }))
         logger.debug(`Found ${validatedDatasets.length} datasets.`)
@@ -148,9 +78,9 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                                         " " +
                                         freezemanUser.last_name
                                 }
-                            }
+                            },
                         )
-                    }
+                    },
                 )
             }
             const body =
@@ -167,13 +97,13 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                             -   Project: ${
                                 dataset.projectAndRunInfo.project_name
                             }  ${
-                            dataset.projectAndRunInfo.project_id ?? ""
-                        } <br/>
+                                dataset.projectAndRunInfo.project_id ?? ""
+                            } <br/>
                             - Dataset/lane ${
                                 dataset.projectAndRunInfo.lane_number
                             } status ${getValidationFlagLabel(
-                            dataset.projectAndRunInfo.validation_status
-                        )} <br/>
+                                dataset.projectAndRunInfo.validation_status,
+                            )} <br/>
                                 ${
                                     dataset.basicCommentUserInfo?.comment !=
                                     undefined
@@ -196,18 +126,18 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                                     undefined
                                         ? "- Created at: " +
                                           dataset.basicCommentUserInfo?.created_at.split(
-                                              "T"
+                                              "T",
                                           )[0] +
                                           " " +
                                           dataset.basicCommentUserInfo?.created_at.split(
-                                              "T"
+                                              "T",
                                           )[1] +
                                           "<br/>"
                                         : ""
                                 }
 
                             `
-                    }
+                    },
                 ) +
                 `
                 Thank you.<br/>
@@ -231,19 +161,19 @@ export const sendLatestReleasedNotificationEmail = async () => {
     if (lastReleasedStatusUpdate) {
         const releasedDatasets = (
             await freezemanApi.Dataset.listByReleasedUpdates(
-                lastReleasedStatusUpdate
+                lastReleasedStatusUpdate,
             )
         ).data.results.map((dataset) => ({ ...dataset }))
 
         logger.debug(
-            `Found ${releasedDatasets.length} datasets to potentially notify for release.`
+            `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
         )
         // the email portion of the logic
         if (releasedDatasets.length > 0) {
             releasedDatasets.sort(
                 (a, b) =>
                     new Date(a.latest_release_update).getTime() -
-                    new Date(b.latest_release_update).getTime()
+                    new Date(b.latest_release_update).getTime(),
             )
             let lastDate: string | undefined = undefined
             for (const dataset of releasedDatasets) {
@@ -262,7 +192,7 @@ export const sendLatestReleasedNotificationEmail = async () => {
                                 -   <b>Dataset ID: ${dataset.id}</b><br/>
                                 -   Dataset Lane: ${dataset.lane}<br/>
                                 -   Dataset release time: ${new Date(
-                                    dataset.latest_release_update
+                                    dataset.latest_release_update,
                                 ).toUTCString()} (UTC)<br/><br/>
                                 Datasets can be downloaded from the MGC Data Portal.
                                 To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
@@ -271,15 +201,15 @@ export const sendLatestReleasedNotificationEmail = async () => {
                                 If you have any issues, please contact us at ${
                                     config.mail.techSupport
                                 }.<br/><br/>
-                                Thank you.<br/>`
+                                Thank you.<br/>`,
                             )
-                        }
+                        },
                     )
                     if (
                         results.some((result) => result.status === "rejected")
                     ) {
                         throw new Error(
-                            `Failed to send email to every recipients of project '${dataset.external_project_id}'`
+                            `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
                         )
                     }
                 }
@@ -396,7 +326,7 @@ interface ExtractedValidatedNotificationData {
 export const sendValidationEmail = async (
     validatedDatasets: ExtractedValidatedNotificationData[],
     body: string,
-    db: any
+    db: any,
 ) => {
     if (validatedDatasets.length > 0) {
         let lastDate: string | undefined = undefined
@@ -411,5 +341,4 @@ export const sendValidationEmail = async (
             await db.updateLatestValidatedNotificationDate(lastDate)
         }
     }
->>>>>>> Stashed changes
 }
