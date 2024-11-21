@@ -18,6 +18,7 @@ import { selectRequestOfDatasetId } from "@store/selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 import { Provider } from "react-redux"
 import { store } from "@store/store"
+import config from "@common/config"
 
 interface DatasetCardProps {
     datasetID: number
@@ -181,7 +182,13 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                             if (status === "SUCCESS") {
                                 Modal.info({
                                     title: `Dataset successfully staged`,
-                                    content: `You can now download the dataset using the instruction sent to your email.`,
+                                    content: [`You can now download the dataset by following the instructions sent to your email.
+                                               If you don't see the email, please check your spam folder.
+                                               If it's still missing, try resetting your password and checking again.
+                                               For further assistance, feel free to contact us at`,
+                                        ' ',
+                                        <a key={0} href={`mailto:${config.supportEmail}`}>{config.supportEmail}</a>
+                                    ],
                                 })
                             }
                         }}

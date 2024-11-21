@@ -8,7 +8,7 @@
 import config from "../../../config"
 import { Kysely, Transaction } from "kysely"
 import {
-    Database,
+    Database as TritonNotificationDatabase,
     NewDownloadFile,
     DownloadFile,
     NewDownloadRequest,
@@ -20,7 +20,7 @@ import {
 import { createSQLite } from "./sqlite-database"
 
 export type DatabaseActions = Awaited<ReturnType<typeof createActions>>
-export async function createActions(db: Kysely<Database>) {
+export async function createActions(db: Kysely<TritonNotificationDatabase>) {
     async function listRequestByDatasetId(
         datasetId: DownloadDatasetID,
     ): Promise<DownloadRequest | undefined> {
@@ -110,7 +110,7 @@ export async function createActions(db: Kysely<Database>) {
 
     async function insertFiles(
         files: NewDownloadFile[],
-        trx?: Transaction<Database>,
+        trx?: Transaction<TritonNotificationDatabase>,
     ) {
         if (files.length === 0) {
             throw new Error("Cannot insert 0 files")
@@ -199,7 +199,7 @@ export async function createActions(db: Kysely<Database>) {
         return await db
             .selectFrom("notification_dates")
             .select("last_released_notification_date")
-            .executeTakeFirstOrThrow()
+            .executeTakeFirst()
     }
 
     async function updateLatestReleaseNotificationDate(date: string) {
@@ -207,6 +207,21 @@ export async function createActions(db: Kysely<Database>) {
             .updateTable("notification_dates")
             .set({ last_released_notification_date: date })
             .returning("last_released_notification_date")
+            .executeTakeFirstOrThrow()
+    }
+
+    async function getLatestValidatedNotificationDate() {
+        return await db
+            .selectFrom("notification_dates")
+            .select("last_validated_notification_date")
+            .executeTakeFirst()
+    }
+
+    async function updateLatestValidatedNotificationDate(date: string) {
+        return await db
+            .updateTable("notification_dates")
+            .set({ last_validated_notification_date: date })
+            .returning("last_validated_notification_date")
             .executeTakeFirstOrThrow()
     }
 
@@ -227,6 +242,8 @@ export async function createActions(db: Kysely<Database>) {
         resetContactPassword,
         updateNotificationDate,
         updateLatestReleaseNotificationDate,
+        getLatestValidatedNotificationDate,
+        updateLatestValidatedNotificationDate,
     }
 }
 

@@ -1,5 +1,5 @@
-import { DatasetState } from "@store/datasets"
+import { TritonNumberOfReads } from "@api/api-types"
 
 export interface ReadsPerSampleGraphProps {
-    readsPerSample: NonNullable<DatasetState["readsPerSample"]>
+    readsPerSample: TritonNumberOfReads[]
 }

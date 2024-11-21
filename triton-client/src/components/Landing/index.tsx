@@ -1,4 +1,4 @@
-import { Typography, Image, FloatButton, Tooltip, Button } from "antd"
+import { Typography, FloatButton, Tooltip, Button } from "antd"
 import { Content } from "antd/es/layout/layout"
 import { FileTextOutlined, InfoCircleOutlined } from "@ant-design/icons"
 import { UserInformationProps } from "./interfaces"
@@ -6,6 +6,7 @@ import { GuidedOnboarding } from "@components/."
 import { Step } from "react-joyride"
 import "./index.scss"
 import { Link } from "react-router-dom"
+import config from "@common/config"
 
 const { Title, Text } = Typography
 
@@ -74,7 +75,7 @@ function LandingPage({ isLoggedIn, userName }: UserInformationProps) {
                             "Failed". If "Queued" is displayed, the dataset is
                             waiting for sufficient disk space to begin staging.
                             If "Failed" is displayed, please contact us at{" "}
-                            <Link to={""}>{"hercules@mcgill.ca"}</Link>
+                            <Link to={""}>{config.supportEmail}</Link>
                         </Typography.Title>
                         <Typography.Title level={5}>
                             4. An info icon {"  "}

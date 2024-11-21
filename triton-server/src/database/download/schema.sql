@@ -4,7 +4,7 @@
 
 create table requests (
     id INTEGER PRIMARY KEY ASC,
-    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED')) not null default 'REQUESTED',
+    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED', 'DELAYED')) not null default 'REQUESTED',
     type       text check(type IN ('HTTP', 'SFTP', 'GLOBUS')) not null,
     dataset_id text not null,
     project_id text not null,
@@ -25,7 +25,7 @@ create unique index idx_dataset_request on requests(dataset_id);
 
 CREATE TABLE historical_requests (
     id INTEGER PRIMARY KEY ASC,
-    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED')) not null default 'REQUESTED',
+    status     text check(status IN ('REQUESTED', 'PENDING', 'SUCCESS', 'FAILED', 'QUEUED', 'DELAYED')) not null default 'REQUESTED',
     type       text check(type IN ('HTTP', 'SFTP', 'GLOBUS')) not null,
     dataset_id text not null,
     project_id text not null,
@@ -81,6 +81,7 @@ create table constants (
 
 create table notification_dates (
     id                              INTEGER PRIMARY KEY ASC check(id = 1),
-    last_released_notification_date text not null -- ISO8601
+    last_released_notification_date text not null, -- ISO8601
+    last_validated_notification_date text not null -- ISO8601
 );
-insert into notification_dates (last_released_notification_date) values (datetime('now')); -- avoiding notification for old datasets
+insert into notification_dates (last_released_notification_date, last_validated_notification_date) values (datetime('now'), datetime('now')); -- init last_released_notification_date row

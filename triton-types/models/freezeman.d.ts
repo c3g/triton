@@ -15,12 +15,27 @@ export interface Dataset {
     readonly project_name: string
     readonly run_name: string
     readonly lane: number
-    readonly files: ReadonlyArray<DatasetFile["id"]>
     readonly readset_count: number
     readonly released_status_count: number
     readonly blocked_status_count: number
     // readonly metric_report_url?: string // it might reveal details about other projects
+    readonly released_by?: string | number
     readonly latest_release_update: string // triton will only fetch datasets that contains released readsets
+    readonly archived_comments: ArchivedComment[]
+    readonly validated_by?: string | number
+    readonly validation_status: ValidationFlag
+    readonly latest_validation_update: string
+}
+export interface ArchivedComment {
+    readonly id: number
+    readonly created_at: string
+    readonly updated_at: string
+    readonly deleted: false
+    readonly object_id: number
+    readonly comment: string
+    readonly created_by: number
+    readonly updated_by: number
+    readonly content_type: number
 }
 
 export type DatasetID = number
@@ -91,4 +106,20 @@ export interface Metric {
     readonly lane: number // Lane number
     readonly value_numeric?: string // Metric value if numeric. Note: decimals are exported as string because JSON only supports floats and serializing as a number could lose precision.
     readonly value_string?: string // Metric value, if text
+}
+
+// A trimmed down version of the user model in freezeman backend
+export interface FreezemanUser {
+    readonly id: number
+    readonly username: string
+    readonly first_name: string
+    readonly last_name: string
+    readonly email: string
+    readonly is_superuser: boolean
+    readonly is_staff: boolean
+    readonly is_active: boolean
+}
+
+export interface ReadsetWithMetrics extends Readset {
+    metrics: Metric[]
 }

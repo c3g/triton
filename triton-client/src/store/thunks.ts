@@ -4,6 +4,7 @@ import {
     ExternalProjectID,
     TritonDataset,
     TritonReadset,
+    TritonReadsPerSample,
     TritonRun,
 } from "../api/api-types"
 import { AuthActions } from "./auth"
@@ -50,8 +51,7 @@ export const fetchProjects =
     }
 
 export const fetchRuns =
-    (externalProjectId: ExternalProjectID) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (externalProjectId: ExternalProjectID) => async (dispatch: AppDispatch) => {
         const runs = await apiTriton.listRunsForProjects([externalProjectId])
         // console.info('Loaded runs succesfully', runs)
         dispatch(RunsStateActions.setRuns(runs))
@@ -148,8 +148,7 @@ export const fetchReadsets =
     }
 
 export const fetchDatasetFiles =
-    (readsetId: TritonReadset["id"]) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (readsetId: TritonReadset["id"]) => async (dispatch: AppDispatch) => {
         const datasetFiles =
             await apiTriton.listDatasetFilesForReadset(readsetId)
         // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
@@ -164,7 +163,7 @@ export const createDownloadRequest =
         datasetID: number,
         type: DownloadRequestType,
     ) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    async (dispatch: AppDispatch) => {
         // TODO: check loading state here
         const response = await apiTriton.createDownloadRequest({
             projectID: projectId,
@@ -176,30 +175,25 @@ export const createDownloadRequest =
         dispatch(updateProjectUsage(projectId))
     }
 
-export const fetchConstants =
-    () => async (dispatch: AppDispatch, getState: () => RootState) => {
-        try {
-            const constants = await apiTriton.getConstants()
-            dispatch(ConstantsStateActions.setConstants(constants))
-        } catch (err) {
-            dispatch(
-                ConstantsStateActions.setError(convertToSerializedError(err)),
-            )
-            throw err
-        }
+export const fetchConstants = () => async (dispatch: AppDispatch) => {
+    try {
+        const constants = await apiTriton.getConstants()
+        dispatch(ConstantsStateActions.setConstants(constants))
+    } catch (err) {
+        dispatch(ConstantsStateActions.setError(convertToSerializedError(err)))
+        throw err
     }
+}
 
 export const deleteDownloadRequest =
-    (datasetID: number) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (datasetID: number) => async (dispatch: AppDispatch) => {
         const response = await apiTriton.deleteDownloadRequest(datasetID)
         // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
         dispatch(RequestsStateActions.setRequests([response.request]))
     }
 
 export const extendStagingRequest =
-    (datasetID: number) =>
-    async (dispatch: AppDispatch, getState: () => RootState) => {
+    (datasetID: number) => async (dispatch: AppDispatch) => {
         const response = await apiTriton.extendStagingRequest(datasetID)
         dispatch(RequestsStateActions.setRequests([response]))
     }
@@ -207,20 +201,36 @@ export const extendStagingRequest =
 export const fetchReadsPerSample =
     (datasetId: TritonDataset["id"]) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
-        const dataset = getState().datasetsState.datasetsById[datasetId]
-        if (dataset?.readsPerSample) {
-            return dataset?.readsPerSample
-        }
-
-        const readsPerSample =
-            await apiTriton.getReadsPerSampleForDataset(datasetId)
-        // console.debug(`Loaded readsets succesfully: ${JSON.stringify(readsets)}`)
-        dispatch(
-            DatasetsStateActions.setReadsPerSample({
-                datasetId,
-                readsPerSample,
-            }),
+        const { readsetsById } = getState().readsetsState
+        const readsets = Object.values(readsetsById).reduce<TritonReadset[]>(
+            (readsets, readset) => {
+                if (readset?.dataset === datasetId) {
+                    readsets.push(readset)
+                }
+                return readsets
+            },
+            [],
         )
+
+        const readsPerSample: TritonReadsPerSample["sampleReads"] = []
+        for (const readset of readsets) {
+            const { metrics } = readset
+            for (const metric of metrics) {
+                if (
+                    metric.name === "nb_reads" &&
+                    metric.metric_group === "qc"
+                ) {
+                    readsPerSample.push({
+                        derivedSampleID: metric.derived_sample_id ?? undefined,
+                        readsetID: metric.readset_id,
+                        sampleName: metric.sample_name,
+                        nbReads: metric.value_numeric
+                            ? Number(metric.value_numeric)
+                            : 0, // The numeric value should always be defined for this type of metric
+                    })
+                }
+            }
+        }
 
         return readsPerSample
     }

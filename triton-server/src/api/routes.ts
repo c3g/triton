@@ -13,10 +13,8 @@ import {
     IsLoggedInData,
     TritonDataset,
     TritonDatasetFile,
-    TritonNumberOfReads,
     TritonProject,
     TritonReadset,
-    TritonReadsPerSample,
     TritonRequest,
     TritonRun,
     User,
@@ -29,7 +27,6 @@ import {
     listRunsByExternalProjectId,
 } from "@api/freezeman/datasets"
 import { listUserProjects } from "@api/freezeman/project"
-import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 
 const router = express.Router()
 
@@ -37,13 +34,6 @@ function okReply<T>(data: T): ApiReply<T> {
     return {
         ok: true,
         data,
-    }
-}
-
-function errorReply(error: Error): ApiReply<unknown> {
-    return {
-        ok: false,
-        message: error.message,
     }
 }
 
@@ -67,7 +57,7 @@ router.get(
             // so this call is redundant.
             isLoggedIn = await isUserAuthenticated(userId, token)
             if (isLoggedIn) {
-                const userDetails = await getUserDetails(userId, token)
+                const userDetails = await getUserDetails(userId)
                 user = userDetails
             }
         }
@@ -79,8 +69,8 @@ router.get(
     "/list-projects/",
     asyncHandler(async (req, res) => {
         if (req.session.credentials) {
-            const { userId, token } = req.session.credentials
-            const projects = await listUserProjects(userId, token)
+            const { userId } = req.session.credentials
+            const projects = await listUserProjects(userId)
             res.json(okReply<TritonProject[]>(projects))
         } else {
             res.sendStatus(401)
@@ -158,28 +148,6 @@ router.get(
         const idParam = Number(req.query.dataset_id)
         const datasetFiles = await listDatasetFilesByDataset(idParam)
         res.json(okReply<TritonDatasetFile[]>(datasetFiles))
-    }),
-)
-
-router.get(
-    "/reads-per-sample/",
-    asyncHandler(async (req, res) => {
-        const datasetId = Number(req.query.dataset_id)
-        const freezemanApi = await getFreezeManAuthenticatedAPI()
-        const metrics = (
-            await freezemanApi.Metrics.getReadsPerSampleForDataset(datasetId)
-        ).data.results
-        const sampleReads: TritonNumberOfReads[] = metrics.map((metric) => {
-            return {
-                derivedSampleID: metric.derived_sample_id ?? undefined,
-                readsetID: metric.readset_id,
-                sampleName: metric.sample_name,
-                nbReads: metric.value_numeric
-                    ? Number(metric.value_numeric)
-                    : 0, // The numeric value should always be defined for this type of metric
-            }
-        })
-        res.json(okReply<TritonReadsPerSample>({ sampleReads }))
     }),
 )
 

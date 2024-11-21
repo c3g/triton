@@ -16,6 +16,7 @@
 export interface ClientConfig {
     // The base endpoint for the triton api, eg 'https://biobank.genome.mcgill.ca/triton/api/' (<< not the real url!)
     apiBaseUrl: URL
+    supportEmail: string
 }
 
 // Get the config that matches the environment
@@ -26,13 +27,21 @@ function getConfig(): ClientConfig {
         case "development":
             return {
                 apiBaseUrl: new URL("http://localhost:3001/api/"),
+                supportEmail: "INSERT-SUPPORT-EMAIL-HERE",
             }
-        default:
+        default: {
+            if (process.env.REACT_APP_TECH_SUPPORT_EMAIL === undefined) {
+                throw new Error(
+                    "REACT_APP_TECH_SUPPORT_EMAIL must be defined in the .env file",
+                )
+            }
             return {
                 apiBaseUrl: new URL(
                     `${process.env.REACT_APP_SERVER_ORIGIN}api/`,
                 ),
+                supportEmail: process.env.REACT_APP_TECH_SUPPORT_EMAIL,
             }
+        }
     }
 }
 

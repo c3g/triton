@@ -1,11 +1,15 @@
 import "dotenv/config"
 
+/**
+ * Setting empty string as default value leads to exception if the environment variable is not set.
+ */
 const TRITON_ENVIRONMENTS = {
     API_URL: "",
     LOGGER_LEVEL: "info",
     CLIENT_ORIGIN: "",
     CLIENT_PORTAL_LOGIN: "",
     CLIENT_PORTAL_API_URL: "",
+    CLIENT_PORTAL_TOKEN_URL: "",
     CLIENT_PORTAL_USERNAME: "",
     CLIENT_PORTAL_PASSWORD: "",
     LIMS_API_URL: "",
@@ -14,8 +18,13 @@ const TRITON_ENVIRONMENTS = {
     SFTP_SERVER: "",
     SFTP_PORT: "",
     ERROR_MONITORING_EMAIL: "",
+    TECH_SUPPORT_EMAIL: "",
+    TO_VALIDATION_EMAIL: "",
+    TO_TEST_EMAIL: "scooby-doo@hotmail.ca",
     TRITON_HTTPS_PROXY: "",
     DOWNLOAD_DATABASE_PATH: "",
+    CONTACT_SERVICE_CRON: "*/30 * * * * *", // 30 seconds
+    RELEASE_VALIDATION_CRON: "0 * * * *", // 1 hour
 }
 
 const missingEnvVars: string[] = []
@@ -50,6 +59,8 @@ export default {
 
     mail: {
         errorMonitoring: TRITON_ENVIRONMENTS.ERROR_MONITORING_EMAIL,
+        techSupport: TRITON_ENVIRONMENTS.TECH_SUPPORT_EMAIL,
+        toValidationNotification: TRITON_ENVIRONMENTS.TO_VALIDATION_EMAIL,
     },
 
     sftp: {
@@ -57,12 +68,18 @@ export default {
         port: TRITON_ENVIRONMENTS.SFTP_PORT,
     },
 
+    email_testing: {
+        to: TRITON_ENVIRONMENTS.TO_TEST_EMAIL,
+    },
+
     client_portal: {
         httpsProxy: TRITON_ENVIRONMENTS.TRITON_HTTPS_PROXY,
         // Hercules login page url - the user logs in on this page.
         loginUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_LOGIN,
         // Api endpoint base url
-        url: TRITON_ENVIRONMENTS.CLIENT_PORTAL_API_URL,
+        apiUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_API_URL,
+        // Token url to get the token
+        tokenUrl: TRITON_ENVIRONMENTS.CLIENT_PORTAL_TOKEN_URL,
         // Credentials for the Triton server to call the Magic api
         user: TRITON_ENVIRONMENTS.CLIENT_PORTAL_USERNAME,
         password: TRITON_ENVIRONMENTS.CLIENT_PORTAL_PASSWORD,
@@ -79,7 +96,8 @@ export default {
         url: TRITON_ENVIRONMENTS.CLIENT_ORIGIN,
     },
 
-    request_service: {
-        tick_frequency: 30000 /* miliseconds */,
+    cron: {
+        contactService: TRITON_ENVIRONMENTS.CONTACT_SERVICE_CRON,
+        notification: TRITON_ENVIRONMENTS.RELEASE_VALIDATION_CRON,
     },
 }
