@@ -13,6 +13,8 @@ export {
     TritonRequest,
     TritonRun,
     User,
+    TritonNumberOfReads,
+    TritonReadsPerSample,
     TritonCreateRequestResponse,
     TritonCreateRequestBody,
     ExternalProjectID,

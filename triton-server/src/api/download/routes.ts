@@ -29,7 +29,7 @@ router.post(
             ).data.results
             if (datasets.length === 0) {
                 return errorHandler(res)(
-                    new Error(`Could not find dataset with id '${datasetID}'`),
+                    new Error(`Could not find dataset with id '${datasetID}'`)
                 )
             }
             const freezemanFiles = (
@@ -43,7 +43,7 @@ router.post(
                         source: file.file_path,
                         destination: fileName,
                     }
-                },
+                }
             )
             const result: TritonCreateRequestResponse = await createRequest(
                 {
@@ -53,13 +53,13 @@ router.post(
                     type,
                     requester: String(req.session.userDetails?.email),
                 },
-                downloadFiles,
+                downloadFiles
             )
             return dataHandler(res)(result)
         } catch (error) {
             return errorHandler(res)(error)
         }
-    }),
+    })
 )
 
 router.post(
@@ -73,7 +73,7 @@ router.post(
         } catch (error) {
             errorHandler(res)(error)
         }
-    }),
+    })
 )
 
 // DELETE request deletion
@@ -88,7 +88,7 @@ router.delete(
         } catch (error) {
             errorHandler(res)(error)
         }
-    }),
+    })
 )
 
 router.get(
@@ -97,7 +97,7 @@ router.get(
         const { getConstants } = await defaultDatabaseActions()
         const result = await getConstants()
         dataHandler(res)(result)
-    }),
+    })
 )
 
 router.post(
@@ -111,7 +111,7 @@ router.post(
         } catch (error) {
             errorHandler(res)(error)
         }
-    }),
+    })
 )
 
 export default router

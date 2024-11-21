@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@types/*": ["types/*"],
+            "@api/*": ["api/*"],
+            "@core/*": ["core/*"],
+            "@notifications/*": ["notifications/*"],
+            "@service/*": ["service/*"],
+            "@database/*": ["database/*"]
+        }
+    },
+    "references": [
+        {
+            "path": "../triton-types"
+        }
+    ]
+}

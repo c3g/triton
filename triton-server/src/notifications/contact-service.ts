@@ -8,6 +8,7 @@ import config from "../../config"
 import { ExternalProjectID } from "../types/api"
 import { logger } from "@core/logger"
 import { defaultDatabaseActions } from "@database/download/actions"
+<<<<<<< Updated upstream
 import { sendEmail } from "@notifications/emails/"
 import { getProjectUsers } from "@api/magic/magic_api"
 
@@ -21,6 +22,28 @@ export function start() {
     const stop = () => {
         logger.info("[contacts] Stopping service...")
         clearInterval(intervalID)
+=======
+import { getProjectUsers } from "@api/magic/magic_api"
+import { sendEmail } from "@notifications/emails"
+import cron from "node-cron"
+
+export function start() {
+    logger.info(
+        `[contacts] Starting service... (${config.cron.contactService})`,
+    )
+
+    const task = cron.schedule(
+        config.cron.contactService,
+        () => {
+            void tick()
+        },
+        { runOnInit: true },
+    )
+
+    const stop = () => {
+        logger.info("[contacts] Stopping service...")
+        task.stop()
+>>>>>>> Stashed changes
     }
 
     async function tick() {
@@ -83,8 +106,15 @@ export function start() {
                             await send(
                                 `${subject}`,
                                 `${subject}.<br/>
+<<<<<<< Updated upstream
                         The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
                         If you forgot your credential, you can reset your password in the data portal.`,
+=======
+                                The dataset can be downloaded using ${request.type} using the credential provided to you.<br/>
+                                If you forgot your credential or didn't receive it, you can reset your password in the data portal.<br/><br/>
+                                If you have any other issues please contact us at ${config.mail.techSupport}.<br/><br/>
+                                Thank You.<br/>`,
+>>>>>>> Stashed changes
                             )
                         },
                     )
@@ -99,7 +129,16 @@ export function start() {
                     await broadcastEmailsOfProject(
                         request.project_id,
                         async (send) => {
+<<<<<<< Updated upstream
                             await send(`${subject}`, `${subject}.`)
+=======
+                            await send(
+                                `${subject}`,
+                                `${subject}.<br/><br/>
+                                Please contact us at ${config.mail.techSupport}.<br/><br/>
+                                Thank You.<br/>`,
+                            )
+>>>>>>> Stashed changes
                         },
                     )
                     await db.updateNotificationDate(request.id)
@@ -138,6 +177,7 @@ function getCredentialSubjectFor(contact: Contact) {
 }
 
 function getCredentialMessageFor(contact: Contact) {
+<<<<<<< Updated upstream
     if (contact.type === "GLOBUS" && contact.status === "NEW") {
         return `
       Hello,<br/>
@@ -152,6 +192,23 @@ function getCredentialMessageFor(contact: Contact) {
       <br/>
       Thanks.<br/>
       `
+=======
+    const ENDING = `If you have any issues please contact us at ${config.mail.techSupport}.<br/><br/>
+    Thank You.<br/>`
+
+    if (contact.type === "GLOBUS" && contact.status === "NEW") {
+        return `
+        Hello,<br/>
+        <br/>
+        A new Globus account has been created for the project ${
+            contact.project_id
+        }.<br/>
+        <br/>
+        Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
+        Username: <b>${contact.project_id}</b><br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}`
+>>>>>>> Stashed changes
     }
 
     if (contact.type === "GLOBUS" && contact.status === "MODIFIED") {
@@ -164,9 +221,14 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
+<<<<<<< Updated upstream
         Password: <b>${contact.depth ?? ""}</b><br/>
         <br/>
         Thanks.<br/>
+=======
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
+>>>>>>> Stashed changes
         `
     }
 
@@ -181,14 +243,20 @@ function getCredentialMessageFor(contact: Contact) {
         Server:   <b>${config.sftp.server}</b><br/>
         Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
+<<<<<<< Updated upstream
         Password: <b>${contact.depth ?? ""}</b><br/>
         <br/>
         Thanks.<br/>
+=======
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
+>>>>>>> Stashed changes
         `
     }
 
     if (contact.type === "SFTP" && contact.status === "MODIFIED") {
         return `
+<<<<<<< Updated upstream
       Hello,<br/>
       <br/>
       The SFTP password has been reset for the project ${
@@ -201,6 +269,20 @@ function getCredentialMessageFor(contact: Contact) {
       <br/>
       Thanks.<br/>
       `
+=======
+        Hello,<br/>
+        <br/>
+        The SFTP password has been reset for the project ${
+            contact.project_id
+        }.<br/>
+        <br/>
+        Server:   <b>${config.sftp.server}</b><br/>
+        Port:     <b>${config.sftp.port}</b><br/>
+        Username: <b>${contact.project_id}</b><br/>
+        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        ${ENDING}
+        `
+>>>>>>> Stashed changes
     }
 
     throw new Error(`Unreachable contact: ${contact.id}`)

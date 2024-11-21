@@ -4,9 +4,9 @@
     "description": "Triton data delivery backend",
     "main": "src/start-server.ts",
     "scripts": {
-        "start-production": "NODE_ENV=production ts-node src/start-server.ts",
-        "start": "NODE_ENV=development nodemon src/start-server.ts",
-        "debug": "NODE_ENV=development DEBUG=epress-session nodemon src/start-server.ts"
+        "start-production": "NODE_ENV=production ts-node src/core/start-server.ts",
+        "start": "NODE_ENV=development nodemon src/core/start-server.ts",
+        "debug": "NODE_ENV=development DEBUG=epress-session nodemon src/core/start-server.ts"
     },
     "nodemonConfig": {
         "ext": "*.ts",
@@ -73,6 +73,8 @@
         "nodemon": "^3.0.1",
         "pino-pretty": "^10.0.1",
         "ts-node": "^10.9.1",
+        "tsc-alias": "^1.8.10",
+        "tsconfig-paths": "^4.2.0",
         "typescript": "^4.7.4"
     }
 }

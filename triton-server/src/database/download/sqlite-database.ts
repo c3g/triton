@@ -1,7 +1,7 @@
 import { Database } from "../../types/download"
 import SQLite from "better-sqlite3"
 import { readFileSync } from "fs"
-import { Kysely, SqliteDialect, sql } from "kysely"
+import { Kysely, SqliteDialect } from "kysely"
 import { logger } from "@core/logger"
 
 export async function createSQLite(

@@ -1,7 +1,7 @@
 import path from "path"
 import express, { NextFunction, Request, Response } from "express"
 import favicon from "serve-favicon"
-import { httpLogger, logger } from "./logger"
+import { httpLogger, logger } from "@core/logger"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
 import compression from "compression"
@@ -12,7 +12,7 @@ import { expressCspHeader, SELF } from "express-csp-header"
 import session from "express-session"
 import flash from "connect-flash"
 import config from "../../config"
-import ApiRouter from "@api/routes"
+import ApiRouter from "../api/routes"
 import MagicAuthMiddleware from "@api/magic/magic_middleware"
 import { UserDetails } from "../types/magic"
 
@@ -21,8 +21,7 @@ import DownloadRouter from "@api/download/routes"
 import * as sqlite3 from "sqlite3"
 import sqliteStoreFactory from "express-session-sqlite"
 import cors from "cors"
-import contactService from "@notifications/contact-service"
-import * as notification from "@notifications/notification-service"
+import { contactServiceStart, notificationServiceStart } from "@notifications/."
 
 const SQLiteStore = sqliteStoreFactory(session)
 
@@ -49,8 +48,8 @@ const CLIENT_PORTAL_ORIGIN = new URL(config.client_portal.loginUrl).origin
  * Setup
  */
 
-const stopContactService = contactService.start()
-const stopNotificationService = notification.start()
+const stopContactService = contactServiceStart()
+const stopNotificationService = notificationServiceStart()
 
 const app = express()
 
