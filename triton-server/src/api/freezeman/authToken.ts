@@ -1,5 +1,5 @@
 import Axios, { AxiosResponse } from "axios"
-import config from "../../../config"
+import config from "@root/config"
 import { logger } from "@core/logger"
 import jwtDecode from "jwt-decode"
 import { clearTimeout } from "timers"

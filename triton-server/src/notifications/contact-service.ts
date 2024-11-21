@@ -4,7 +4,7 @@
 /* eslint-disable no-console */
 
 import { Contact } from "../types/download"
-import config from "../../config"
+import config from "@root/config"
 import { ExternalProjectID } from "../types/api"
 import { logger } from "@core/logger"
 import { defaultDatabaseActions } from "@database/download/actions"

@@ -8,7 +8,7 @@ import type {
     ReadsetWithMetrics,
     ReleaseFlagReleased,
 } from "../../types/freezeman"
-import config from "../../../config"
+import config from "@root/config"
 import { logger } from "@core/logger"
 import { getAccessToken, handle401 } from "./authToken"
 

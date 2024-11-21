@@ -16,7 +16,7 @@
  * containing the proper authorization headers.
  */
 import axios, { AxiosInstance } from "axios"
-import config from "../../../config"
+import config from "@root/config"
 import { logger } from "@core/logger"
 import { HttpsProxyAgent } from "https-proxy-agent"
 

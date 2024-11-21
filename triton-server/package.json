@@ -2,7 +2,7 @@
     "name": "triton-server",
     "version": "0.0.0",
     "description": "Triton data delivery backend",
-    "main": "src/start-server.ts",
+    "main": "src/core/start-server.ts",
     "scripts": {
         "start-production": "NODE_ENV=production ts-node src/core/start-server.ts",
         "start": "NODE_ENV=development nodemon src/core/start-server.ts",
@@ -15,6 +15,7 @@
             "package-lock.json",
             "src",
             "tsconfig.json",
+            "tsconfig.path.json",
             "../triton-types/models"
         ],
         "verbose": false
@@ -68,7 +69,6 @@
         "@types/nodemailer": "^6.4.15",
         "@types/serve-favicon": "^2.5.3",
         "@types/sqlite3": "^3.1.8",
-        "craco": "^0.0.3",
         "globals": "^15.6.0",
         "nodemon": "^3.0.1",
         "pino-pretty": "^10.0.1",

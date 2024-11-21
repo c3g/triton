@@ -2,12 +2,13 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "paths": {
-            "@types/*": ["types/*"],
-            "@api/*": ["api/*"],
-            "@core/*": ["core/*"],
-            "@notifications/*": ["notifications/*"],
-            "@service/*": ["service/*"],
-            "@database/*": ["database/*"]
+            "@root/*": ["../*"],
+            "@types/*": ["./types/*"],
+            "@api/*": ["./api/*"],
+            "@core/*": ["./core/*"],
+            "@notifications/*": ["./notifications/*"],
+            "@service/*": ["./service/*"],
+            "@database/*": ["./database/*"]
         }
     },
     "references": [

@@ -1,7 +1,7 @@
 import Express from "express"
 import asyncHandler from "express-async-handler"
 import { getUserDetails, isUserAuthenticated } from "./magic_api"
-import config from "../../../config"
+import config from "@root/config"
 import { logger } from "@core/logger"
 
 /**

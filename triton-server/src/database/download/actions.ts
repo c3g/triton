@@ -5,7 +5,7 @@
  */
 
 // import util from 'util'
-import config from "../../../config"
+import config from "@root/config"
 import { Kysely, Transaction } from "kysely"
 import {
     Database as TritonNotificationDatabase,

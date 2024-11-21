@@ -1,4 +1,4 @@
-import config from "../../config"
+import config from "@root/config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
 import { getFreezeManAuthenticatedAPI } from "@api/freezeman/api"
