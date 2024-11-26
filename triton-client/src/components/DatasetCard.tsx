@@ -126,48 +126,25 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const requestDetails = useMemo(() => {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => {
             const req = requestByType[type]
+
+            const extendStagingAction = {
+                action: {
+                    name: "Extend staging",
+                    actionCall: () =>
+                        dispatch(extendStagingRequest(datasetID)).catch(
+                            (e) => console.error(e),
+                        ),
+                },
+                icon: (
+                    <PlusCircleOutlined style={{ color: "#097969" }} />
+                ),
+            }
+
+            const actions: ActionDropdownProps["actions"] = []
+            let button: ReactNode
             if (req && !req.should_delete && req.status === "SUCCESS") {
                 const { type, status } = req
-                const actions: ActionDropdownProps["actions"] = [
-                    {
-                        action: {
-                            name: "Unstage dataset",
-                            actionCall: () =>
-                                dispatch(deleteDownloadRequest(datasetID)).then(
-                                    () => {
-                                        notification.success({
-                                            message: "Dataset Unstaging",
-                                            description: `Dataset #${datasetID} will be unstaged shortly.`,
-                                        })
-                                    },
-                                    (e) => {
-                                        notification.error({
-                                            message: "Error Unstaging Dataset",
-                                            description: `Dataset #${datasetID} could not be unstaged.`,
-                                        })
-                                        console.error(e)
-                                    },
-                                ),
-                        },
-                        icon: (
-                            <CloseCircleOutlined style={{ color: "#c9162b" }} />
-                        ),
-                    },
-                    {
-                        action: {
-                            name: "Extend staging",
-                            actionCall: () =>
-                                dispatch(extendStagingRequest(datasetID)).catch(
-                                    (e) => console.error(e),
-                                ),
-                        },
-                        icon: (
-                            <PlusCircleOutlined style={{ color: "#097969" }} />
-                        ),
-                    },
-                ]
-
-                const buttonStagingActive = (
+                button = (
                     <Button
                         key={type}
                         style={{ paddingLeft: "4", paddingRight: "4" }}
@@ -194,24 +171,42 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         </Space>
                     </Button>
                 )
-
-                return (
-                    <ActionDropdown
-                        key={type}
-                        button={buttonStagingActive}
-                        actions={actions}
-                    />
-                )
+                actions.push({
+                    action: {
+                        name: "Unstage dataset",
+                        actionCall: () =>
+                            dispatch(deleteDownloadRequest(datasetID)).then(
+                                () => {
+                                    notification.success({
+                                        message: "Dataset Unstaging",
+                                        description: `Dataset #${datasetID} will be unstaged shortly.`,
+                                    })
+                                },
+                                (e) => {
+                                    notification.error({
+                                        message: "Error Unstaging Dataset",
+                                        description: `Dataset #${datasetID} could not be unstaged.`,
+                                    })
+                                    console.error(e)
+                                },
+                            ),
+                    },
+                    icon: (
+                        <CloseCircleOutlined style={{ color: "#c9162b" }} />
+                    ),
+                })
+                actions.push(extendStagingAction)
             } else {
                 let statusDescription: ReactNode
                 if (req && req.should_delete) {
                     statusDescription = "UNSTAGING"
                 } else if (req?.status) {
                     statusDescription = req.status
+                    actions.push(extendStagingAction)
                 } else {
                     statusDescription = "STAGE"
                 }
-                return (
+                button = (
                     <Button
                         key={type}
                         style={{ paddingLeft: "4", paddingRight: "4" }}
@@ -233,6 +228,18 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
                         </Space>
                     </Button>
                 )
+            }
+
+            if (actions.length > 0) {
+                return (
+                    <ActionDropdown
+                        key={type}
+                        button={button}
+                        actions={actions}
+                    />
+                )
+            } else {
+                return button
             }
         })
     }, [
