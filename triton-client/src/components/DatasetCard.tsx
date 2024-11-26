@@ -1,24 +1,13 @@
-import { Button, Col, Modal, notification, Row, Space, Spin } from "antd"
+import { Button, Col, Modal, Row, Spin } from "antd"
 import { InfoCircleOutlined } from "@ant-design/icons"
-import { ReactNode, useCallback, useMemo, useState } from "react"
-import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
-import { DownloadRequest, DownloadRequestType } from "@api/api-types"
+import { ReactNode, useCallback, useMemo } from "react"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
-import { ReadsetState } from "@store/readsets"
-import {
-    deleteDownloadRequest,
-    createDownloadRequest,
-    extendStagingRequest,
-} from "@store/thunks"
-import { selectConstants } from "@store/constants"
 import { DataSize } from "@components/shared"
-import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
-import { ActionDropdown, ReadsPerSample } from "@components/."
-import { selectRequestOfDatasetId } from "@store/selectors"
+import { ReadsPerSample } from "@components/."
+import { selectRequestOfDatasetId, selectTotalDatasetSize } from "@store/selectors"
 import { SUPPORTED_DOWNLOAD_TYPES } from "@common/constants"
 import { Provider } from "react-redux"
 import { store } from "@store/store"
-import config from "@common/config"
 import DatasetCardButton from "./DatasetCardButton"
 
 interface DatasetCardProps {
@@ -33,105 +22,21 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
     const activeRequest = useAppSelector((state) =>
         selectRequestOfDatasetId(state, datasetID),
     )
-
-    const readsetsById = useAppSelector(
-        (state) => state.readsetsState.readsetsById,
-    )
     const project = useAppSelector((state) =>
         dataset?.external_project_id
             ? state.projectsState.projectsById[dataset.external_project_id]
             : undefined,
     )
-    const constants = useAppSelector(selectConstants)
+    const totalSize = useAppSelector((state) => selectTotalDatasetSize(state, datasetID))
+
     const alreadyRequested = !!activeRequest
-
-    const [updatingRequest, setUpdatingRequest] = useState(false)
-    const dispatchCreateRequest = useCallback(
-        async (type: DownloadRequestType) => {
-            if (dataset) {
-                setUpdatingRequest(true)
-                await dispatch(
-                    createDownloadRequest(
-                        dataset.external_project_id,
-                        datasetID,
-                        type,
-                    ),
-                ).finally(() => setUpdatingRequest(false))
-            }
-        },
-        [dataset, datasetID, dispatch],
-    )
-
-    const readsets = useMemo(() => {
-        return Object.values(readsetsById).reduce<ReadsetState[]>(
-            (readsets, readset) => {
-                if (readset && readset.dataset === datasetID) {
-                    readsets.push(readset)
-                }
-                return readsets
-            },
-            [],
-        )
-    }, [datasetID, readsetsById])
-    const totalSize = useMemo(
-        () => readsets.reduce((total, r) => total + r.total_size, 0),
-        [readsets],
-    )
-
-    const request = useCallback(
-        (downloadType: DownloadRequestType) => {
-            if (dataset && project && totalSize) {
-                const diskUsage = project.diskUsage[downloadType]
-                const diskCapacity = constants.diskCapacity[downloadType]
-                if (diskUsage + totalSize > diskCapacity) {
-                    Modal.confirm({
-                        title: `${downloadType} Project Quota Exceeded`,
-                        content: `The total size of the datasets will exceed the ${downloadType} project quota. This dataset will be queued until space is freed.`,
-                        onOk: () =>
-                            dispatchCreateRequest(downloadType).catch((e) =>
-                                console.error(e),
-                            ),
-                        okText: "Continue",
-                        cancelText: "Cancel",
-                    })
-                } else {
-                    dispatchCreateRequest(downloadType).catch((e) =>
-                        console.error(e),
-                    )
-                }
-            }
-        },
-        [
-            constants.diskCapacity,
-            dataset,
-            dispatchCreateRequest,
-            project,
-            totalSize,
-        ],
-    )
-
-    const requestByType = useMemo(() => {
-        const requestByType: Record<
-            DownloadRequestType,
-            DownloadRequest | undefined
-        > = {
-            GLOBUS: undefined,
-            SFTP: undefined,
-        }
-        if (activeRequest) {
-            requestByType[activeRequest.type] = activeRequest
-        }
-        return requestByType
-    }, [activeRequest])
 
     const requestDetails = useMemo(() => {
         return SUPPORTED_DOWNLOAD_TYPES.map((type) => (
             <DatasetCardButton
                 key={type}
                 datasetID={datasetID}
-                loading={updatingRequest}
                 type={type}
-                request={requestByType[type]}
             />
         ))
     }, [
@@ -141,10 +46,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
         datasetID,
         dispatch,
         project,
-        request,
-        requestByType,
         totalSize,
-        updatingRequest,
     ])
 
     const expiration = useMemo(() => {

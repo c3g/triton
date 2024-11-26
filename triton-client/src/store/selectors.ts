@@ -90,7 +90,7 @@ export const selectDisksUsageByRunName = createSelector(
 export const selectTotalDatasetSize = createSelector(
     [
         (state: RootState) => state.readsetsState.readsetsById,
-        (datasetID: number) => datasetID,
+        (_, datasetID: number) => datasetID,
     ],
     (readsetsById, datasetID) => {
         return Object.values(readsetsById).reduce(

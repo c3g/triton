@@ -1,13 +1,82 @@
-import { deleteDownloadRequest, extendStagingRequest } from "@api/api-triton"
 import DatasetCardButtonProps from "./interface"
-import { useAppDispatch } from "@store/hooks"
+import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
-import { ReactNode } from "react"
-import { Button, Modal, notification } from "antd"
+import { ReactNode, useCallback, useState } from "react"
+import { Button, Modal, Space, notification } from "antd"
 import config from "@common/config"
+import { DownloadRequestType } from "@api/api-types"
+import { selectConstants } from "@store/constants"
+import { selectRequestOfDatasetId, selectTotalDatasetSize } from "@store/selectors"
+import ActionDropdown from "@components/ActionDropdown"
+import { createDownloadRequest, deleteDownloadRequest, extendStagingRequest } from "@store/thunks"
+import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
 
-export default function DatasetCardButton({ datasetID, loading, type, request }: DatasetCardButtonProps) {
+export default function DatasetCardButton({ datasetID, type }: DatasetCardButtonProps) {
     const dispatch = useAppDispatch()
+    const dataset = useAppSelector(
+        (state) => state.datasetsState.datasetsById[datasetID],
+    )
+    const project = useAppSelector((state) =>
+        dataset?.external_project_id
+            ? state.projectsState.projectsById[dataset.external_project_id]
+            : undefined,
+    )
+    const totalSize = useAppSelector((state) => selectTotalDatasetSize(state, datasetID))
+    const request = useAppSelector((state) => {
+        const request = selectRequestOfDatasetId(state, datasetID)
+        return request?.type === type ? request : undefined
+    })
+    const alreadyRequested = useAppSelector((state) => Boolean(selectRequestOfDatasetId(state, datasetID)))
+    const constants = useAppSelector(selectConstants)
+
+
+    const [updatingRequest, setUpdatingRequest] = useState(false)
+    const dispatchCreateRequest = useCallback(
+        async (type: DownloadRequestType) => {
+            if (dataset) {
+                setUpdatingRequest(true)
+                await dispatch(
+                    createDownloadRequest(
+                        dataset.external_project_id,
+                        datasetID,
+                        type,
+                    ),
+                ).finally(() => setUpdatingRequest(false))
+            }
+        },
+        [dataset, datasetID, dispatch],
+    )
+    const requestDataset = useCallback(
+        (downloadType: DownloadRequestType) => {
+            if (dataset && project && totalSize) {
+                const diskUsage = project.diskUsage[downloadType]
+                const diskCapacity = constants.diskCapacity[downloadType]
+                if (diskUsage + totalSize > diskCapacity) {
+                    Modal.confirm({
+                        title: `${downloadType} Project Quota Exceeded`,
+                        content: `The total size of the datasets will exceed the ${downloadType} project quota. This dataset will be queued until space is freed.`,
+                        onOk: () =>
+                            dispatchCreateRequest(downloadType).catch((e) =>
+                                console.error(e),
+                            ),
+                        okText: "Continue",
+                        cancelText: "Cancel",
+                    })
+                } else {
+                    dispatchCreateRequest(downloadType).catch((e) =>
+                        console.error(e),
+                    )
+                }
+            }
+        },
+        [
+            constants.diskCapacity,
+            dataset,
+            dispatchCreateRequest,
+            project,
+            totalSize,
+        ],
+    )
 
     const extendStagingAction = {
         action: {
@@ -30,7 +99,7 @@ export default function DatasetCardButton({ datasetID, loading, type, request }:
             <Button
                 key={type}
                 style={{ paddingLeft: "4", paddingRight: "4" }}
-                disabled={loading}
+                disabled={updatingRequest}
                 onClick={() => {
                     if (status === "SUCCESS") {
                         Modal.info({
@@ -100,7 +169,7 @@ export default function DatasetCardButton({ datasetID, loading, type, request }:
                     !project
                 }
                 onClick={() =>
-                    request?.status !== "FAILED" && request(type)
+                    request?.status !== "FAILED" && requestDataset(type)
                 }
             >
                 <Space>
