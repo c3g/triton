@@ -1,4 +1,3 @@
-import DatasetCardButtonProps from "./interface"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ReactNode, useCallback, useState } from "react"
@@ -10,6 +9,11 @@ import { selectRequestOfDatasetId, selectTotalDatasetSize } from "@store/selecto
 import ActionDropdown from "@components/ActionDropdown"
 import { createDownloadRequest, deleteDownloadRequest, extendStagingRequest } from "@store/thunks"
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons"
+
+interface DatasetCardButtonProps {
+    datasetID: number
+    type: DownloadRequestType
+}
 
 export default function DatasetCardButton({ datasetID, type }: DatasetCardButtonProps) {
     const dispatch = useAppDispatch()
