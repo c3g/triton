@@ -15,7 +15,7 @@ export function start() {
     logger.info("[contacts] Starting service...")
     const intervalID = setInterval(() => {
         void tick()
-    }, 30 * 1000)
+    }, config.cron.contactService)
     void tick()
 
     const stop = () => {
