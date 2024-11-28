@@ -86,19 +86,3 @@ export const selectDisksUsageByRunName = createSelector(
         )
     },
 )
-
-export const selectTotalDatasetSize = createSelector(
-    [
-        (state: RootState) => state.readsetsState.readsetsById,
-        (_, datasetID: number) => datasetID,
-    ],
-    (readsetsById, datasetID) => {
-        return Object.values(readsetsById).reduce(
-            (total, readset) =>
-                readset && readset.dataset === datasetID
-                    ? total + readset.total_size
-                    : total,
-            0,
-        )
-    },
-)

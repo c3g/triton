@@ -48,8 +48,4 @@ void new Promise((resolve, reject) => {
         reject(err)
     })
     server.on("listening", () => console.log(`listening on port ${PORT}`))
-    server.on("request", (req, res) => {
-        console.log(req.method, req.url, req.headers)
-        console.log(res.statusCode, res.statusMessage)
-    })
 })
