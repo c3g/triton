@@ -31,6 +31,7 @@
     },
     "dependencies": {
         "@ant-design/charts": "^2.1.2",
+        "@ant-design/icons": "^5.5.1",
         "@antv/g2": "^5.2.2",
         "antd": "^5.18.0",
         "lodash": "^4.17.21",
@@ -53,9 +54,9 @@
         "@types/react-dom": "^18.0.6",
         "@types/redux-logger": "^3.0.9",
         "node-sass": "^7.0.3",
-        "react-infinite-scroll-component": "6.1.0",
         "react-joyride": "^2.8.2",
         "react-scripts": "5.0.1",
+        "react-infinite-scroll-component": "6.1.0",
         "sass": "^1.54.3",
         "typescript": "^3.3.4",
         "webpack": "^5.88.2"

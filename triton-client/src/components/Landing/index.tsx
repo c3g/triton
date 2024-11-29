@@ -1,4 +1,4 @@
-import { Typography, Image, FloatButton, Tooltip, Button } from "antd"
+import { Typography, FloatButton, Tooltip, Button } from "antd"
 import { Content } from "antd/es/layout/layout"
 import { FileTextOutlined, InfoCircleOutlined } from "@ant-design/icons"
 import { UserInformationProps } from "./interfaces"
