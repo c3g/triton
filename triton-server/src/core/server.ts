@@ -60,7 +60,6 @@ app.set("view engine", "jade")
 const ORIGINS = [SELF, CLIENT_ORIGIN, CLIENT_PORTAL_ORIGIN] as const
 
 app.use(compression())
-app.use(favicon(path.join(__dirname, "public", "favicon.ico")))
 app.use(httpLogger)
 app.use(helmet())
 app.use(
