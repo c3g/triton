@@ -12,7 +12,7 @@ import { expressCspHeader, SELF } from "express-csp-header"
 import session from "express-session"
 import flash from "connect-flash"
 import config from "@root/config"
-import ApiRouter from "../api/routes"
+import ApiRouter from "@api/routes"
 import MagicAuthMiddleware from "@api/magic/magic_middleware"
 import { UserDetails } from "../types/magic"
 
