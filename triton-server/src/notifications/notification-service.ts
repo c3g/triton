@@ -95,14 +95,11 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Comments: </b>" + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Comments left by: </b>" + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
                                 ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Created at: </b>" + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
-
                             ----------------------`
                     },
                 ) +
                 `
-
                 <br/>Thank you.<br/>
-
                 This is an automated email, do not reply back.<br/>` // await sendTestEmail(body)
             await sendValidationEmail(formattedData, body)
         }
