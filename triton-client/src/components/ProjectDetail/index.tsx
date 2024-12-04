@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react"
 import { Step } from "react-joyride"
 import { useParams } from "react-router-dom"
-import { Collapse, CollapseProps, Space, Typography } from "antd"
-import { TritonDataset, TritonProject, TritonRun } from "@api/api-types"
+import { Checkbox, Collapse, CollapseProps, Space, Typography } from "antd"
+import { TritonDataset, TritonRun } from "@api/api-types"
 import { useAppDispatch, useAppSelector } from "@store/hooks"
 import { selectConstants } from "@store/constants"
 import {
@@ -22,13 +22,14 @@ import {
     selectRequestsByRunName,
 } from "@store/selectors"
 import "./index.scss"
+import { ProjectState, ProjectsStateActions } from "@store/projects"
 
 const { Text, Title } = Typography
 
 function ProjectDetail() {
     const dispatch = useAppDispatch()
     const { projectExternalId = "" } = useParams()
-    const project: TritonProject | undefined = useAppSelector(
+    const project: ProjectState | undefined = useAppSelector(
         (state) => state.projectsState.projectsById[projectExternalId],
     )
 
@@ -90,6 +91,25 @@ function ProjectDetail() {
                         />
                     </div>
                     <ProjectDiskUsage projectExternalId={projectExternalId} />
+                    <div style={{ padding: "0.5rem" }} />
+                    <Space>
+                        Preferred File Types:
+                        {Object.entries(project.fileTypes).map(([fileType, value]) => (
+                            <Checkbox
+                                key={fileType}
+                                checked={value}
+                                onChange={(e) =>
+                                    dispatch(ProjectsStateActions.setFileType({
+                                        projectId: projectExternalId,
+                                        fileType: fileType as keyof ProjectState['fileTypes'],
+                                        value: e.target.checked
+                                    }))
+                                }
+                            >
+                                {fileType}
+                            </Checkbox>
+                        ))}
+                    </Space>
                     <div style={{ padding: "0.5rem" }} />
                     <Collapse className="data-sets-container" items={items} />
                 </>

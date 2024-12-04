@@ -59,7 +59,14 @@ export async function listDatasetsByIds(
 ): Promise<TritonDataset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
-    return datasetsResponse.data.results.map((d) => d)
+    return datasetsResponse.data.results.map((d) => {
+        const dataset: TritonDataset = { ...d }
+        if (dataset.files) {
+            // avoid sending unnecessary data
+            delete dataset.files
+        }
+        return dataset
+    })
 }
 
 export async function listRequests(

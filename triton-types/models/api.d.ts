@@ -61,7 +61,9 @@ export interface TritonProject {
     readonly external_name: string // Magic project name
 }
 
-export interface TritonDataset extends Omit<Dataset, "files"> {}
+export interface TritonDataset extends Omit<Dataset, "files"> {
+    files?: Dataset["files"] // should be deleted before sending to the client
+}
 
 export interface TritonRequest extends DownloadRequest {}
 
@@ -83,10 +85,12 @@ export interface TritonDatasetFile {
     downloadFile: DownloadFile
 }
 
+export type ReadsetFileType = "fastq" | "bam" | "bai" | "cram"
 export interface TritonCreateRequestBody {
     projectID: ExternalProjectID
     datasetID: number
     type: DownloadRequestType
+    fileTypes: ReadsetFileType[]
 }
 
 export interface TritonConstants extends Constants {}

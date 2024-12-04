@@ -4,6 +4,12 @@ import { RootState } from "./store"
 
 export interface ProjectState extends TritonProject {
     diskUsage: Record<DownloadRequestType, number>
+    fileTypes: {
+        fastq: boolean
+        bam: boolean
+        cram: boolean
+        bai: boolean
+    }
 }
 
 export interface ProjectsState {
@@ -36,6 +42,12 @@ export const projectsSlice = createSlice({
                         GLOBUS: 0,
                         SFTP: 0,
                     },
+                    fileTypes: {
+                        fastq: true,
+                        bam: true,
+                        cram: true,
+                        bai: true,
+                    },
                 }
             })
         },
@@ -53,6 +65,20 @@ export const projectsSlice = createSlice({
                     ...project.diskUsage,
                     ...diskUsage,
                 }
+            }
+        },
+        setFileType: (
+            state,
+            action: PayloadAction<{
+                projectId: TritonProject["external_id"]
+                fileType: keyof ProjectState["fileTypes"]
+                value: boolean
+            }>,
+        ) => {
+            const { projectId, fileType, value } = action.payload
+            const project = state.projectsById[projectId]
+            if (project) {
+                project.fileTypes[fileType] = value
             }
         },
         setError: (state, action: PayloadAction<SerializedError>) => {

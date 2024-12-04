@@ -9,6 +9,14 @@ import {
     TritonCreateRequestResponse,
 } from "../../types/api/"
 import path from "path"
+import { ReadsetFileType } from "../../../../triton-types/models/api"
+
+const fileTypeToExtension: Record<ReadsetFileType, string> = {
+    fastq: ".fastq.gz",
+    bam: ".bam",
+    bai: ".bai",
+    cram: ".cram",
+}
 
 const router = express.Router()
 
@@ -18,7 +26,7 @@ const router = express.Router()
 router.post(
     "/create-request/",
     asyncHandler(async (req: Request, res: Response) => {
-        const { projectID, datasetID, type } =
+        const { projectID, datasetID, type, fileTypes } =
             req.body as TritonCreateRequestBody
         const { createRequest } = await defaultDatabaseActions()
 
@@ -36,16 +44,20 @@ router.post(
             const freezemanFiles = (
                 await freezeManAPI.DatasetFile.listByDatasetId(dataset.id)
             ).data.results
-            const downloadFiles: NewDownloadFile[] = freezemanFiles.map(
-                (file) => {
+            const downloadFiles: NewDownloadFile[] = freezemanFiles
+                .filter((file) =>
+                    fileTypes.some((type) =>
+                        file.file_path.endsWith(fileTypeToExtension[type]),
+                    ),
+                )
+                .map((file) => {
                     const fileName = path.basename(file.file_path)
                     return {
                         dataset_id: String(datasetID),
                         source: file.file_path,
                         destination: fileName,
                     }
-                },
-            )
+                })
             const result: TritonCreateRequestResponse = await createRequest(
                 {
                     project_id: projectID,
