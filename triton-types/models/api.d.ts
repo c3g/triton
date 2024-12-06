@@ -61,8 +61,11 @@ export interface TritonProject {
     readonly external_name: string // Magic project name
 }
 
+export type FileType = "fastq" | "bam" | "bai" | "cram"
+
 export interface TritonDataset extends Omit<Dataset, "files"> {
     files?: Dataset["files"] // should be deleted before sending to the client
+    sizes: Record<FileType, number> // size of each file type in bytes
 }
 
 export interface TritonRequest extends DownloadRequest {}

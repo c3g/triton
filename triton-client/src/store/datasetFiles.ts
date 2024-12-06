@@ -5,8 +5,6 @@ export interface DownloadFileState {
     readonly downloadFile: DownloadFile
 }
 
-export type FileType = "fastq1" | "fastq2" | "bam" | "bai"
-
 export interface DatasetFileState extends TritonDatasetFile {}
 
 export interface DatasetFilesState {

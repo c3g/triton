@@ -92,7 +92,7 @@ function DatasetCard({ datasetID }: DatasetCardProps) {
             }, [])}
             <Col span={3}>{activeRequest && expiration}</Col>
             <Col span={3} style={{ textAlign: "right" }}>
-                {totalSize ? <DataSize size={totalSize} /> : <Spin />}
+                {totalSize !== undefined ? <DataSize size={totalSize} /> : <Spin />}
             </Col>
         </Row>
     ) : (

@@ -32,9 +32,8 @@ router.post(
 
         try {
             const freezeManAPI = await getFreezeManAuthenticatedAPI()
-            const datasets = (
-                await freezeManAPI.Dataset.list([datasetID.toString()])
-            ).data.results
+            const datasets = (await freezeManAPI.Dataset.list([datasetID])).data
+                .results
             if (datasets.length === 0) {
                 return errorHandler(res)(
                     new Error(`Could not find dataset with id '${datasetID}'`),
@@ -42,7 +41,7 @@ router.post(
             }
             const dataset = datasets[0]
             const freezemanFiles = (
-                await freezeManAPI.DatasetFile.listByDatasetId(dataset.id)
+                await freezeManAPI.DatasetFile.listByDatasetIds([dataset.id])
             ).data.results
             const downloadFiles: NewDownloadFile[] = freezemanFiles
                 .filter((file) =>

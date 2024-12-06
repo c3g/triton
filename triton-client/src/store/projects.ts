@@ -1,15 +1,10 @@
 import { createSlice, PayloadAction, SerializedError } from "@reduxjs/toolkit"
-import { DownloadRequestType, TritonProject } from "../api/api-types"
+import { DownloadRequestType, FileType, TritonProject } from "../api/api-types"
 import { RootState } from "./store"
 
 export interface ProjectState extends TritonProject {
     diskUsage: Record<DownloadRequestType, number>
-    fileTypes: {
-        fastq: boolean
-        bam: boolean
-        cram: boolean
-        bai: boolean
-    }
+    fileTypes: Record<FileType, boolean>
 }
 
 export interface ProjectsState {
