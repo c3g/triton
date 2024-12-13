@@ -38,10 +38,10 @@ export const projectsSlice = createSlice({
                         SFTP: 0,
                     },
                     fileTypes: {
-                        fastq: true,
-                        bam: true,
-                        cram: true,
-                        bai: true,
+                        FASTQ: true,
+                        BAM: true,
+                        CRAM: true,
+                        BAI: true,
                     },
                 }
             })

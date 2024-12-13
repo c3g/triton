@@ -9,6 +9,7 @@ import {
 } from "../../types/api"
 import { FileType } from "../../../../triton-types/models/api"
 import { logger } from "@core/logger"
+import { basename } from "path"
 
 export async function listRunsByExternalProjectId(
     externalProjectIds: string[],
@@ -67,10 +68,10 @@ export async function listDatasetsByIds(
         const dataset: TritonDataset = {
             ...d,
             sizes: {
-                fastq: 0,
-                bam: 0,
-                bai: 0,
-                cram: 0,
+                FASTQ: 0,
+                BAM: 0,
+                BAI: 0,
+                CRAM: 0,
             },
         }
         if (dataset.files) {
@@ -80,23 +81,24 @@ export async function listDatasetsByIds(
         return dataset
     })
 
-    const fileTypes: FileType[] = ["fastq", "bam", "bai", "cram"]
+    const fileTypes: FileType[] = ["FASTQ", "BAM", "BAI", "CRAM"]
+    const lowerFileTypes = fileTypes.map((type) => type.toLowerCase())
+
     for (const tritonDataset of tritonDatasets) {
         const datasetFiles = await freezemanApi.DatasetFile.listByDatasetIds([
             tritonDataset.id,
         ])
         for (const datasetFile of datasetFiles.data.results) {
-            const fileType = fileTypes.find((type) =>
-                datasetFile.file_path.endsWith(
-                    type === "fastq" ? ".fastq.gz" : `.${type}`,
-                ),
-            )
-            if (fileType === undefined) {
+            const index = lowerFileTypes.findIndex((type) => {
+                const filename = basename(datasetFile.file_path)
+                return filename.split(".")[1] === type
+            })
+            if (index === -1) {
                 logger.warn(
                     `Unknown file type for file path ${datasetFile.file_path}`,
                 )
             } else {
-                tritonDataset.sizes[fileType] += datasetFile.size
+                tritonDataset.sizes[fileTypes[index]] += datasetFile.size
             }
         }
     }
