@@ -61,7 +61,18 @@ export interface TritonProject {
     readonly external_name: string // Magic project name
 }
 
-export interface TritonDataset extends Omit<Dataset, "files"> {}
+/**
+ * Dataset file formats
+ * FASTQ: Fastq files (fastq.gz)
+ * BAM: BAM + BAI files
+ * CRAM: CRAM + CRAI files
+ */
+export type FileType = "FASTQ" | "BAM" | "CRAM"
+
+export interface TritonDataset extends Omit<Dataset, "files"> {
+    files?: Dataset["files"] // should be deleted before sending to the client
+    sizes: Record<FileType, number> // size of each file type in bytes
+}
 
 export interface TritonRequest extends DownloadRequest {}
 
@@ -87,6 +98,7 @@ export interface TritonCreateRequestBody {
     projectID: ExternalProjectID
     datasetID: number
     type: DownloadRequestType
+    fileTypes: FileType[]
 }
 
 export interface TritonConstants extends Constants {}

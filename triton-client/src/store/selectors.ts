@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit"
 import { RootState } from "@store/store"
-import { DownloadRequestType } from "@api/api-types"
+import { DownloadRequestType, TritonDataset } from "@api/api-types"
 import { RequestState } from "@store/requests"
 import { ReadsetState } from "@store/readsets"
 import { DatasetState } from "@store/datasets"
@@ -89,15 +89,29 @@ export const selectDisksUsageByRunName = createSelector(
 
 export const selectTotalDatasetSize = createSelector(
     [
-        (state: RootState) => state.readsetsState.readsetsById,
-        (_, datasetID: number) => datasetID,
+        (state: RootState, datasetID: TritonDataset["id"]) => {
+            const projectID =
+                state.datasetsState.datasetsById[datasetID]?.external_project_id
+            if (projectID) {
+                return state.projectsState.projectsById[projectID]?.fileTypes
+            }
+        },
+        (state: RootState, datasetID: TritonDataset["id"]) => {
+            return state.datasetsState.datasetsById[datasetID]?.sizes
+        },
     ],
-    (readsetsById, datasetID) => {
-        return Object.values(readsetsById).reduce(
-            (total, readset) =>
-                readset && readset.dataset === datasetID
-                    ? total + readset.total_size
-                    : total,
+    (fileTypes, totalFilesSizesByType) => {
+        if (!fileTypes || !totalFilesSizesByType) {
+            return undefined
+        }
+        return Object.entries(totalFilesSizesByType).reduce<number>(
+            (totalSize, [fileType, fileSize]) => {
+                if (fileTypes[fileType]) {
+                    return totalSize + fileSize
+                } else {
+                    return totalSize
+                }
+            },
             0,
         )
     },

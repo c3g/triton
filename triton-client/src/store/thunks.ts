@@ -2,6 +2,7 @@ import apiTriton from "../api/api-triton"
 import {
     DownloadRequestType,
     ExternalProjectID,
+    FileType,
     TritonDataset,
     TritonReadset,
     TritonReadsPerSample,
@@ -162,6 +163,7 @@ export const createDownloadRequest =
         projectId: ExternalProjectID,
         datasetID: number,
         type: DownloadRequestType,
+        fileTypes: FileType[] = [],
     ) =>
     async (dispatch: AppDispatch) => {
         // TODO: check loading state here
@@ -169,6 +171,7 @@ export const createDownloadRequest =
             projectID: projectId,
             datasetID,
             type,
+            fileTypes,
         })
         // console.debug(`Loaded datasets succesfully: ${JSON.stringify(datasets)}`)
         dispatch(RequestsStateActions.setRequests([response.request]))

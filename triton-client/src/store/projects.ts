@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction, SerializedError } from "@reduxjs/toolkit"
-import { DownloadRequestType, TritonProject } from "../api/api-types"
+import { DownloadRequestType, FileType, TritonProject } from "../api/api-types"
 import { RootState } from "./store"
 
 export interface ProjectState extends TritonProject {
     diskUsage: Record<DownloadRequestType, number>
+    fileTypes: Record<FileType, boolean>
 }
 
 export interface ProjectsState {
@@ -36,6 +37,11 @@ export const projectsSlice = createSlice({
                         GLOBUS: 0,
                         SFTP: 0,
                     },
+                    fileTypes: {
+                        FASTQ: true,
+                        BAM: true,
+                        CRAM: true,
+                    },
                 }
             })
         },
@@ -53,6 +59,20 @@ export const projectsSlice = createSlice({
                     ...project.diskUsage,
                     ...diskUsage,
                 }
+            }
+        },
+        setFileType: (
+            state,
+            action: PayloadAction<{
+                projectId: TritonProject["external_id"]
+                fileType: keyof ProjectState["fileTypes"]
+                value: boolean
+            }>,
+        ) => {
+            const { projectId, fileType, value } = action.payload
+            const project = state.projectsById[projectId]
+            if (project) {
+                project.fileTypes[fileType] = value
             }
         },
         setError: (state, action: PayloadAction<SerializedError>) => {

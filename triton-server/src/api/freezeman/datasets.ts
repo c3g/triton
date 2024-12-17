@@ -7,6 +7,9 @@ import {
     TritonReadset,
     TritonRun,
 } from "../../types/api"
+import { FileType } from "../../../../triton-types/models/api"
+import { logger } from "@core/logger"
+import { FILE_TYPE_TO_REGEXP } from "@api/utils"
 
 export async function listRunsByExternalProjectId(
     externalProjectIds: string[],
@@ -58,8 +61,47 @@ export async function listDatasetsByIds(
     datasetIds: string[],
 ): Promise<TritonDataset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
-    const datasetsResponse = await freezemanApi.Dataset.list(datasetIds)
-    return datasetsResponse.data.results.map((d) => d)
+    const datasetsResponse = await freezemanApi.Dataset.list(
+        datasetIds.map((id) => parseInt(id)),
+    )
+    const tritonDatasets = datasetsResponse.data.results.map((d) => {
+        const dataset: TritonDataset = {
+            ...d,
+            sizes: {
+                FASTQ: 0,
+                BAM: 0,
+                CRAM: 0,
+            },
+        }
+        if (dataset.files) {
+            // avoid sending unnecessary data
+            delete dataset.files
+        }
+        return dataset
+    })
+
+    const fileTypes: FileType[] = ["FASTQ", "BAM", "CRAM"]
+
+    for (const tritonDataset of tritonDatasets) {
+        const datasetFiles = await freezemanApi.DatasetFile.listByDatasetIds([
+            tritonDataset.id,
+        ])
+        for (const datasetFile of datasetFiles.data.results) {
+            const fileTypesIndex = fileTypes.findIndex((type) => {
+                FILE_TYPE_TO_REGEXP[type].test(datasetFile.file_path)
+            })
+            if (fileTypesIndex === -1) {
+                logger.warn(
+                    `Unknown file type for file path ${datasetFile.file_path}`,
+                )
+            } else {
+                tritonDataset.sizes[fileTypes[fileTypesIndex]] +=
+                    datasetFile.size
+            }
+        }
+    }
+
+    return tritonDatasets
 }
 
 export async function listRequests(
@@ -85,8 +127,9 @@ export async function listReadsetsByDataset(
     datasetId: TritonDataset["id"],
 ): Promise<TritonReadset[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
-    const readsetsResponse =
-        await freezemanApi.Readset.listByDatasetId(datasetId)
+    const readsetsResponse = await freezemanApi.Readset.listByDatasetIds([
+        datasetId,
+    ])
     const readsets = [...readsetsResponse.data.results] // it's a readonly array
     return readsets
 }
@@ -96,7 +139,7 @@ export async function listDatasetFilesByDataset(
 ): Promise<TritonDatasetFile[]> {
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetFiles = (
-        await freezemanApi.DatasetFile.listByDatasetId(datasetId)
+        await freezemanApi.DatasetFile.listByDatasetIds([datasetId])
     ).data.results
 
     const { listFilesByDatasetId } = await defaultDatabaseActions()

@@ -25,6 +25,7 @@ export interface Dataset {
     readonly validated_by?: string | number
     readonly validation_status: ValidationFlag
     readonly latest_validation_update: string
+    readonly files: Array<DatasetFile["id"]>
 }
 export interface ArchivedComment {
     readonly id: number

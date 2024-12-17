@@ -9,6 +9,7 @@ import {
     TritonCreateRequestResponse,
 } from "../../types/api/"
 import path from "path"
+import { FILE_TYPE_TO_REGEXP } from "@api/utils"
 
 const router = express.Router()
 
@@ -18,15 +19,14 @@ const router = express.Router()
 router.post(
     "/create-request/",
     asyncHandler(async (req: Request, res: Response) => {
-        const { projectID, datasetID, type } =
+        const { projectID, datasetID, type, fileTypes } =
             req.body as TritonCreateRequestBody
         const { createRequest } = await defaultDatabaseActions()
 
         try {
             const freezeManAPI = await getFreezeManAuthenticatedAPI()
-            const datasets = (
-                await freezeManAPI.Dataset.list([datasetID.toString()])
-            ).data.results
+            const datasets = (await freezeManAPI.Dataset.list([datasetID])).data
+                .results
             if (datasets.length === 0) {
                 return errorHandler(res)(
                     new Error(`Could not find dataset with id '${datasetID}'`),
@@ -34,18 +34,22 @@ router.post(
             }
             const dataset = datasets[0]
             const freezemanFiles = (
-                await freezeManAPI.DatasetFile.listByDatasetId(dataset.id)
+                await freezeManAPI.DatasetFile.listByDatasetIds([dataset.id])
             ).data.results
-            const downloadFiles: NewDownloadFile[] = freezemanFiles.map(
-                (file) => {
+            const downloadFiles: NewDownloadFile[] = freezemanFiles
+                .filter((file) =>
+                    fileTypes.some((type) =>
+                        FILE_TYPE_TO_REGEXP[type].test(file.file_path),
+                    ),
+                )
+                .map((file) => {
                     const fileName = path.basename(file.file_path)
                     return {
                         dataset_id: String(datasetID),
                         source: file.file_path,
                         destination: fileName,
                     }
-                },
-            )
+                })
             const result: TritonCreateRequestResponse = await createRequest(
                 {
                     project_id: projectID,

@@ -3,7 +3,7 @@ import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ReactNode, useCallback, useState } from "react"
 import { Button, Modal, Space, notification } from "antd"
 import config from "@common/config"
-import { DownloadRequestType } from "@api/api-types"
+import { DownloadRequestType, FileType } from "@api/api-types"
 import { selectConstants } from "@store/constants"
 import { selectRequestOfDatasetId, selectTotalDatasetSize } from "@store/selectors"
 import ActionDropdown from "@components/ActionDropdown"
@@ -44,8 +44,11 @@ export default function DatasetCardButton({ datasetID, type }: DatasetCardButton
                         dataset.external_project_id,
                         datasetID,
                         type,
+                        project
+                            ? Object.entries(project.fileTypes).reduce<FileType[]>((acc, [fileType, checked]) => checked ? [...acc, fileType as FileType] : acc, [])
+                            : [] as FileType[],
                     ),
-                ).finally(() => setUpdatingRequest(false))
+                ).catch((e) => console.error(e)).finally(() => setUpdatingRequest(false))
             }
         },
         [dataset, datasetID, dispatch],
@@ -60,16 +63,12 @@ export default function DatasetCardButton({ datasetID, type }: DatasetCardButton
                         title: `${downloadType} Project Quota Exceeded`,
                         content: `The total size of the datasets will exceed the ${downloadType} project quota. This dataset will be queued until space is freed.`,
                         onOk: () =>
-                            dispatchCreateRequest(downloadType).catch((e) =>
-                                console.error(e),
-                            ),
+                            dispatchCreateRequest(downloadType),
                         okText: "Continue",
                         cancelText: "Cancel",
                     })
                 } else {
-                    dispatchCreateRequest(downloadType).catch((e) =>
-                        console.error(e),
-                    )
+                    dispatchCreateRequest(downloadType)
                 }
             }
         },

@@ -87,7 +87,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
     return {
         Project: {
             list: async (
-                ids: readonly string[],
+                ids: readonly Project["id"][],
                 external: boolean = true,
             ): Promise<ListResponse<Project>> =>
                 await axios.get(
@@ -111,7 +111,9 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )}`,
                 )
             },
-            list: async (ids: string[]): Promise<ListResponse<Dataset>> => {
+            list: async (
+                ids: Array<Dataset["id"]>,
+            ): Promise<ListResponse<Dataset>> => {
                 if (ids.length === 0) {
                     throw new Error(
                         "Must provide at least one project id to list datasets",
@@ -137,22 +139,22 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
             },
         },
         DatasetFile: {
-            listByDatasetId: async (
-                id: Dataset["id"],
+            listByDatasetIds: async (
+                ids: Array<Dataset["id"]>,
             ): Promise<ListResponse<DatasetFile>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 return await axios.get(
-                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id__in=${id}&readset__release_status=${RELEASED}&limit=100000`,
+                    `${LIMS_API_URL}/dataset-files/?readset__dataset__id__in=${ids.join(",")}&readset__release_status=${RELEASED}&limit=100000`,
                 )
             },
         },
         Readset: {
-            listByDatasetId: async (
-                datasetId: Dataset["id"],
+            listByDatasetIds: async (
+                datasetIds: Array<Dataset["id"]>,
             ): Promise<ListResponse<ReadsetWithMetrics>> => {
                 const RELEASED: ReleaseFlagReleased = 1
                 const params = [
-                    `dataset__id__in=${datasetId}`,
+                    `dataset__id__in=${datasetIds.join(",")}`,
                     `release_status=${RELEASED}`,
                     `withMetrics=true`,
                 ]
