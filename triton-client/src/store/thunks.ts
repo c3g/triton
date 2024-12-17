@@ -2,7 +2,7 @@ import apiTriton from "../api/api-triton"
 import {
     DownloadRequestType,
     ExternalProjectID,
-    ReadsetFileType,
+    FileType,
     TritonDataset,
     TritonReadset,
     TritonReadsPerSample,
@@ -163,7 +163,7 @@ export const createDownloadRequest =
         projectId: ExternalProjectID,
         datasetID: number,
         type: DownloadRequestType,
-        fileTypes: ReadsetFileType[] = [],
+        fileTypes: FileType[] = [],
     ) =>
     async (dispatch: AppDispatch) => {
         // TODO: check loading state here

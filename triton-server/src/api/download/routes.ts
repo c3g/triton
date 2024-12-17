@@ -9,14 +9,7 @@ import {
     TritonCreateRequestResponse,
 } from "../../types/api/"
 import path from "path"
-import { ReadsetFileType } from "../../../../triton-types/models/api"
-
-const fileTypeToExtension: Record<ReadsetFileType, string> = {
-    fastq: ".fastq.gz",
-    bam: ".bam",
-    bai: ".bai",
-    cram: ".cram",
-}
+import { FILE_TYPE_TO_REGEXP } from "@api/utils"
 
 const router = express.Router()
 
@@ -46,7 +39,7 @@ router.post(
             const downloadFiles: NewDownloadFile[] = freezemanFiles
                 .filter((file) =>
                     fileTypes.some((type) =>
-                        file.file_path.endsWith(fileTypeToExtension[type]),
+                        FILE_TYPE_TO_REGEXP[type].test(file.file_path),
                     ),
                 )
                 .map((file) => {

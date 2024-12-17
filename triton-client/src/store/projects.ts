@@ -41,7 +41,6 @@ export const projectsSlice = createSlice({
                         FASTQ: true,
                         BAM: true,
                         CRAM: true,
-                        BAI: true,
                     },
                 }
             })

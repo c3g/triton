@@ -3,7 +3,7 @@ import { ActionDropdownProps } from "@components/ActionDropdown/interfaces"
 import { ReactNode, useCallback, useState } from "react"
 import { Button, Modal, Space, notification } from "antd"
 import config from "@common/config"
-import { DownloadRequestType, ReadsetFileType } from "@api/api-types"
+import { DownloadRequestType, FileType } from "@api/api-types"
 import { selectConstants } from "@store/constants"
 import { selectRequestOfDatasetId, selectTotalDatasetSize } from "@store/selectors"
 import ActionDropdown from "@components/ActionDropdown"
@@ -45,8 +45,8 @@ export default function DatasetCardButton({ datasetID, type }: DatasetCardButton
                         datasetID,
                         type,
                         project
-                            ? Object.entries(project.fileTypes).reduce<ReadsetFileType[]>((acc, [fileType, checked]) => checked ? [...acc, fileType as ReadsetFileType] : acc, [])
-                            : [] as ReadsetFileType[],
+                            ? Object.entries(project.fileTypes).reduce<FileType[]>((acc, [fileType, checked]) => checked ? [...acc, fileType as FileType] : acc, [])
+                            : [] as FileType[],
                     ),
                 ).catch((e) => console.error(e)).finally(() => setUpdatingRequest(false))
             }

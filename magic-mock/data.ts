@@ -35,6 +35,14 @@ export const userProjects: UserProjects = {
             demographic: "demographic",
             sector: "sector",
         },
+        {
+            projectNumber: "P004942",
+            name: "MNI_NGP_Membership_Agreement",
+            researchArea: "researchArea",
+            organization: "organization",
+            demographic: "demographic",
+            sector: "sector",
+        },
     ],
     ...userDetails,
 } as const
@@ -53,6 +61,10 @@ export const tritonProjects: readonly TritonProject[] = [
     {
         external_id: "P015605",
         external_name: "AK_StickleBack_Fish_Ext_Seq",
+    },
+    {
+        external_id: "P004942",
+        external_name: "MNI_NGP_Membership_Agreement",
     },
 ] as const
 
