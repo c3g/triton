@@ -80,23 +80,27 @@ export async function listDatasetsByIds(
         return dataset
     })
 
-    const fileTypes: FileType[] = ["FASTQ", "BAM", "CRAM"]
-
     for (const tritonDataset of tritonDatasets) {
         const datasetFiles = await freezemanApi.DatasetFile.listByDatasetIds([
             tritonDataset.id,
         ])
         for (const datasetFile of datasetFiles.data.results) {
-            const fileTypesIndex = fileTypes.findIndex((type) => {
-                FILE_TYPE_TO_REGEXP[type].test(datasetFile.file_path)
-            })
-            if (fileTypesIndex === -1) {
+            const fileType = Object.entries(
+                FILE_TYPE_TO_REGEXP,
+            ).reduce<FileType | null>(
+                (prev, [fileType, regexp]) =>
+                    prev ||
+                    (regexp.test(datasetFile.file_path)
+                        ? (fileType as FileType)
+                        : null),
+                null,
+            )
+            if (!fileType) {
                 logger.warn(
                     `Unknown file type for file path ${datasetFile.file_path}`,
                 )
             } else {
-                tritonDataset.sizes[fileTypes[fileTypesIndex]] +=
-                    datasetFile.size
+                tritonDataset.sizes[fileType] += datasetFile.size
             }
         }
     }
