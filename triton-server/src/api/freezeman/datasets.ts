@@ -89,7 +89,7 @@ export async function listDatasetsByIds(
                 FILE_TYPE_TO_REGEXP,
             ).reduce<FileType | null>(
                 (prev, [fileType, regexp]) =>
-                    prev ||
+                    prev ??
                     (regexp.test(datasetFile.file_path)
                         ? (fileType as FileType)
                         : null),
