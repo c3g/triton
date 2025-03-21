@@ -27,6 +27,7 @@ import {
     listRunsByExternalProjectId,
 } from "./datasets"
 import { listUserProjects } from "./project"
+import { logger } from "../logger"
 
 const router = express.Router()
 
@@ -65,6 +66,7 @@ router.get(
             isLoggedIn = await isUserAuthenticated(userId, token)
             if (isLoggedIn) {
                 const userDetails = await getUserDetails(userId, token)
+                logger.info(`User ${userDetails.email} is logged in`)
                 user = userDetails
             }
         }
