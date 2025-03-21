@@ -17,7 +17,7 @@ export async function sendEmail(
     try {
         await new Promise<void>((resolve, reject) => {
             sendmail.stderr.on("data", (data: string) => {
-                logger.error(data, "[sendmail]")
+                logger.error({ data }, "[sendmail]")
                 reject(data)
             })
             sendmail.on("exit", () => resolve())
@@ -34,7 +34,10 @@ export async function sendEmail(
                         logger.error(err, "[sendmail]")
                         reject(err)
                     } else {
-                        logger.debug(`Finished writing to ${to}`, "[sendmail]")
+                        logger.info(
+                            `Finished writing to ${to}: ${subject}`,
+                            "[sendmail]",
+                        )
                     }
                 },
             )
