@@ -154,7 +154,7 @@ export const sendLatestReleasedNotificationEmail = async () => {
                     if (
                         results.some((result) => result.status === "rejected")
                     ) {
-                        throw new Error(
+                        logger.warn(
                             `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
                         )
                     }
