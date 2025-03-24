@@ -131,7 +131,7 @@ export const sendLatestReleasedNotificationEmail = async () => {
             for (const dataset of releasedDatasets) {
                 if (dataset.released_status_count > 0) {
                     const subject = `The dataset for project '${dataset.external_project_id}' (Dataset #${dataset.id}) is now ready for staging and then download.`
-                    const results = await email.broadcastEmailsOfProject(
+                    await email.broadcastEmailsOfProject(
                         dataset.external_project_id,
                         async (send) => {
                             await send(
@@ -151,13 +151,6 @@ export const sendLatestReleasedNotificationEmail = async () => {
                             )
                         },
                     )
-                    if (
-                        results.some((result) => result.status === "rejected")
-                    ) {
-                        logger.warn(
-                            `Failed to send email to every recipients of project '${dataset.external_project_id}'`,
-                        )
-                    }
                 }
 
                 // although datasets are sorted by date, we only want to
