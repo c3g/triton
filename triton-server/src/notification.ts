@@ -39,10 +39,14 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 lastValidationStatusUpdate,
             )
         ).data.results.map((dataset) => ({ ...dataset }))
-        logger.debug(`Found ${validatedDatasets.length} datasets.`)
+
         // the email portion of the logic
 
         if (validatedDatasets.length > 0) {
+            logger.info(
+                `Found ${validatedDatasets.length} datasets to notify for validation.`,
+            )
+
             let formattedData: ExtractedValidatedNotificationData[] =
                 await extractValidatedDatasetsInfo(validatedDatasets)
 
@@ -54,6 +58,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                     ids.push(dataset.basicCommentUserInfo?.user_id)
                 }
             })
+
             if (ids.length > 0) {
                 ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
                     (freezemanUser) => {
@@ -74,6 +79,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                     },
                 )
             }
+
             const body =
                 "<b>A run has been validated:</b> <br/>" +
                 formattedData.map(
@@ -96,6 +102,10 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
 
                 This is an automated email, do not reply back.<br/>` // await sendTestEmail(body)
             await sendValidationEmail(formattedData, body)
+        } else {
+            logger.debug(
+                `Found ${validatedDatasets.length} datasets to notify for validation.`,
+            )
         }
     }
 }
@@ -116,11 +126,13 @@ export const sendLatestReleasedNotificationEmail = async () => {
             )
         ).data.results.map((dataset) => ({ ...dataset }))
 
-        logger.debug(
-            `Found ${releasedDatasets.length} datasets to potentially notify for release.`,
-        )
         // the email portion of the logic
+
         if (releasedDatasets.length > 0) {
+            logger.info(
+                `Found ${releasedDatasets.length} datasets to notify for release.`,
+            )
+
             releasedDatasets.sort((a, b) =>
                 compareTimestamp(
                     a.latest_release_update,
@@ -164,6 +176,10 @@ export const sendLatestReleasedNotificationEmail = async () => {
                 // update the last notification date
                 await db.updateLatestReleaseNotificationDate(lastDate)
             }
+        } else {
+            logger.debug(
+                `Found ${releasedDatasets.length} datasets to notify for release.`,
+            )
         }
     }
 }
