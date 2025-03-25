@@ -39,7 +39,11 @@ export const httpLogger = asyncHandler(
             const message = `${method ?? "undefined"} ${url} ${statusCode} ${statusMessage}`
 
             if (statusCode < 400) {
-                logger.info(obj, message)
+                if (method === "GET") {
+                    logger.debug(obj, message)
+                } else {
+                    logger.info(obj, message)
+                }
             } else if (statusCode === 500) {
                 logger.error(obj, message)
             } else {
