@@ -106,7 +106,7 @@ export const getAuthenticatedAPI = (axios: AxiosInstance) => {
                     )
                 }
                 return await axios.get(
-                    `${LIMS_API_URL}/datasets/?external_project_id__in=${externalProjectIds.join(
+                    `${LIMS_API_URL}/datasets/?project__external_id=${externalProjectIds.join(
                         ",",
                     )}`,
                 )
