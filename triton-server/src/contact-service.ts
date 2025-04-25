@@ -162,6 +162,10 @@ function getCredentialMessageFor(contact: Contact) {
     }
 
     if (contact.type === "GLOBUS" && contact.status === "MODIFIED") {
+        const usingGlobus =
+            "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=116"
+        const unlinkIdentity =
+            "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=117"
         return `
         Hello,<br/>
         <br/>
@@ -171,7 +175,11 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth}</b><br/><br/>
+        Password: <b>${contact.depth}</b><br/>
+        <br/>
+        Using Globus: <a href="${usingGlobus}">${usingGlobus}</a><br/>
+        <b>Please unlink the identity after you're done:</b> <a href="${unlinkIdentity}">${unlinkIdentity}</a><br/>
+        <br/>
         ${ENDING}
         `
     }
