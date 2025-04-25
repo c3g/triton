@@ -14,11 +14,12 @@ export async function listRunsByExternalProjectId(
     const freezemanApi = await getFreezeManAuthenticatedAPI()
     const datasetsResponse =
         await freezemanApi.Dataset.listByExternalProjectIds(externalProjectIds)
-    const datasets = datasetsResponse.data.results.filter(
+
+    const datasetsWithReleases = datasetsResponse.data.results.filter(
         (dataset) => dataset.released_status_count > 0,
     )
-    const datasetsByRunIDAndProjectID = datasets.reduce<{
-        [projectID: string]: { [runName: string]: typeof datasets }
+    const datasetsByRunIDAndProjectID = datasetsWithReleases.reduce<{
+        [projectID: string]: { [runName: string]: typeof datasetsWithReleases }
     }>((runsByProjectID, dataset) => {
         const runName = dataset.run_name
         const externalProjectID = dataset.external_project_id
