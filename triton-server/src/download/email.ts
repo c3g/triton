@@ -4,7 +4,7 @@
 
 import { spawn } from "child_process"
 import { logger } from "../logger"
-import config from "config"
+import config from "../../config"
 
 export async function sendEmail(
     from: string,
