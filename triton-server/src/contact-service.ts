@@ -8,7 +8,7 @@ import config from "../config"
 import { ExternalProjectID } from "./api/api-types"
 import { logger } from "./logger"
 import { defaultDatabaseActions } from "./download/actions"
-import { sendEmail } from "./download/email"
+import { sendEmail, sendEmailDebug } from "./download/email"
 import { getProjectUsers } from "./magic/magic_api"
 
 export function start() {
@@ -77,6 +77,10 @@ export function start() {
                     (!notificationDate || notificationDate < completionDate)
                 ) {
                     const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' is ready`
+                    sendEmailDebug(
+                        "Triton Request Completed",
+                        `Request completed for dataset ${request.dataset_id} with type ${request.type} for project ${request.project_id}`,
+                    )
                     await broadcastEmailsOfProject(
                         request.project_id,
                         async (send) => {
@@ -97,17 +101,9 @@ export function start() {
                     failureDate &&
                     (!notificationDate || notificationDate < failureDate)
                 ) {
-                    const subject = `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`
-                    await broadcastEmailsOfProject(
-                        request.project_id,
-                        async (send) => {
-                            await send(
-                                `${subject}`,
-                                `${subject}.<br/><br/>
-                                Please contact us at ${config.mail.techSupport}.<br/><br/>
-                                Thank You.<br/>`,
-                            )
-                        },
+                    sendEmailDebug(
+                        "Triton Request Failed",
+                        `The dataset #${request.dataset_id} for project '${request.project_id}' failed to be staged`,
                     )
                     await db.updateNotificationDate(request.id)
                 }
@@ -228,13 +224,13 @@ async function getEmailsForProject(
         const { stack = "e.stack" } = e instanceof Error ? e : {}
         await sendEmail(
             "",
-            config.mail.errorMonitoring,
+            config.mail.debug,
             subject,
             `ProjectID: ${projectID}<br/><pre>${stack}</pre>`,
         ).catch((error) =>
             logger.error(
                 error,
-                `[contacts] Could not send email to ${config.mail.errorMonitoring}`,
+                `[contacts] Could not send email to ${config.mail.debug}`,
             ),
         )
     }

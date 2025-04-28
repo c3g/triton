@@ -4,6 +4,7 @@
 
 import { spawn } from "child_process"
 import { logger } from "../logger"
+import config from "config"
 
 export async function sendEmail(
     from: string,
@@ -46,4 +47,8 @@ export async function sendEmail(
     } finally {
         sendmail.kill()
     }
+}
+
+export async function sendEmailDebug(subject: string, body: string) {
+    await sendEmail("", config.mail.debug, subject, body)
 }
