@@ -9,6 +9,7 @@ import {
     TritonCreateRequestResponse,
 } from "./api-types"
 import path from "path"
+import { sendEmailDebug } from "./email"
 
 const router = express.Router()
 
@@ -56,6 +57,10 @@ router.post(
                 },
                 downloadFiles,
             )
+            sendEmailDebug(
+                "Triton Request Created",
+                `Request created for dataset ${datasetID} with type ${type} for project ${projectID}`,
+            )
             return dataHandler(res)(result)
         } catch (error) {
             return errorHandler(res)(error)
@@ -70,6 +75,10 @@ router.post(
         const { extendRequest } = await defaultDatabaseActions()
         try {
             const result = await extendRequest(String(datasetID))
+            sendEmailDebug(
+                "Triton Request Extended",
+                `Request extended for dataset ${datasetID}`,
+            )
             dataHandler(res)(result)
         } catch (error) {
             errorHandler(res)(error)
@@ -85,6 +94,11 @@ router.delete(
         const { deleteRequest } = await defaultDatabaseActions()
         try {
             const result = await deleteRequest(String(datasetID))
+            sendEmailDebug(
+                "Triton Request Deleted",
+                `Request deleted for dataset ${datasetID}`,
+            )
+
             dataHandler(res)(result)
         } catch (error) {
             errorHandler(res)(error)
@@ -108,6 +122,10 @@ router.post(
         try {
             const { resetContactPassword } = await defaultDatabaseActions()
             await resetContactPassword(projectID, type)
+            sendEmailDebug(
+                "Triton Password Reset",
+                `Password reset for project ${projectID} with type ${type}`,
+            )
             dataHandler(res)({})
         } catch (error) {
             errorHandler(res)(error)

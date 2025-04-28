@@ -30,7 +30,7 @@ const config = {
     },
 
     mail: {
-        errorMonitoring: getMandatoryEnv("ERROR_MONITORING_EMAIL"),
+        debug: getMandatoryEnv("DEBUG_EMAIL"),
         techSupport: getMandatoryEnv("TECH_SUPPORT_EMAIL"),
         toValidationNotification: getMandatoryEnv("TO_VALIDATION_EMAIL"),
     },
