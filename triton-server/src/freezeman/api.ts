@@ -71,10 +71,9 @@ export const createAuthorizedAxios = (accessToken?: string): AxiosInstance => {
         const {
             status,
             config: { baseURL, url, method, params },
-            data,
         } = res
         logger.debug(
-            { status, data, config: { baseURL, url, method, params } },
+            { status, config: { baseURL, url, method, params } },
             "Freezeman Response",
         )
         return res
