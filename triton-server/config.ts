@@ -1,13 +1,5 @@
 import "dotenv/config"
 
-function getEnv(key: string, defaultValue?: string) {
-    const value = process.env[key]
-    if (value === undefined) {
-        return defaultValue
-    }
-    return value
-}
-
 const missingKeys = new Set<string>()
 function getMandatoryEnv(key: string) {
     const value = process.env[key]
