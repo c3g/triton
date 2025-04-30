@@ -51,10 +51,14 @@ export async function sendEmail(
 }
 
 export async function sendEmailDebug(subject: string, body: string) {
-    await sendEmail(
-        "",
-        config.mail.debug,
-        `${subject} (${os.hostname()})`,
-        body,
-    )
+    try {
+        await sendEmail(
+            "",
+            config.mail.debug,
+            `${subject} (${os.hostname()})`,
+            body,
+        )
+    } catch (err) {
+        logger.error(err, "[sendEmailDebug]")
+    }
 }
