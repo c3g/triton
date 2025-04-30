@@ -50,5 +50,10 @@ export async function sendEmail(
 }
 
 export async function sendEmailDebug(subject: string, body: string) {
-    await sendEmail("", config.mail.debug, subject, body)
+    await sendEmail(
+        "",
+        config.mail.debug,
+        `${subject} (${process.env.NODE_ENV || "development"})`,
+        body,
+    )
 }
