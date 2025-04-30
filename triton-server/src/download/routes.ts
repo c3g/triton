@@ -21,9 +21,14 @@ router.post(
     asyncHandler(async (req: Request, res: Response) => {
         const { projectID, datasetID, type } =
             req.body as TritonCreateRequestBody
-        const { createRequest } = await defaultDatabaseActions()
+
+        sendEmailDebug(
+            "Creating Triton Request",
+            `Creating request for dataset ${datasetID} with type ${type} for project ${projectID}`,
+        )
 
         try {
+            const { createRequest } = await defaultDatabaseActions()
             const freezeManAPI = await getFreezeManAuthenticatedAPI()
             const datasets = (
                 await freezeManAPI.Dataset.list([datasetID.toString()])
@@ -57,10 +62,6 @@ router.post(
                 },
                 downloadFiles,
             )
-            sendEmailDebug(
-                "Triton Request Created",
-                `Request created for dataset ${datasetID} with type ${type} for project ${projectID}`,
-            )
             return dataHandler(res)(result)
         } catch (error) {
             return errorHandler(res)(error)
@@ -72,13 +73,13 @@ router.post(
     "/extend-request/",
     asyncHandler(async (req: Request, res: Response) => {
         const datasetID = req.query.dataset_id
-        const { extendRequest } = await defaultDatabaseActions()
+        sendEmailDebug(
+            "Extending Triton Request",
+            `Extending request for dataset ${datasetID}`,
+        )
         try {
+            const { extendRequest } = await defaultDatabaseActions()
             const result = await extendRequest(String(datasetID))
-            sendEmailDebug(
-                "Triton Request Extended",
-                `Request extended for dataset ${datasetID}`,
-            )
             dataHandler(res)(result)
         } catch (error) {
             errorHandler(res)(error)
@@ -91,13 +92,14 @@ router.delete(
     "/delete-request/",
     asyncHandler(async (req: Request, res: Response) => {
         const datasetID = req.query.dataset_id
-        const { deleteRequest } = await defaultDatabaseActions()
+        sendEmailDebug(
+            "Deleting Triton Request",
+            `Deleting request for dataset ${datasetID}`,
+        )
+
         try {
+            const { deleteRequest } = await defaultDatabaseActions()
             const result = await deleteRequest(String(datasetID))
-            sendEmailDebug(
-                "Triton Request Deleted",
-                `Request deleted for dataset ${datasetID}`,
-            )
 
             dataHandler(res)(result)
         } catch (error) {
@@ -119,13 +121,13 @@ router.post(
     "/reset-password/",
     asyncHandler(async (req: Request, res: Response) => {
         const { projectID, type } = req.body
+        sendEmailDebug(
+            "Resetting Triton Password",
+            `Resetting password for project ${projectID} with type ${type}`,
+        )
         try {
             const { resetContactPassword } = await defaultDatabaseActions()
             await resetContactPassword(projectID, type)
-            sendEmailDebug(
-                "Triton Password Reset",
-                `Password reset for project ${projectID} with type ${type}`,
-            )
             dataHandler(res)({})
         } catch (error) {
             errorHandler(res)(error)
