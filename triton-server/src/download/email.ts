@@ -4,6 +4,7 @@
 
 import { spawn } from "child_process"
 import { logger } from "../logger"
+import os from "os"
 import config from "../../config"
 
 export async function sendEmail(
@@ -53,7 +54,7 @@ export async function sendEmailDebug(subject: string, body: string) {
     await sendEmail(
         "",
         config.mail.debug,
-        `${subject} (${process.env.NODE_ENV || "development"})`,
+        `${subject} (${os.hostname()})`,
         body,
     )
 }
