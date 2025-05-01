@@ -143,6 +143,19 @@ function getCredentialSubjectFor(contact: Contact) {
 
 function getCredentialMessageFor(contact: Contact) {
     // contact.depth is assumed to not be null nor undefined
+    const usingGlobus =
+        "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=116"
+    const unlinkIdentity =
+        "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=117"
+    const GLOBUS_ENDING = `
+        We are using Globus to ensure fast and secure transport of the data.
+        For a guide on how to proceed with the data transfer, you can consult this page: 
+        <a href="${usingGlobus}">${usingGlobus}</a><br/>
+        Technical limitations prevent us from allowing more than one user to have access to the data at the same time.
+        In order to allow other members of your team to access data,
+        please unlink your identity from the data once you are done with the transfer.
+        Here is a page to help with that operation: 
+        <a href="${unlinkIdentity}">${unlinkIdentity}</a><br/>`
 
     const ENDING = `If you have any issues please contact us at ${config.mail.techSupport}.<br/><br/>
     Thank You.<br/>`
@@ -158,14 +171,11 @@ function getCredentialMessageFor(contact: Contact) {
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
         Password: <b>${contact.depth}</b><br/><br/>
+        ${GLOBUS_ENDING}<br/>
         ${ENDING}`
     }
 
     if (contact.type === "GLOBUS" && contact.status === "MODIFIED") {
-        const usingGlobus =
-            "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=116"
-        const unlinkIdentity =
-            "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=117"
         return `
         Hello,<br/>
         <br/>
@@ -175,11 +185,8 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth}</b><br/>
-        <br/>
-        Using Globus: <a href="${usingGlobus}">${usingGlobus}</a><br/>
-        <b>Please unlink the identity after you're done:</b> <a href="${unlinkIdentity}">${unlinkIdentity}</a><br/>
-        <br/>
+        Password: <b>${contact.depth}</b><br/><br/>
+        ${GLOBUS_ENDING}<br/>
         ${ENDING}
         `
     }
