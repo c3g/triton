@@ -142,6 +142,8 @@ function getCredentialSubjectFor(contact: Contact) {
 }
 
 function getCredentialMessageFor(contact: Contact) {
+    // contact.depth is assumed to not be null nor undefined
+
     const ENDING = `If you have any issues please contact us at ${config.mail.techSupport}.<br/><br/>
     Thank You.<br/>`
 
@@ -155,7 +157,7 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        Password: <b>${contact.depth}</b><br/><br/>
         ${ENDING}`
     }
 
@@ -169,7 +171,7 @@ function getCredentialMessageFor(contact: Contact) {
         <br/>
         Endpoint: <b>mcgilluniversity#genomecentre-lims</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        Password: <b>${contact.depth}</b><br/><br/>
         ${ENDING}
         `
     }
@@ -185,7 +187,7 @@ function getCredentialMessageFor(contact: Contact) {
         Server:   <b>${config.sftp.server}</b><br/>
         Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        Password: <b>${contact.depth}</b><br/><br/>
         ${ENDING}
         `
     }
@@ -201,7 +203,7 @@ function getCredentialMessageFor(contact: Contact) {
         Server:   <b>${config.sftp.server}</b><br/>
         Port:     <b>${config.sftp.port}</b><br/>
         Username: <b>${contact.project_id}</b><br/>
-        Password: <b>${contact.depth ?? "ERROR COULD NOT GENERATE PASSWORD"}</b><br/><br/>
+        Password: <b>${contact.depth}</b><br/><br/>
         ${ENDING}
         `
     }
