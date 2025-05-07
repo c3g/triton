@@ -148,14 +148,10 @@ function getCredentialMessageFor(contact: Contact) {
     const unlinkIdentity =
         "https://servicedesk.genome.mcgill.ca/index.php?pg=kb.page&id=117"
     const GLOBUS_ENDING = `
-        We are using Globus to ensure fast and secure transport of the data.
-        For a guide on how to proceed with the data transfer, you can consult this page: 
-        <a href="${usingGlobus}">${usingGlobus}</a><br/>
-        Technical limitations prevent us from allowing more than one user to have access to the data at the same time.
+        We are using Globus to ensure fast and secure transfer of data: <a href="${usingGlobus}">${usingGlobus}</a><br/>
         In order to allow other members of your team to access data,
         please unlink your identity from the data once you are done with the transfer.
-        Here is a page to help with that operation: 
-        <a href="${unlinkIdentity}">${unlinkIdentity}</a><br/>`
+        Here is a page to help with that operation: <a href="${unlinkIdentity}">${unlinkIdentity}</a><br/>`
 
     const ENDING = `If you have any issues please contact us at ${config.mail.techSupport}.<br/><br/>
     Thank You.<br/>`
