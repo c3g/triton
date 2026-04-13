@@ -23,7 +23,6 @@ export const start = async () => {
 
 export const sendDatasetValidationStatusUpdateEmail = async () => {
     const db = await defaultDatabaseActions()
-    const ids: number[] = []
 
     const freezemanApi = await getFreezeManAuthenticatedAPI()
 
@@ -45,61 +44,77 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 `Found ${validatedDatasets.length} datasets to notify for validation.`,
             )
 
-            let formattedData: ExtractedValidatedNotificationData[] =
-                await extractValidatedDatasetsInfo(validatedDatasets)
+            const formattedData = extractValidatedDatasetsInfo(
+                validatedDatasets,
+                lastValidationStatusUpdate,
+            )
 
-            formattedData.map((dataset: ExtractedValidatedNotificationData) => {
-                if (
-                    dataset.basicCommentUserInfo?.user_id &&
-                    !ids.includes(dataset.basicCommentUserInfo?.user_id)
-                ) {
-                    ids.push(dataset.basicCommentUserInfo?.user_id)
+            const basicCommentUserInfoByUserId: Record<
+                number,
+                BasicCommentUserInfo[]
+            > = {}
+            for (const dataset of formattedData) {
+                for (const commentInfo of dataset.basicCommentUserInfos) {
+                    if (!basicCommentUserInfoByUserId[commentInfo.user_id]) {
+                        basicCommentUserInfoByUserId[commentInfo.user_id] = []
+                    }
+                    basicCommentUserInfoByUserId[commentInfo.user_id].push(
+                        commentInfo,
+                    )
                 }
-            })
-
-            if (ids.length > 0) {
-                ;(await freezemanApi.Users.getUsersByIds(ids)).data.results.map(
-                    (freezemanUser) => {
-                        formattedData.map(
-                            (user: ExtractedValidatedNotificationData) => {
-                                if (
-                                    user.basicCommentUserInfo?.user_id ===
-                                        freezemanUser.id &&
-                                    user.basicCommentUserInfo?.user_id
-                                ) {
-                                    user.basicCommentUserInfo.name =
-                                        freezemanUser.first_name +
-                                        " " +
-                                        freezemanUser.last_name
-                                }
-                            },
-                        )
-                    },
-                )
             }
 
-            const body =
-                "<b>A run has been validated:</b> <br/>" +
-                formattedData.map(
-                    (dataset: ExtractedValidatedNotificationData) => {
-                        return `<br/><br/>
-                            - <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>
-                            - <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>
-                            - <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>
-                            - <b>Dataset/lane ${dataset.projectAndRunInfo.lane_number} status</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Comments: </b>" + dataset.basicCommentUserInfo?.comment + "<br/>" : "No comments <br/>"}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Comments left by: </b>" + dataset.basicCommentUserInfo?.name + "<br/>" : ""}
-                                ${dataset.basicCommentUserInfo?.comment != undefined ? "- <b>Created at: </b>" + dataset.basicCommentUserInfo?.created_at.split("T")[0] + " " + dataset.basicCommentUserInfo?.created_at.split("T")[1] + "<br/>" : ""}
+            const userIDs = Object.keys(basicCommentUserInfoByUserId).map(
+                (id) => parseInt(id),
+            )
+            if (userIDs) {
+                const users = await freezemanApi.Users.getUsersByIds(userIDs)
+                for (const freezemanUser of users.data.results) {
+                    const commentInfos =
+                        basicCommentUserInfoByUserId[freezemanUser.id]
+                    for (const commentInfo of commentInfos) {
+                        commentInfo.name = `${freezemanUser.first_name} ${freezemanUser.last_name}`
+                    }
+                }
+            }
 
-                            ----------------------`
-                    },
-                ) +
-                `
-
+            const body: string[] = []
+            body.push("<b>A run has been validated:</b> <br/>")
+            for (const dataset of formattedData) {
+                body.push("<br/><br/>")
+                body.push(
+                    `- <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>`,
+                )
+                body.push(
+                    `- <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>`,
+                )
+                body.push(
+                    `- <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>`,
+                )
+                body.push(
+                    `- <b>Dataset/lane ${dataset.projectAndRunInfo.lane_number} status</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>`,
+                )
+                if (dataset.basicCommentUserInfos.length > 0) {
+                    body.push(`- <b>Comments: </b> <br/>`)
+                    for (const commentInfo of dataset.basicCommentUserInfos) {
+                        body.push(`&emsp; - ${commentInfo.comment} <br/>`)
+                        body.push(
+                            `&emsp; - <b>Comments left by: </b> ${commentInfo.name} <br/>`,
+                        )
+                        body.push(
+                            `&emsp; - <b>Created at: </b> ${commentInfo.created_at.split("T")[0]} ${commentInfo.created_at.split("T")[1]} <br/>`,
+                        )
+                    }
+                }
+            }
+            body.push(`
                 <br/>Thank you.<br/>
 
-                This is an automated email, do not reply back.<br/>` // await sendTestEmail(body)
-            await sendValidationEmail(formattedData, body)
+                This is an automated email, do not reply back.<br/>
+            `)
+
+            // sendTestEmail(body.join("\n"))
+            await sendValidationEmail(formattedData, body.join("\n"))
         } else {
             logger.debug(
                 `Found ${validatedDatasets.length} datasets to notify for validation.`,
@@ -163,12 +178,12 @@ const getValidationFlagLabel = (status: number) => {
 }
 
 // this should also do the api call to get the basic info from the user
-const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
-    let extractedData: ExtractedValidatedNotificationData[] = []
-    validatedDataset.forEach((item: Dataset) => {
-        let runsInfo: ProjectAndRunInfo
-        let userCommentInfo: BasicCommentUserInfo | undefined = undefined
-        runsInfo = {
+const extractValidatedDatasetsInfo = (
+    validatedDataset: Dataset[],
+    lastValidationStatusUpdate: string,
+): ExtractedValidatedNotificationData[] => {
+    return validatedDataset.map((item: Dataset) => {
+        const runsInfo: ProjectAndRunInfo = {
             run_name: item.run_name,
             project_name: item.project_name,
             project_id: item.external_project_id,
@@ -177,23 +192,29 @@ const extractValidatedDatasetsInfo = async (validatedDataset: Dataset[]) => {
             validated_by: item.validated_by ?? "",
             latest_validation_update: item.latest_validation_update,
         }
-        if (item.archived_comments.length > 0) {
-            let latestComment = item.archived_comments.reduce((a, b) => {
-                return new Date(a.created_at) > new Date(b.created_at) ? a : b
-            })
-            userCommentInfo = {
-                comment: latestComment.comment,
-                created_at: latestComment.created_at,
-                user_id: latestComment.created_by,
+
+        const userCommentInfos: BasicCommentUserInfo[] = []
+        for (const comment of item.archived_comments) {
+            if (
+                new Date(comment.created_at) >
+                new Date(lastValidationStatusUpdate)
+            ) {
+                userCommentInfos.push({
+                    comment: comment.comment,
+                    created_at: comment.created_at,
+                    user_id: comment.created_by,
+                })
             }
         }
-        extractedData.push({
-            basicCommentUserInfo: userCommentInfo,
-            projectAndRunInfo: runsInfo,
-        })
-    })
+        userCommentInfos.sort((a, b) =>
+            compareTimestamp(a.created_at, b.created_at),
+        )
 
-    return extractedData
+        return {
+            basicCommentUserInfos: userCommentInfos,
+            projectAndRunInfo: runsInfo,
+        }
+    })
 }
 
 interface BasicCommentUserInfo {
@@ -216,7 +237,7 @@ interface ProjectAndRunInfo {
 
 interface ExtractedValidatedNotificationData {
     projectAndRunInfo: ProjectAndRunInfo
-    basicCommentUserInfo?: BasicCommentUserInfo
+    basicCommentUserInfos: BasicCommentUserInfo[]
 }
 
 export const sendValidationEmail = async (
