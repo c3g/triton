@@ -116,6 +116,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                         )
                     }
                 }
+                body.push("<br/>")
             }
             body.push(`
                 <br/>Thank you.<br/>
