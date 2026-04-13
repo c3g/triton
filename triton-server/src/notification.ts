@@ -44,10 +44,8 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 `Found ${validatedDatasets.length} datasets to notify for validation.`,
             )
 
-            const formattedData = extractValidatedDatasetsInfo(
-                validatedDatasets,
-                lastValidationStatusUpdate,
-            )
+            const formattedData =
+                extractValidatedDatasetsInfo(validatedDatasets)
 
             const basicCommentUserInfoByUserId: Record<
                 number,
@@ -192,7 +190,6 @@ const getValidationFlagLabel = (status: number) => {
 // this should also do the api call to get the basic info from the user
 const extractValidatedDatasetsInfo = (
     validatedDataset: Dataset[],
-    lastValidationStatusUpdate: string,
 ): ExtractedValidatedNotificationData[] => {
     return validatedDataset.map((item: Dataset) => {
         const runsInfo: ProjectAndRunInfo = {
@@ -205,22 +202,13 @@ const extractValidatedDatasetsInfo = (
             latest_validation_update: item.latest_validation_update,
         }
 
-        const userCommentInfos: BasicCommentUserInfo[] = []
-        for (const comment of item.archived_comments) {
-            if (
-                new Date(comment.created_at) >
-                new Date(lastValidationStatusUpdate)
-            ) {
-                userCommentInfos.push({
-                    comment: comment.comment,
-                    created_at: comment.created_at,
-                    user_id: comment.created_by,
-                })
-            }
-        }
-        userCommentInfos.sort((a, b) =>
-            compareTimestamp(a.created_at, b.created_at),
-        )
+        const userCommentInfos: BasicCommentUserInfo[] = item.archived_comments
+            .map((comment) => ({
+                comment: comment.comment,
+                created_at: comment.created_at,
+                user_id: comment.created_by,
+            }))
+            .sort((a, b) => compareTimestamp(a.created_at, b.created_at))
 
         return {
             basicCommentUserInfos: userCommentInfos,
