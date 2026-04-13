@@ -114,7 +114,6 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                         body.push(
                             `&emsp;&emsp;<b>Created at: </b> ${date} ${time}`,
                         )
-                        body.push("<br/>")
                     }
                 }
             }
