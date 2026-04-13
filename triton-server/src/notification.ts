@@ -1,7 +1,6 @@
 import config from "../config"
 import cron from "node-cron"
 import nodemailer from "nodemailer"
-import * as email from "./contact-service"
 import { getFreezeManAuthenticatedAPI } from "./freezeman/api"
 import { defaultDatabaseActions } from "./download/actions"
 import { logger } from "./logger"
@@ -14,7 +13,6 @@ export const start = async () => {
     logger.info(`Notification service started to run. (${cronExpression})`)
     const task = cron.schedule(cronExpression, () => {
         logger.debug("Executing notification service.")
-        sendLatestReleasedNotificationEmail()
         sendDatasetValidationStatusUpdateEmail()
     })
 
@@ -105,80 +103,6 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
         } else {
             logger.debug(
                 `Found ${validatedDatasets.length} datasets to notify for validation.`,
-            )
-        }
-    }
-}
-
-export const sendLatestReleasedNotificationEmail = async () => {
-    const db = await defaultDatabaseActions()
-
-    const freezemanApi = await getFreezeManAuthenticatedAPI()
-
-    const lastReleasedStatusUpdate = (
-        await db.getLatestReleaseNotificationDate()
-    )?.last_released_notification_date
-
-    if (lastReleasedStatusUpdate) {
-        const releasedDatasets = (
-            await freezemanApi.Dataset.listByReleasedUpdates(
-                lastReleasedStatusUpdate,
-            )
-        ).data.results.map((dataset) => ({ ...dataset }))
-
-        // the email portion of the logic
-
-        if (releasedDatasets.length > 0) {
-            logger.info(
-                `Found ${releasedDatasets.length} datasets to notify for release.`,
-            )
-
-            releasedDatasets.sort((a, b) =>
-                compareTimestamp(
-                    a.latest_release_update,
-                    b.latest_release_update,
-                ),
-            )
-            let lastDate: string | undefined = undefined
-            for (const dataset of releasedDatasets) {
-                if (dataset.released_status_count > 0) {
-                    const subject = `The dataset for project '${dataset.external_project_id}' (Dataset #${dataset.id}) is now ready for staging and then download.`
-                    await email.broadcastEmailsOfProject(
-                        dataset.external_project_id,
-                        async (send) => {
-                            await send(
-                                `${subject}`,
-                                `${subject}.<br/><br/>
-                                -   <b>Project ID: ${dataset.external_project_id}</b><br/>
-                                -   <b>Run Name: ${dataset.run_name}</b><br/>
-                                -   <b>Dataset ID: ${dataset.id}</b><br/>
-                                -   Dataset Lane: ${dataset.lane}<br/>
-                                -   Dataset release time: ${new Date(dataset.latest_release_update).toUTCString()} (UTC)<br/><br/>
-                                Datasets can be downloaded from the MGC Data Portal.
-                                To access the Data Portal, please login to your Hercules account and click on the Data Portal button on the top menu.<br/>
-                                You can download the dataset via SFTP or Globus using the credentials provided during the staging process.<br/><br/>
-                                If you forgot or didn't receive your credential, you can reset your password in the Data Portal.<br/>
-                                If you have any issues, please contact us at ${config.mail.techSupport}.<br/><br/>
-                                Thank you.<br/>`,
-                            )
-                        },
-                    )
-                }
-
-                // although datasets are sorted by date, we only want to
-                // update the last date if the date is different
-                if (lastDate && dataset.latest_release_update !== lastDate) {
-                    await db.updateLatestReleaseNotificationDate(lastDate)
-                }
-                lastDate = dataset.latest_release_update
-            }
-            if (lastDate !== undefined) {
-                // update the last notification date
-                await db.updateLatestReleaseNotificationDate(lastDate)
-            }
-        } else {
-            logger.debug(
-                `Found ${releasedDatasets.length} datasets to notify for release.`,
             )
         }
     }
