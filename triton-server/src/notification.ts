@@ -208,7 +208,7 @@ const extractValidatedDatasetsInfo = (
                 created_at: comment.created_at,
                 user_id: comment.created_by,
             }))
-            .sort((a, b) => compareTimestamp(a.created_at, b.created_at))
+            .sort((a, b) => -compareTimestamp(a.created_at, b.created_at))
 
         return {
             basicCommentUserInfos: userCommentInfos,
