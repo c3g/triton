@@ -107,13 +107,12 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                         body.push(
                             `&emsp;&emsp;<b>Left by: </b> ${commentInfo.name} <br/>`,
                         )
-                        const date = commentInfo.created_at.split("T")[0]
-                        const time = commentInfo.created_at
-                            .split("T")[1]
-                            .split(".")[0]
-                        body.push(
-                            `&emsp;&emsp;<b>Created at: </b> ${date} ${time}`,
-                        )
+                        const time = new Date(
+                            commentInfo.created_at,
+                        ).toLocaleString("en-CA", {
+                            timeZone: "America/Montreal",
+                        })
+                        body.push(`&emsp;&emsp;<b>Created at: </b> ${time}`)
                     }
                 }
                 body.push("<br/>")
