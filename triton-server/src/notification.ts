@@ -11,14 +11,10 @@ export const start = async () => {
     const cronExpression = "*/15 * * * *"
     logger.info(`Environment running: ${process.env.NODE_ENV}`)
     logger.info(`Notification service started to run. (${cronExpression})`)
-    const task = cron.schedule(
-        cronExpression,
-        () => {
-            logger.debug("Executing notification service.")
-            sendDatasetValidationStatusUpdateEmail()
-        },
-        { runOnInit: true },
-    )
+    const task = cron.schedule(cronExpression, () => {
+        logger.debug("Executing notification service.")
+        sendDatasetValidationStatusUpdateEmail()
+    })
 
     return () => {
         task.stop()
