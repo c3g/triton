@@ -97,16 +97,16 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 if (dataset.basicCommentUserInfos.length > 0) {
                     body.push(`- <b>Comments: </b> <br/>`)
                     for (const commentInfo of dataset.basicCommentUserInfos) {
-                        body.push(`&emsp; - ${commentInfo.comment} <br/>`)
+                        body.push(`&emsp;- ${commentInfo.comment} <br/>`)
                         body.push(
-                            `&emsp;<b>Comments left by: </b> ${commentInfo.name} <br/>`,
+                            `&emsp;&emsp;<b>Comments left by: </b> ${commentInfo.name} <br/>`,
                         )
                         const date = commentInfo.created_at.split("T")[0]
                         const time = commentInfo.created_at
                             .split("T")[1]
                             .split(".")[0]
                         body.push(
-                            `&emsp;<b>Created at: </b> ${date} ${time} <br/>`,
+                            `&emsp;&emsp;<b>Created at: </b> ${date} ${time} <br/>`,
                         )
                     }
                 }
