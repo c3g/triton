@@ -118,11 +118,13 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                 }
                 body.push("<br/>")
             }
-            body.push(`
-                <br/>Thank you.<br/>
-
-                This is an automated email, do not reply back.<br/>
-            `)
+            body.push(
+                "<br/>",
+                "Thank you.",
+                "<br/>",
+                "This is an automated email, do not reply back.",
+            )
+            body.push("<br/>")
 
             // sendTestEmail(body.join("\n"))
             await sendValidationEmail(formattedData, body.join("\n"))
