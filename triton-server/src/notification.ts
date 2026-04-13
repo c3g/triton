@@ -79,24 +79,30 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             }
 
             const body: string[] = []
-            body.push("<b>A run has been validated:</b> <br/>")
+            body.push("<b>A run has been validated:</b>")
+            body.push("<br/>")
             for (const dataset of formattedData) {
-                body.push("<br/><br/>")
+                body.push("<br/>")
                 body.push(
-                    `- <b>Run Name:</b> ${dataset.projectAndRunInfo.run_name} <br/>`,
+                    `<b>Run Name:</b> ${dataset.projectAndRunInfo.run_name}`,
                 )
+                body.push("<br/>")
                 body.push(
-                    `- <b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by} <br/>`,
+                    `<b>Validated by:</b> ${dataset.projectAndRunInfo.validated_by}`,
                 )
+                body.push("<br/>")
                 body.push(
-                    `- <b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""} <br/>`,
+                    `<b>Project:</b> ${dataset.projectAndRunInfo.project_name}  ${dataset.projectAndRunInfo.project_id ?? ""}`,
                 )
+                body.push("<br/>")
                 body.push(
-                    `- <b>Dataset/lane ${dataset.projectAndRunInfo.lane_number} status</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)} <br/>`,
+                    `<b>Lane ${dataset.projectAndRunInfo.lane_number} status:</b> ${getValidationFlagLabel(dataset.projectAndRunInfo.validation_status)}`,
                 )
+                body.push("<br/>")
                 if (dataset.basicCommentUserInfos.length > 0) {
-                    body.push(`- <b>Comments: </b> <br/>`)
+                    body.push(`<b>Comments:</b>`)
                     for (const commentInfo of dataset.basicCommentUserInfos) {
+                        body.push("<br/>")
                         body.push(`&emsp;- ${commentInfo.comment} <br/>`)
                         body.push(
                             `&emsp;&emsp;<b>Comments left by: </b> ${commentInfo.name} <br/>`,
@@ -106,8 +112,9 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                             .split("T")[1]
                             .split(".")[0]
                         body.push(
-                            `&emsp;&emsp;<b>Created at: </b> ${date} ${time} <br/>`,
+                            `&emsp;&emsp;<b>Created at: </b> ${date} ${time}`,
                         )
+                        body.push("<br/>")
                     }
                 }
             }
