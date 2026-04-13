@@ -105,7 +105,7 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
                         body.push("<br/>")
                         body.push(`&emsp;- ${commentInfo.comment} <br/>`)
                         body.push(
-                            `&emsp;&emsp;<b>Comments left by: </b> ${commentInfo.name} <br/>`,
+                            `&emsp;&emsp;<b>Left by: </b> ${commentInfo.name} <br/>`,
                         )
                         const date = commentInfo.created_at.split("T")[0]
                         const time = commentInfo.created_at
