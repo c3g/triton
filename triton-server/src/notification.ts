@@ -65,14 +65,12 @@ export const sendDatasetValidationStatusUpdateEmail = async () => {
             const userIDs = Object.keys(basicCommentUserInfoByUserId).map(
                 (id) => parseInt(id),
             )
-            if (userIDs) {
-                const users = await freezemanApi.Users.getUsersByIds(userIDs)
-                for (const freezemanUser of users.data.results) {
-                    const commentInfos =
-                        basicCommentUserInfoByUserId[freezemanUser.id]
-                    for (const commentInfo of commentInfos) {
-                        commentInfo.name = `${freezemanUser.first_name} ${freezemanUser.last_name}`
-                    }
+            const users = await freezemanApi.Users.getUsersByIds(userIDs)
+            for (const freezemanUser of users.data.results) {
+                const commentInfos =
+                    basicCommentUserInfoByUserId[freezemanUser.id]
+                for (const commentInfo of commentInfos) {
+                    commentInfo.name = `${freezemanUser.first_name} ${freezemanUser.last_name}`
                 }
             }
 
